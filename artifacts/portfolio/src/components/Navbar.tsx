@@ -1,16 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { Github, Linkedin, Mail, Terminal } from "lucide-react";
+import { Github, Linkedin, Terminal } from "lucide-react";
 import { personalInfo } from "@/data/projects";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
 export function Navbar() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const isHome = location === "/";
   const [scrolled, setScrolled] = useState(false);
 
@@ -23,16 +18,21 @@ export function Navbar() {
   }, []);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, target: string) => {
+    e.preventDefault();
     if (isHome) {
-      e.preventDefault();
       const el = document.getElementById(target);
       if (el) {
         el.scrollIntoView({ behavior: "smooth" });
       }
+    } else {
+      navigate("/");
+      setTimeout(() => {
+        const el = document.getElementById(target);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
     }
-    // If not home, the standard wouter Link will navigate to /#target, 
-    // which works natively on next render if standard anchor logic kicks in, 
-    // but React needs a bit of help. We'll let Wouter handle the route change.
   };
 
   return (
@@ -45,8 +45,8 @@ export function Navbar() {
       )}
     >
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="flex items-center gap-2 group"
         >
           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-colors">
@@ -58,42 +58,42 @@ export function Navbar() {
         </Link>
 
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-          <Link 
-            href="/#projects" 
+          <a
+            href="/#projects"
             onClick={(e) => handleNavClick(e, "projects")}
-            className="hover:text-foreground transition-colors"
+            className="hover:text-foreground transition-colors cursor-pointer"
           >
             Projects
-          </Link>
-          <Link 
-            href="/#about" 
+          </a>
+          <a
+            href="/#about"
             onClick={(e) => handleNavClick(e, "about")}
-            className="hover:text-foreground transition-colors"
+            className="hover:text-foreground transition-colors cursor-pointer"
           >
             About
-          </Link>
-          <Link 
-            href="/#contact" 
+          </a>
+          <a
+            href="/#contact"
             onClick={(e) => handleNavClick(e, "contact")}
-            className="hover:text-foreground transition-colors"
+            className="hover:text-foreground transition-colors cursor-pointer"
           >
             Contact
-          </Link>
+          </a>
         </div>
 
         <div className="flex items-center gap-4">
-          <a 
-            href={personalInfo.links.github} 
-            target="_blank" 
+          <a
+            href={personalInfo.links.github}
+            target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-secondary rounded-full"
             aria-label="GitHub"
           >
             <Github className="w-5 h-5" />
           </a>
-          <a 
-            href={personalInfo.links.linkedin} 
-            target="_blank" 
+          <a
+            href={personalInfo.links.linkedin}
+            target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-primary transition-colors p-2 hover:bg-primary/10 rounded-full"
             aria-label="LinkedIn"

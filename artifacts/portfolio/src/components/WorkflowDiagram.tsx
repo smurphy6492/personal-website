@@ -1,11 +1,6 @@
 import { motion } from "framer-motion";
-import { ArrowDown, Cpu, Database, Network, User, BarChart, FileText, CheckCircle, Wrench, RefreshCw, Github } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { ArrowDown, Cpu, Database, Network, User, BarChart, FileText, CheckCircle, Wrench, Github } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface WorkflowDiagramProps {
   steps: string[];

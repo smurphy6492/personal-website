@@ -4,13 +4,8 @@ import { Footer } from "@/components/Footer";
 import { WorkflowDiagram } from "@/components/WorkflowDiagram";
 import { projects } from "@/data/projects";
 import { ArrowLeft, Github, ExternalLink, Clock, CheckCircle2 } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/utils";
 import { useEffect } from "react";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 export function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
