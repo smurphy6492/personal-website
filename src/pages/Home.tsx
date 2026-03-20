@@ -2,7 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ProjectCard } from "@/components/ProjectCard";
 import { projects, personalInfo } from "@/data/projects";
-import { ArrowDown, Mail, Github, Linkedin, TerminalSquare } from "lucide-react";
+import { ArrowDown, Mail, Github, Linkedin, TerminalSquare, GitBranch, Bot, Cpu } from "lucide-react";
 
 export function Home() {
   const scrollToProjects = (e: React.MouseEvent) => {
@@ -91,6 +91,62 @@ export function Home() {
             <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
               {personalInfo.about.map((paragraph, idx) => (
                 <p key={idx}>{paragraph}</p>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* HOW I BUILT THIS SECTION */}
+        <section id="how-built" className="w-full max-w-6xl mx-auto px-6 py-24 z-10 relative">
+          <div className="mb-12">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
+              How I Built This
+            </h2>
+            <div className="w-20 h-1.5 bg-accent rounded-full" />
+            <p className="text-muted-foreground mt-6 max-w-2xl text-lg">
+              This site was built by an AI agent — not with AI assistance, but <em>by</em> an AI agent. Here's how.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-card border border-border rounded-2xl p-6">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
+                <Bot className="w-5 h-5 text-primary" />
+              </div>
+              <h3 className="font-display font-semibold text-lg text-foreground mb-2">Agentic Development</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Claude Code reads the codebase, plans changes, writes the implementation, and commits to GitHub. I provide direction and review. The agent handles the execution.
+              </p>
+            </div>
+            <div className="bg-card border border-border rounded-2xl p-6">
+              <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-4">
+                <Cpu className="w-5 h-5 text-accent" />
+              </div>
+              <h3 className="font-display font-semibold text-lg text-foreground mb-2">Specialized Agents</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Different agents handle different work: <code className="text-xs bg-secondary px-1 py-0.5 rounded">web-developer</code> for UI, <code className="text-xs bg-secondary px-1 py-0.5 rounded">content-writer</code> for copy, <code className="text-xs bg-secondary px-1 py-0.5 rounded">planner</code> for architecture. Each agent specializes.
+              </p>
+            </div>
+            <div className="bg-card border border-border rounded-2xl p-6">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
+                <GitBranch className="w-5 h-5 text-emerald-500" />
+              </div>
+              <h3 className="font-display font-semibold text-lg text-foreground mb-2">Visible Proof</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                The GitHub commit history is the record. Every feature, every content update, every deployment — all routed through an agentic workflow. The work is auditable.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-card/50 border border-border rounded-2xl p-6 md:p-8">
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              Most portfolios claim AI skills and then show a static list of technologies. This site is the proof. If you're evaluating whether I can build with AI agents — you're looking at the output right now.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {["React", "Vite", "Tailwind", "shadcn/ui", "Claude Code", "GitHub", "Netlify"].map((tech) => (
+                <span key={tech} className="px-2.5 py-1 rounded-md bg-secondary text-secondary-foreground text-xs font-mono font-medium border border-border/50">
+                  {tech}
+                </span>
               ))}
             </div>
           </div>
