@@ -16,7 +16,7 @@ export function GitHubStats() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch("/github-stats.json")
+    fetch("https://raw.githubusercontent.com/smurphy6492/personal-website/master/public/github-stats.json")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch stats");
         return res.json();
