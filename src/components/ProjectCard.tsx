@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { ArrowRight, Clock, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Clock, CheckCircle2, Radio } from "lucide-react";
 import type { Project } from "@/data/projects";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +8,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
+  const isLive = project.status === "Live";
   const isInProgress = project.status === "In Progress";
 
   return (
@@ -22,11 +23,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </h3>
           <span className={cn(
             "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap border shrink-0",
-            isInProgress 
+            isLive
+              ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+              : isInProgress
               ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
               : "bg-blue-500/10 text-blue-400 border-blue-500/20"
           )}>
-            {isInProgress ? <Clock className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+            {isLive ? <Radio className="w-3.5 h-3.5" /> : isInProgress ? <Clock className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
             {project.status}
           </span>
         </div>
@@ -52,13 +55,25 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </div>
       </div>
 
-      <Link 
-        href={`/projects/${project.id}`}
-        className="inline-flex items-center gap-2 font-semibold text-sm text-foreground group-hover:text-primary transition-colors mt-auto w-fit"
-      >
-        View Project Details
-        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-      </Link>
+      <div className="flex items-center gap-4 mt-auto">
+        <Link
+          href={`/projects/${project.id}`}
+          className="inline-flex items-center gap-2 font-semibold text-sm text-foreground group-hover:text-primary transition-colors w-fit"
+        >
+          View Details
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+        </Link>
+        {project.githubUrl && (
+          <a
+            href={project.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            GitHub →
+          </a>
+        )}
+      </div>
     </div>
   );
 }

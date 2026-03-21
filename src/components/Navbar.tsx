@@ -73,6 +73,13 @@ export function Navbar() {
             About
           </a>
           <a
+            href="/#how-built"
+            onClick={(e) => handleNavClick(e, "how-built")}
+            className="hover:text-foreground transition-colors cursor-pointer"
+          >
+            How I Built This
+          </a>
+          <a
             href="/#contact"
             onClick={(e) => handleNavClick(e, "contact")}
             className="hover:text-foreground transition-colors cursor-pointer"

@@ -5,10 +5,21 @@ export interface Project {
   problem: string;
   workflow: string[];
   stack: string[];
-  status: "In Progress" | "Planned";
+  status: "Live" | "In Progress" | "Planned";
+  githubUrl?: string;
 }
 
 export const projects: Project[] = [
+  {
+    id: "personal-website",
+    name: "This Portfolio Site",
+    tagline: "A portfolio site built entirely through agentic development with Claude Code.",
+    problem: "Most AI portfolios describe skills without demonstrating them. This site is different — it was planned, built, and documented by AI agents working through Claude Code. The commit history is the proof. Every component, every case study, and every line of copy went through an agentic workflow, making the site itself a live demonstration of the development approach it describes.",
+    workflow: ["Session Plan", "Planner Agent", "Web Developer Agent", "Content Writer Agent", "Git Commit", "Netlify Deploy"],
+    stack: ["React", "Vite", "Tailwind", "shadcn/ui", "Claude Code", "Netlify"],
+    status: "Live",
+    githubUrl: "https://github.com/smurphy6492/personal-website"
+  },
   {
     id: "autonomous-analytics-agent",
     name: "Autonomous Analytics Agent",
@@ -59,16 +70,16 @@ export const projects: Project[] = [
 export const personalInfo = {
   name: "Sean Murphy",
   title: "Analytics + AI Systems Builder",
-  headline: "Building autonomous analytics systems with AI agents.",
-  subtext: "Former Director of Analytics. Now building AI-augmented data systems.",
+  headline: "I build AI agents that do the work of analytics teams.",
+  subtext: "Former Director of Analytics. Now designing multi-agent systems that automate the repetitive mechanics of data work — from query generation to pipeline monitoring to executive reporting.",
   about: [
-    "I am an Analytics Leader turned AI Systems Builder. Throughout my career as a Director of Analytics, I've seen firsthand how much time highly skilled data professionals spend on repetitive tasks: writing routine SQL, debugging pipeline failures, and churning out weekly executive summaries.",
-    "Now, I'm combining my deep background in data engineering, BI, and strategy with modern AI agent frameworks (LangGraph, CrewAI).",
-    "My focus is building autonomous, multi-agent systems that don't just act as 'copilots' — they operate as an entire virtual data team. The goal is to scale the impact of a single analytics professional 10x by automating the mechanics of data work, freeing human minds to focus entirely on strategy."
+    "I spent years directing analytics teams, and the pattern was always the same: talented people burning hours on tasks a machine should handle. Writing routine SQL. Debugging pipeline failures at 2am. Manually formatting the same executive summary every Monday. The strategic work got whatever time was left over.",
+    "Now I build systems that change that ratio. Using LangGraph, CrewAI, and Claude, I design multi-agent architectures where specialized AI agents collaborate on analytics workflows — one generates the SQL, another builds the visualization, a third writes the narrative. The agents handle the mechanics. The human handles the thinking.",
+    "My goal isn't to replace data professionals. It's to multiply them. A single analytics engineer paired with the right agent infrastructure should be able to operate at the scale of a full team. That's what I'm building toward — and proving out — with every project on this site."
   ],
   links: {
     linkedin: "https://www.linkedin.com/in/seanmurphy2014/",
-    github: "https://github.com/smurphy6492/personal-website",
+    github: "https://github.com/smurphy6492",
     email: "smurphy1357@gmail.com"
   }
 };
