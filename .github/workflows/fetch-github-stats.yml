@@ -34,5 +34,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add public/github-stats.json
-          git diff --cached --quiet || git commit -m "data: update github stats [skip ci]"
+          git diff --cached --quiet || git commit -m "data: update github stats"
           git push
