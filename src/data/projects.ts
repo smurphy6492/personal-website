@@ -29,42 +29,6 @@ export const projects: Project[] = [
     stack: ["Python", "DuckDB", "LangGraph", "OpenAI", "Claude", "Streamlit"],
     status: "In Progress"
   },
-  {
-    id: "customer-insights-engine",
-    name: "AI Customer Insights Engine",
-    tagline: "Turn raw transaction data into customer segments, CLV predictions, and marketing strategy.",
-    problem: "Ecommerce teams have rich data but lack the time and tooling to systematically turn it into actionable customer insights. This pipeline does it automatically.",
-    workflow: ["Raw Orders Data", "Feature Engineering Agent", "Segmentation Agent", "CLV Prediction Agent", "Strategy Recommendation Agent", "Marketing Playbook"],
-    stack: ["Python", "Postgres", "CrewAI", "scikit-learn", "Pandas"],
-    status: "In Progress"
-  },
-  {
-    id: "bi-migration-agent",
-    name: "Automated BI Migration Agent",
-    tagline: "From Tableau workbooks to dbt models — automatically.",
-    problem: "BI platform migrations are expensive and time-consuming. This agent parses Tableau workbooks, extracts the embedded SQL, and converts it to well-documented dbt models with lineage graphs.",
-    workflow: ["Tableau Workbook Input", "Parser Agent", "SQL Extraction Agent", "dbt Model Generator", "Documentation Agent", "Lineage Graph Output"],
-    stack: ["Python", "dbt", "LangGraph", "Claude", "SQLGlot"],
-    status: "In Progress"
-  },
-  {
-    id: "self-healing-pipeline",
-    name: "Self-Healing Data Pipeline",
-    tagline: "When your pipeline breaks, the agent diagnoses it and opens the fix as a PR.",
-    problem: "Data engineers spend too much time responding to pipeline failures. This agent monitors Airflow jobs, reads failure logs, diagnoses root causes, writes fixes, and opens GitHub PRs automatically.",
-    workflow: ["Airflow Job Failure", "Log Reader Agent", "Diagnosis Agent", "Fix Writer Agent", "GitHub PR Agent", "Slack Notification"],
-    stack: ["Python", "Airflow", "LangGraph", "GitHub API", "OpenAI"],
-    status: "Planned"
-  },
-  {
-    id: "autonomous-data-team",
-    name: "Autonomous Data Team",
-    tagline: "What if one person could run a full analytics team — powered by AI?",
-    problem: "Small companies can't afford full analytics teams. This system simulates a complete team of AI analysts — data engineer, analytics engineer, BI analyst, and data scientist — collaborating to answer complex business questions.",
-    workflow: ["User Request", "Planner Agent", "Data Engineer Agent", "Analytics Engineer Agent", "Data Scientist Agent", "BI Dashboard Agent", "Executive Memo"],
-    stack: ["Python", "LangGraph", "DuckDB", "Postgres", "Streamlit", "Claude"],
-    status: "Planned"
-  }
 ];
 
 export const personalInfo = {
