@@ -1,20 +1,20 @@
 {
-  "updated_at": "2026-03-21T19:03:45.141671+00:00",
-  "public_repos": 1,
+  "updated_at": "2026-03-22T05:41:17.953338+00:00",
+  "public_repos": 2,
   "total_stars": 0,
-  "commits_this_year": 2,
+  "commits_this_year": 4,
   "top_languages": [
     {
-      "name": "TypeScript",
-      "percentage": 96
-    },
-    {
       "name": "Python",
-      "percentage": 2
+      "percentage": 48
     },
     {
-      "name": "CSS",
-      "percentage": 1
+      "name": "TypeScript",
+      "percentage": 48
+    },
+    {
+      "name": "Jinja",
+      "percentage": 3
     }
   ]
 }
