@@ -38,7 +38,7 @@ export const personalInfo = {
   subtext: "Analytics leader and multi-agent systems builder — designing the AI infrastructure that lets small teams operate at scale.",
   about: [
     "I spent years directing analytics teams, and the pattern was always the same: talented people burning hours on tasks a machine should handle. Writing routine SQL. Debugging pipeline failures at 2am. Manually formatting the same executive summary every Monday. The strategic work got whatever time was left over.",
-    "Now I build systems that change that ratio. Using the Claude API and Python, I design multi-agent architectures with custom orchestration — specialized agents collaborate on analytics workflows, from data profiling and SQL generation to visualization and executive summary writing. The agents handle the mechanics. The human handles the thinking.",
+    "Now I build systems that change that ratio. Using the Claude API and Python, I design multi-agent architectures with custom orchestration — specialized agents collaborate on analytics workflows, from data profiling and SQL generation to visualization and executive summary writing.",
     "My goal isn't to replace data professionals. It's to multiply them. A single analytics engineer paired with the right agent infrastructure should be able to operate at the scale of a full team. That's what I'm building toward — and proving out — with every project on this site."
   ],
   links: {
