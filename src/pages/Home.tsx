@@ -2,6 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ProjectCard } from "@/components/ProjectCard";
 import { GitHubStats } from "@/components/GitHubStats";
+import { AgentDemo } from "@/components/AgentDemo";
 import { projects, personalInfo } from "@/data/projects";
 import { ArrowDown, Mail, Github, Linkedin, TerminalSquare, GitBranch, Bot, Cpu } from "lucide-react";
 
@@ -26,34 +27,42 @@ export function Home() {
 
       <main className="flex-1 w-full pt-32">
         {/* HERO SECTION */}
-        <section className="relative w-full max-w-6xl mx-auto px-6 py-24 md:py-32 flex flex-col items-center text-center z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border border-border text-sm font-medium text-muted-foreground mb-8">
-            <TerminalSquare className="w-4 h-4 text-primary" />
-            <span>{personalInfo.title}</span>
+        <section className="relative w-full max-w-6xl mx-auto px-6 py-16 md:py-24 flex flex-col md:flex-row items-center gap-12 lg:gap-20 z-10">
+          {/* Left: text content */}
+          <div className="flex-1 flex flex-col items-start text-left">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border border-border text-sm font-medium text-muted-foreground mb-8">
+              <TerminalSquare className="w-4 h-4 text-primary" />
+              <span>{personalInfo.title}</span>
+            </div>
+
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-foreground leading-[1.1] mb-6">
+              {personalInfo.headline}
+            </h1>
+
+            <p className="text-lg md:text-xl text-muted-foreground max-w-md mb-10 leading-relaxed">
+              {personalInfo.subtext}
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <button
+                onClick={scrollToProjects}
+                className="px-8 py-4 rounded-xl font-semibold bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
+              >
+                View Projects
+                <ArrowDown className="w-4 h-4" />
+              </button>
+              <button
+                onClick={scrollToContact}
+                className="px-8 py-4 rounded-xl font-semibold bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 hover:-translate-y-0.5 transition-all duration-300"
+              >
+                Get in Touch
+              </button>
+            </div>
           </div>
-          
-          <h1 className="text-5xl md:text-7xl font-display font-extrabold tracking-tight text-foreground max-w-4xl leading-[1.1] mb-6">
-            {personalInfo.headline}
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mb-12 leading-relaxed">
-            {personalInfo.subtext}
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
-            <button 
-              onClick={scrollToProjects}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl font-semibold bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2"
-            >
-              View Projects
-              <ArrowDown className="w-4 h-4" />
-            </button>
-            <button 
-              onClick={scrollToContact}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl font-semibold bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2"
-            >
-              Get in Touch
-            </button>
+
+          {/* Right: live agent demo */}
+          <div className="flex-1 w-full flex items-center justify-center">
+            <AgentDemo />
           </div>
         </section>
 
