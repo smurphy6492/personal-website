@@ -101,12 +101,25 @@ export function ProjectDetail() {
             <WorkflowDiagram steps={project.workflow} />
           </section>
 
+          {/* Case Study Sections */}
+          {project.caseStudy && project.caseStudy.length > 0 && (
+            <section className="mb-20 space-y-8">
+              <h2 className="text-3xl font-display font-bold text-foreground">How I Built This</h2>
+              {project.caseStudy.map((section) => (
+                <div key={section.heading} className="bg-card border border-border rounded-2xl p-8 md:p-10 shadow-lg shadow-black/20">
+                  <h3 className="text-xl font-display font-bold text-foreground mb-3">{section.heading}</h3>
+                  <p className="text-lg text-muted-foreground leading-relaxed">{section.body}</p>
+                </div>
+              ))}
+            </section>
+          )}
+
           {/* CTA / Repo Link */}
           <section className="text-center py-12 border-t border-border mt-12">
             <h3 className="text-2xl font-display font-bold text-foreground mb-6">Explore the Code</h3>
-            <a 
-              href="https://github.com/smurphy6492/personal-website" 
-              target="_blank" 
+            <a
+              href={project.githubUrl ?? "https://github.com/smurphy6492"}
+              target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-semibold bg-foreground text-background hover:scale-105 transition-transform duration-300 shadow-xl shadow-white/5"
             >
@@ -114,9 +127,6 @@ export function ProjectDetail() {
               View on GitHub
               <ExternalLink className="w-4 h-4 ml-1 opacity-70" />
             </a>
-            <p className="text-sm text-muted-foreground mt-4">
-              Note: Links to personal GitHub while code is being organized.
-            </p>
           </section>
 
         </div>
