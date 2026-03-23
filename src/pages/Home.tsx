@@ -185,7 +185,7 @@ export function Home() {
           </div>
         </section>
 
-        <GitHubStats />
+        {/* <GitHubStats /> */}
 
         {/* CONTACT SECTION */}
         <section id="contact" className="w-full max-w-4xl mx-auto px-6 py-24 text-center z-10 relative">
