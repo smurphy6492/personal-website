@@ -25,9 +25,9 @@ export function Home() {
 
       <Navbar />
 
-      <main className="flex-1 w-full pt-32">
+      <main className="flex-1 w-full pt-20">
         {/* HERO SECTION */}
-        <section className="relative w-full max-w-6xl mx-auto px-6 py-16 md:py-24 flex flex-col md:flex-row items-center gap-12 lg:gap-20 z-10">
+        <section className="relative w-full max-w-6xl mx-auto px-6 py-10 md:py-16 flex flex-col md:flex-row items-start gap-12 lg:gap-20 z-10">
           {/* Left: text content */}
           <div className="flex-1 flex flex-col items-start text-left">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border border-border text-sm font-medium text-muted-foreground mb-8">
