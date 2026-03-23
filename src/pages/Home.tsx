@@ -90,38 +90,6 @@ export function Home() {
           </div>
         </section>
 
-        {/* WHAT'S NEXT SECTION */}
-        <section className="w-full max-w-6xl mx-auto px-6 pb-24 z-10 relative">
-          <div className="bg-card/50 border border-border rounded-2xl p-8 md:p-10">
-            <h3 className="text-xl font-display font-semibold text-foreground mb-1">What's Next</h3>
-            <p className="text-muted-foreground text-sm mb-8">Projects in the pipeline after the Analytics Agent ships.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                {
-                  name: "AI Customer Insights Engine",
-                  description: "Turn raw transaction data into customer segments, CLV predictions, and marketing strategy — automatically."
-                },
-                {
-                  name: "Automated BI Migration Agent",
-                  description: "Parse Tableau workbooks, extract embedded SQL, and convert to documented dbt models with lineage graphs."
-                },
-                {
-                  name: "Self-Healing Data Pipeline",
-                  description: "Monitor pipeline failures, diagnose root causes, write fixes, and open GitHub PRs — without human intervention."
-                }
-              ].map((item) => (
-                <div key={item.name} className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
-                    <span className="text-sm font-medium text-foreground">{item.name}</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed pl-3.5">{item.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* ABOUT SECTION */}
         <section id="about" className="w-full bg-card/50 border-y border-border py-24 z-10 relative">
           <div className="max-w-4xl mx-auto px-6">
