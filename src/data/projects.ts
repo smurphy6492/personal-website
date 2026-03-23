@@ -34,8 +34,8 @@ export const projects: Project[] = [
 export const personalInfo = {
   name: "Sean Murphy",
   title: "Analytics + AI Systems Builder",
-  headline: "I build AI agents that do the work of analytics teams.",
-  subtext: "Former Director of Analytics. Now designing multi-agent systems that automate the repetitive mechanics of data work — from query generation to pipeline monitoring to executive reporting.",
+  headline: "I lead analytics teams and build the AI systems that scale them.",
+  subtext: "Analytics leader and multi-agent systems builder — designing the AI infrastructure that lets small teams operate at scale.",
   about: [
     "I spent years directing analytics teams, and the pattern was always the same: talented people burning hours on tasks a machine should handle. Writing routine SQL. Debugging pipeline failures at 2am. Manually formatting the same executive summary every Monday. The strategic work got whatever time was left over.",
     "Now I build systems that change that ratio. Using LangGraph, CrewAI, and Claude, I design multi-agent architectures where specialized AI agents collaborate on analytics workflows — one generates the SQL, another builds the visualization, a third writes the narrative. The agents handle the mechanics. The human handles the thinking.",
