@@ -94,14 +94,22 @@ export function Home() {
         <section id="about" className="w-full bg-card/50 border-y border-border py-24 z-10 relative">
           <div className="max-w-4xl mx-auto px-6">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4 text-center">
-              About Me
+              Why I Build This Way
             </h2>
             <div className="w-20 h-1.5 bg-accent rounded-full mx-auto mb-12" />
-            
-            <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
-              {personalInfo.about.map((paragraph, idx) => (
-                <p key={idx}>{paragraph}</p>
-              ))}
+
+            <div className="space-y-8 text-lg text-muted-foreground leading-relaxed">
+              <p>{personalInfo.about[0]}</p>
+
+              {/* Pull quote */}
+              <blockquote className="border-l-4 border-primary pl-6 my-8">
+                <p className="text-xl md:text-2xl font-display font-semibold text-foreground leading-snug">
+                  "The agents handle the mechanics.<br />The human handles the thinking."
+                </p>
+              </blockquote>
+
+              <p>{personalInfo.about[1]}</p>
+              <p>{personalInfo.about[2]}</p>
             </div>
           </div>
         </section>
