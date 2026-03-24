@@ -175,12 +175,12 @@ export function Home() {
         {/* CONTACT SECTION */}
         <section id="contact" className="w-full max-w-4xl mx-auto px-6 py-24 text-center z-10 relative">
           <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
-            Let's Build Together
+            Get in Touch
           </h2>
           <div className="w-20 h-1.5 bg-primary rounded-full mx-auto mb-12" />
-          
+
           <p className="text-xl text-muted-foreground mb-12">
-            Currently exploring new opportunities in data architecture, AI system building, and analytics leadership.
+            Looking to lead data teams where AI agents aren't a buzzword — they're how the work gets done.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
