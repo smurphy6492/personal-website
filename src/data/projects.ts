@@ -100,7 +100,7 @@ export const projects: Project[] = [
     id: "tableau-migration-toolkit",
     name: "Tableau Migration Toolkit",
     tagline: "98 dashboards migrated from Redshift to Databricks — then the process got packaged into portable AI tooling.",
-    problem: "BI migrations are one of the most tedious jobs in analytics. You're not doing anything intellectually hard — you're copying Custom SQL out of Tableau, updating table names, translating dialect-specific functions, validating row counts, and reconnecting data sources. Multiply that by 98 dashboards and you've got weeks of repetitive work where the real risk isn't complexity, it's human error on dashboard number 73. I did the migration manually, dashboard by dashboard, assisted by Claude Code. Then I extracted the repeatable methodology and packaged it as a skill and agent that any team can drop into their workspace.",
+    problem: "BI migrations are one of the most tedious jobs in analytics. You're not doing anything intellectually hard — you're copying Custom SQL out of Tableau, updating table names, translating dialect-specific functions, validating row counts, and reconnecting data sources. Multiply that by 98 dashboards and you've got weeks of repetitive work where the real risk isn't complexity, it's human error on dashboard number 73. I did these migrations in a real business environment — production Tableau workbooks, live Redshift and Databricks clusters, actual stakeholders waiting on dashboards — with Claude Code as my copilot throughout. Then I extracted the repeatable methodology and packaged it as a skill and agent that any team can drop into their workspace.",
     workflow: [
       "Migration Notes PDF → methodology extraction",
       "98 SQL files → pattern analysis",
