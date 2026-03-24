@@ -156,7 +156,7 @@ export const projects: Project[] = [
           { type: "workflow" },
           { type: "bullets", items: [
             "Before: Claude generated 7 testable hypotheses from the data dictionary — these structured the entire investigation",
-            "During: Pure SQL/Python analysis against 9 FRED time series. No AI in the analytical loop.",
+            "During: I directed the SQL/Python analysis against 9 FRED time series. Claude Code wrote the code — I decided what to ask and how to interpret it.",
             "After: Claude wrote the executive summary and chart captions from actual metrics. I reviewed every cited number against the data."
           ]},
           { type: "callout", value: "Six of seven AI-generated hypotheses were confirmed by the data. The surprise: Electronics, not Books, turned out to be the most disrupted category." }
