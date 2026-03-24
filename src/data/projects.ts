@@ -1,37 +1,54 @@
-export interface CaseStudySection {
+export interface StatItem {
+  value: string;
+  label: string;
+  detail?: string;
+}
+
+export type ContentBlock =
+  | { type: "text"; value: string }
+  | { type: "bullets"; items: string[] }
+  | { type: "stats"; items: StatItem[] }
+  | { type: "image"; src: string; alt: string; caption?: string }
+  | { type: "code"; language: string; value: string; caption?: string }
+  | { type: "callout"; value: string }
+  | { type: "table"; headers: string[]; rows: string[][] }
+  | { type: "embed"; src: string; title: string; height?: number }
+  | { type: "workflow" };
+
+export interface ProjectSection {
   heading: string;
-  body: string;
+  content: ContentBlock[];
 }
 
 export interface Project {
   id: string;
   name: string;
   tagline: string;
-  problem: string;
+  problem: ContentBlock[];
   workflow: string[];
   stack: string[];
-  status: "Live" | "In Progress" | "Planned";
+  status: "Live" | "In Progress" | "Planned" | "Complete";
   githubUrl?: string;
   liveUrl?: string;
-  caseStudy?: CaseStudySection[];
+  metrics?: StatItem[];
+  sections: ProjectSection[];
 }
 
 export const projects: Project[] = [
   {
-    id: "personal-website",
-    name: "This Portfolio Site",
-    tagline: "A portfolio site built entirely through agentic development with Claude Code.",
-    problem: "Most AI portfolios describe skills without demonstrating them. This site is different — it was planned, built, and documented by AI agents working through Claude Code. The commit history is the proof. Every component, every case study, and every line of copy went through an agentic workflow, making the site itself a live demonstration of the development approach it describes.",
-    workflow: ["Session Plan", "Planner Agent", "Web Developer Agent", "Content Writer Agent", "Git Commit", "Netlify Deploy"],
-    stack: ["React", "Vite", "Tailwind", "shadcn/ui", "Claude Code", "Netlify"],
-    status: "Live",
-    githubUrl: "https://github.com/smurphy6492/personal-website"
-  },
-  {
     id: "autonomous-analytics-agent",
     name: "Autonomous Analytics Agent",
     tagline: "Ask a business question. Get SQL, charts, and an executive summary — automatically.",
-    problem: "Every analytics team knows the pattern: a stakeholder asks a question, an analyst writes SQL, builds a chart, drafts the summary, and two hours later delivers something that prompts three follow-up questions. It's not that the work is hard — it's that the work is repetitive, and the cycle time kills momentum. I wanted to build a system where a question goes in and a self-contained report comes out, with no human in the loop unless something breaks.",
+    problem: [
+      { type: "text", value: "Every analytics team knows this cycle: a stakeholder asks a question, an analyst writes SQL, builds a chart, drafts a summary, and two hours later delivers something that prompts three follow-up questions." },
+      { type: "bullets", items: [
+        "Stakeholder asks a business question",
+        "Analyst writes SQL, builds chart, drafts summary",
+        "Two hours later: answer prompts follow-up questions",
+        "Cycle repeats — the work isn't hard, it's repetitive"
+      ]},
+      { type: "callout", value: "I wanted to build a system where a question goes in and a complete report comes out, with no human in the loop unless something breaks." }
+    ],
     workflow: [
       "Data Profiler → DuckDB schema + stats",
       "Orchestrator → SQL query plan",
@@ -43,22 +60,44 @@ export const projects: Project[] = [
     stack: ["Python", "Claude API", "DuckDB", "Plotly", "Pydantic", "Jinja2", "Typer"],
     status: "Live",
     githubUrl: "https://github.com/smurphy6492/autonomous-analytics-agent",
-    caseStudy: [
+    metrics: [
+      { value: "6", label: "Specialized Agents" },
+      { value: "3x", label: "Self-Correcting Retries" },
+      { value: "0", label: "Human Steps Required" },
+      { value: "~60s", label: "Question to Report" }
+    ],
+    sections: [
       {
-        heading: "What I Built",
-        body: "A multi-agent pipeline that takes a natural language business question and produces a complete HTML report — SQL queries, rendered Plotly charts, and a written executive summary — with no manual intervention. Six specialized agents handle different stages of the workflow, from schema discovery to final report assembly. The output is a single self-contained HTML file you can email to a stakeholder or drop into Slack."
+        heading: "System Architecture",
+        content: [
+          { type: "text", value: "Six agents chain in sequence. Each one handles a specific stage, passes structured output to the next, and the pipeline self-corrects when queries fail." },
+          { type: "workflow" },
+          { type: "bullets", items: [
+            "Data Profiler connects to DuckDB and extracts schema metadata plus summary statistics",
+            "Orchestrator takes the user's question and schema context, then plans which queries are needed",
+            "SQL Analyst generates and executes SQL — if it fails, the DuckDB error feeds back to Claude for self-correction, up to 3 retries",
+            "Viz Agent renders Plotly charts deterministically with no API call",
+            "Report Builder assembles everything into a self-contained HTML file via Jinja2"
+          ]}
+        ]
       },
       {
-        heading: "The Architecture",
-        body: "The pipeline chains six agents in sequence. Data Profiler connects to DuckDB and extracts schema metadata plus summary statistics. Orchestrator takes the user's question and the schema context, then plans which queries are needed. SQL Analyst generates the SQL and executes it — if execution fails, it feeds the DuckDB error back to Claude for correction, retrying up to three times. Orchestrator runs again to synthesize results and specify chart types. Viz Agent renders Plotly charts deterministically with no API call. Report Builder assembles everything into a Jinja2 HTML template."
+        heading: "Sample Output",
+        content: [
+          { type: "text", value: "Each report is a self-contained HTML file with interactive Plotly charts and an executive summary that cites actual numbers from the query results. Here's a real report generated from the question: \"What are the revenue trends by product category?\"" },
+          { type: "embed", src: "/reports/analytics-agent-demo.html", title: "Auto-generated revenue analysis report", height: 600 }
+        ]
       },
       {
         heading: "Key Technical Decisions",
-        body: "DuckDB handles all data access — it's in-memory, requires zero setup, and reads CSVs natively, so there's no Postgres to spin up or connection strings to manage. All inter-agent communication uses JSON mode with Pydantic validation; Claude outputs structured JSON that Pydantic models validate before the next agent touches it, eliminating the hallucinated field names that silently break pipelines. The SQL retry loop is the self-correcting heart of the system: when a query fails, the actual DuckDB error message goes back to Claude with the original context, letting the model fix its own mistakes without hardcoded fallbacks."
-      },
-      {
-        heading: "What It Demonstrates",
-        body: "This project proves that autonomous task execution across multiple specialized agents is production-viable when you enforce structure at every boundary. Typed contracts between agents and self-correcting loops that consume real error messages — not just retry blindly — are what make agentic systems work with messy real-world data instead of just clean demos."
+        content: [
+          { type: "bullets", items: [
+            "DuckDB for all data access — in-memory, zero setup, reads CSVs natively. No Postgres to spin up or connection strings to manage.",
+            "Pydantic JSON contracts between agents — Claude outputs structured JSON that gets validated before the next agent touches it. Eliminates hallucinated field names that silently break pipelines.",
+            "Self-correcting SQL — when a query fails, the actual DuckDB error message goes back to Claude with original context. The model fixes its own mistakes without hardcoded fallbacks."
+          ]},
+          { type: "callout", value: "Typed contracts between agents and self-correcting loops that consume real error messages are what make agentic systems work with messy data — not just clean demos." }
+        ]
       }
     ]
   },
@@ -66,7 +105,10 @@ export const projects: Project[] = [
     id: "ecommerce-data-story",
     name: "E-Commerce Disruption Analysis",
     tagline: "25 years of US retail data reveal which categories e-commerce has gutted — and which it hasn't touched.",
-    problem: "Everyone knows e-commerce has transformed retail, but the disruption hasn't been uniform. Electronics stores have been hollowed out while grocery barely flinched. I wanted to quantify this — not with opinions, but with 25 years of official US Census Bureau data. The goal: a single, polished analytical artifact that answers \"which retail categories have been most disrupted by e-commerce?\" with specific numbers, not hand-waving.",
+    problem: [
+      { type: "text", value: "Everyone knows e-commerce transformed retail, but the disruption hasn't been uniform. Electronics stores have been hollowed out while grocery barely flinched." },
+      { type: "callout", value: "Which retail categories have been most disrupted by e-commerce? I wanted to answer that with 25 years of Census Bureau data, not opinions." }
+    ],
     workflow: [
       "Claude API → 7 testable hypotheses",
       "FRED data download → 9 time series (2000–2025)",
@@ -79,22 +121,46 @@ export const projects: Project[] = [
     status: "Live",
     githubUrl: "https://github.com/smurphy6492/ecommerce-data-story",
     liveUrl: "/reports/ecommerce-disruption.html",
-    caseStudy: [
+    metrics: [
+      { value: "20x", label: "E-Commerce Growth", detail: "0.8% → 16.4% of US retail" },
+      { value: "98.7", label: "Electronics Disruption Index", detail: "Most disrupted category" },
+      { value: "25 yrs", label: "Data Span", detail: "Quarterly FRED data, 2000–2025" },
+      { value: "6 of 7", label: "Hypotheses Confirmed" }
+    ],
+    sections: [
       {
         heading: "Key Findings",
-        body: "E-commerce grew from 0.8% of US retail in Q1 2000 to 16.4% by Q3 2025 — a 20x increase. Electronics scored 98.7 on the Disruption Index — essentially zero growth over 25 years while nonstore retailers grew 9.4% annually. Furniture (81.8) and Books/Hobby/Music (81.6) followed. Food & Beverage (62.8) and Gasoline (59.6) proved most resilient. COVID permanently accelerated e-commerce by 4.1 percentage points above the pre-COVID trend — it stuck. The biggest surprise: Clothing's 5-year CAGR of 7.2% versus its 25-year CAGR of 2.9% marks it as the next major disruption battleground."
+        content: [
+          { type: "table", headers: ["Category", "Disruption Index", "Signal"],
+            rows: [
+              ["Electronics", "98.7", "Essentially zero growth in 25 years"],
+              ["Furniture", "81.8", "Showrooming gutted physical retail"],
+              ["Books / Hobby / Music", "81.6", "Amazon's original beachhead"],
+              ["Clothing", "73.4", "5yr CAGR 7.2% — next battleground"],
+              ["Food & Beverage", "62.8", "Most resilient — physical stays"],
+              ["Gasoline", "59.6", "Immune to e-commerce disruption"]
+            ]
+          },
+          { type: "bullets", items: [
+            "COVID permanently accelerated e-commerce by 4.1 percentage points above the pre-COVID trend — it stuck",
+            "Clothing's 5-year CAGR of 7.2% vs. its 25-year CAGR of 2.9% marks it as the next major disruption battleground",
+            "Nonstore retailers grew 9.4% annually while Electronics barely moved"
+          ]},
+          { type: "embed", src: "/reports/ecommerce-disruption.html", title: "Full Interactive Report", height: 600 }
+        ]
       },
       {
-        heading: "AI Integration Design",
-        body: "Claude bookended the analysis — it didn't do it. Before any code was written, I prompted Claude with the data dictionary and business question to generate 7 testable hypotheses. These structured the entire investigation: instead of fishing for patterns, I was testing specific claims. After the analysis, I fed Claude the actual metrics and it wrote the executive summary and chart captions. I reviewed every cited number against the data. The AI helped me think before I started and communicate after I finished."
-      },
-      {
-        heading: "The Data",
-        body: "Nine FRED time series covering US retail categories from electronics to groceries to gasoline stations, spanning 25 years of quarterly and monthly data. All from public US Census Bureau sources — no authentication required. Five analyses: penetration timeline, category CAGR comparison, a custom Disruption Index, COVID acceleration measurement, and category deep dives with event annotations."
-      },
-      {
-        heading: "What It Demonstrates",
-        body: "This project complements the Autonomous Analytics Agent: that project shows the system, this one shows the output. It demonstrates business question framing, genuine SQL/Python analysis with real government data, a custom Disruption Index metric, and practical AI integration where Claude adds value at specific points rather than running the whole show. Six of seven AI-generated hypotheses were confirmed by the data — one was nuanced when Electronics, not Books, turned out to be the most disrupted category."
+        heading: "How It Was Built",
+        content: [
+          { type: "text", value: "Claude bookended the analysis — it didn't do it. The AI helped me think before I started and communicate after I finished." },
+          { type: "workflow" },
+          { type: "bullets", items: [
+            "Before: Claude generated 7 testable hypotheses from the data dictionary — these structured the entire investigation",
+            "During: Pure SQL/Python analysis against 9 FRED time series. No AI in the analytical loop.",
+            "After: Claude wrote the executive summary and chart captions from actual metrics. I reviewed every cited number against the data."
+          ]},
+          { type: "callout", value: "Six of seven AI-generated hypotheses were confirmed by the data. The surprise: Electronics, not Books, turned out to be the most disrupted category." }
+        ]
       }
     ]
   },
@@ -102,34 +168,95 @@ export const projects: Project[] = [
     id: "tableau-migration-toolkit",
     name: "Tableau Migration Toolkit",
     tagline: "98 dashboards migrated from Redshift to Databricks — then the process got packaged into portable AI tooling.",
-    problem: "BI migrations are one of the most tedious jobs in analytics. You're not doing anything intellectually hard — you're copying Custom SQL out of Tableau, updating table names, translating dialect-specific functions, validating row counts, and reconnecting data sources. Multiply that by 98 dashboards and you've got weeks of repetitive work where the real risk isn't complexity, it's human error on dashboard number 73. I did these migrations in a real business environment — production Tableau workbooks, live Redshift and Databricks clusters, actual stakeholders waiting on dashboards — with Claude Code as my copilot throughout. Then I extracted the repeatable methodology and packaged it as a skill and agent that any team can drop into their workspace.",
+    problem: [
+      { type: "text", value: "BI migrations are one of the most tedious jobs in analytics. Nothing intellectually hard — just repetitive work where the real risk is human error on dashboard #73. I did this migration in production: real Tableau workbooks, live clusters, stakeholders waiting on dashboards." },
+      { type: "bullets", items: [
+        "Extract Custom SQL from each Tableau workbook",
+        "Translate Redshift dialect → Spark SQL",
+        "Update table names to Unity Catalog",
+        "Materialize as gold tables in Databricks",
+        "Validate row counts against the source",
+        "Reconnect Tableau and set refresh schedules"
+      ]},
+      { type: "callout", value: "98 dashboards. Same 8-step process. Each one with its own edge cases — date spines, LOD expressions, Initial SQL temp tables, blended data sources." }
+    ],
     workflow: [
-      "Migration Notes PDF → methodology extraction",
-      "98 SQL files → pattern analysis",
-      "METHODOLOGY.md → portable 8-step process",
-      "Sanitize SQL → 5 public examples",
-      "Claude Code skill → 7-step guided workflow",
-      "Agent persona → planning + edge case advisor"
+      "Download Tableau workbook (.twb/.twbx)",
+      "Extract Custom SQL from data sources",
+      "Map table names → Unity Catalog",
+      "Translate Redshift dialect → Spark SQL",
+      "Materialize as gold table in Databricks",
+      "Validate row counts + revenue totals",
+      "Reconnect Tableau → new data source",
+      "Set refresh schedule"
     ],
     stack: ["Claude Code", "SQL", "Databricks", "Tableau", "Python", "Redshift"],
-    status: "Live",
+    status: "Complete",
     githubUrl: "https://github.com/smurphy6492/tableau-migration-toolkit",
-    caseStudy: [
-      {
-        heading: "The Real Work",
-        body: "At an e-commerce company, I migrated 98 Tableau dashboards from Redshift to Databricks. Every dashboard followed the same pattern: download the workbook, extract the Custom SQL, translate Redshift syntax to Spark SQL, update table names from the old schema to Unity Catalog, materialize as a gold table, validate row counts against the source, reconnect Tableau, and set up the refresh schedule. The work wasn't hard. It was just 98 repetitions of the same 8-step process, where each dashboard had its own edge cases — date spines, LOD expressions, Initial SQL temp tables, blended data sources."
-      },
-      {
-        heading: "What I Extracted",
-        body: "After the migration was done, the methodology was in my head and scattered across commit messages. Nothing was portable. So I went back and extracted the process into a structured METHODOLOGY.md — a platform-agnostic guide that any analyst could follow without knowing which company it came from. I sanitized 5 representative SQL files (from simple SELECTs to 300-line cohort analyses with window functions) to show the real patterns at each complexity level. All company-specific table names, column names, and business logic were replaced with a fictional demo schema."
-      },
+    metrics: [
+      { value: "98", label: "Dashboards Migrated" },
+      { value: "40+", label: "Dialect Translations", detail: "Redshift → Spark SQL" },
+      { value: "8", label: "Step Methodology" },
+      { value: "2", label: "Packaged Artifacts", detail: "Claude Code skill + agent" }
+    ],
+    sections: [
       {
         heading: "The Toolkit",
-        body: "The methodology became two Claude Code artifacts. A skill (/migrate-tableau-workbook) that walks an analyst through migrating a single workbook in 7 steps — inventory, extract SQL, map tables, adapt dialect, build the target table, validate, and reconnect Tableau. And an agent persona that can plan a full migration project: scope it, batch workbooks by complexity, estimate timelines, and advise on edge cases like RAWSQL calculated fields or Tableau parameters embedded in Custom SQL. Both reference the same set of documents: a dialect translation table covering 40+ function differences across Redshift, SQL Server, and Postgres, a validation query reference, and a naming convention guide."
+        content: [
+          { type: "text", value: "After the migration was done, I extracted the methodology into portable AI tooling that any team can use." },
+          { type: "bullets", items: [
+            "A Claude Code skill (/migrate-tableau-workbook) — walks an analyst through migrating a single workbook in 7 guided steps",
+            "An agent persona — plans full migration projects, batches workbooks by complexity, estimates timelines, advises on edge cases like RAWSQL fields or parameters embedded in Custom SQL",
+            "Reference docs — dialect translation table covering 40+ function differences across Redshift, SQL Server, and Postgres, plus validation queries and naming conventions"
+          ]},
+          { type: "workflow" }
+        ]
       },
       {
-        heading: "What It Demonstrates",
-        body: "This project is about the difference between doing work and packaging work. The 98-dashboard migration was a job. The toolkit is an asset — it turns one person's experience into something any team can use. It also shows a practical use case for Claude Code skills and agents beyond toy examples: a real workflow with real edge cases, built from real production migrations, not hypothetical scenarios. The sanitization pipeline (including a Python script that applies regex-based table name mapping and checks output against a blocklist of sensitive patterns) is itself a reusable tool."
+        heading: "SQL Migration Examples",
+        content: [
+          { type: "text", value: "Five sanitized examples show the real patterns at each complexity level. Here are the dialect notes from two of them:" },
+          { type: "code", language: "sql", value: `-- DIALECT NOTES (Redshift → Databricks Spark SQL)
+--
+-- Date arithmetic:
+--   Redshift:   DATEADD(MONTH, -49, GETDATE())
+--   Databricks: ADD_MONTHS(CURRENT_DATE(), -49)
+--
+-- Null coalescing:
+--   Redshift:   NVL(col, default)
+--   Databricks: COALESCE(col, default)
+--
+-- IMPORTANT: All column aliases are lowercase.
+-- Redshift returns lowercase regardless of alias case.
+-- Databricks preserves case. Tableau field references
+-- break if case changes — enforce lowercase explicitly.`, caption: "From simple_select.sql — basic dialect translation for a weekly KPI dashboard" },
+          { type: "code", language: "sql", value: `-- DIALECT NOTES (Redshift → Databricks Spark SQL)
+--
+-- Integer division:
+--   Redshift:   DIV(expr, n)  — function
+--   Databricks: expr DIV n    — infix operator
+--
+-- Sequence generation (replacing recursive CTE):
+--   Redshift:   Recursive CTE or GENERATE_SERIES
+--   Databricks: EXPLODE(SEQUENCE(0, 60))
+--   Generates integers 0-60 as quarter offsets.
+--
+-- Date diff (argument order flipped):
+--   Redshift:   DATEDIFF(day, start_date, end_date)
+--   Databricks: DATEDIFF(end_date, start_date)`, caption: "From window_functions.sql — customer cohort dashboard with running totals and period offsets" }
+        ]
+      },
+      {
+        heading: "From Job to Asset",
+        content: [
+          { type: "text", value: "After the migration, the methodology was in my head and scattered across commit messages. Nothing was portable. So I extracted it into a structured METHODOLOGY.md — a platform-agnostic guide any analyst could follow." },
+          { type: "bullets", items: [
+            "5 sanitized SQL files from simple SELECTs to 300-line cohort analyses with window functions",
+            "All company-specific table names, column names, and business logic replaced with a fictional demo schema",
+            "A Python sanitization script that applies regex-based table name mapping and checks output against a blocklist of sensitive patterns"
+          ]},
+          { type: "callout", value: "The 98-dashboard migration was a job. The toolkit is an asset — it turns one person's experience into something any team can use." }
+        ]
       }
     ]
   },

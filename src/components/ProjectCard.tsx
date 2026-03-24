@@ -8,7 +8,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const isLive = project.status === "Live";
+  const isLive = project.status === "Live" || project.status === "Complete";
   const isInProgress = project.status === "In Progress";
 
   return (

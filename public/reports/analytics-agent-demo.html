@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Report</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        /* ------------------------------------------------------------------ */
+        /* Reset & base                                                         */
+        /* ------------------------------------------------------------------ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { font-size: 16px; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, sans-serif;
+            background: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+        }
+
+        a { color: #0066cc; }
+
+        /* ------------------------------------------------------------------ */
+        /* Layout                                                               */
+        /* ------------------------------------------------------------------ */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Header                                                               */
+        /* ------------------------------------------------------------------ */
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+            color: #fff;
+            padding: 2.5rem 0 2rem;
+        }
+
+        header .container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header .subtitle {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        header .question-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 1rem;
+        }
+
+        header .question-text {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.9);
+            font-style: italic;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Main content                                                         */
+        /* ------------------------------------------------------------------ */
+        main {
+            padding: 2rem 0 3rem;
+        }
+
+        section {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            padding: 1.75rem 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        section h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0f3460;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #343a40;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        section h3:first-child {
+            margin-top: 0;
+        }
+
+        p { margin-bottom: 0.75rem; }
+
+        /* ------------------------------------------------------------------ */
+        /* Key metrics                                                          */
+        /* ------------------------------------------------------------------ */
+        .key-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        .metric-card {
+            flex: 1 1 160px;
+            background: #f1f3f5;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            text-align: center;
+            border-top: 3px solid #0f3460;
+        }
+
+        .metric-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #0f3460;
+            line-height: 1.2;
+        }
+
+        .metric-label {
+            font-size: 0.78rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+
+        .metric-context {
+            font-size: 0.8rem;
+            color: #495057;
+            margin-top: 0.4rem;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Charts                                                               */
+        /* ------------------------------------------------------------------ */
+        .chart-container {
+            margin-bottom: 2rem;
+        }
+
+        .chart-container:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Data tables                                                          */
+        /* ------------------------------------------------------------------ */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .data-table th {
+            background: #0f3460;
+            color: #fff;
+            padding: 0.6rem 0.85rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 0.5rem 0.85rem;
+            border-bottom: 1px solid #dee2e6;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr:nth-child(even) { background: #f8f9fa; }
+        .data-table tbody tr:hover { background: #e9f0fb; }
+
+        /* ------------------------------------------------------------------ */
+        /* Methodology / collapsible                                           */
+        /* ------------------------------------------------------------------ */
+        details {
+            margin-top: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 0.75rem 1rem;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #343a40;
+            list-style: none;
+        }
+
+        summary::after {
+            content: " ▶";
+            float: right;
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        details[open] summary::after { content: " ▼"; }
+
+        .query-block {
+            padding: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .query-block p {
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            color: #343a40;
+        }
+
+        pre {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        code { font-family: "Fira Code", "Cascadia Code", Consolas, monospace; }
+
+        /* ------------------------------------------------------------------ */
+        /* Errors                                                               */
+        /* ------------------------------------------------------------------ */
+        .error-banner {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+        }
+
+        .error-banner strong { color: #856404; }
+
+        /* ------------------------------------------------------------------ */
+        /* Footer                                                               */
+        /* ------------------------------------------------------------------ */
+        footer {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.8rem;
+            padding: 1.5rem 0 2rem;
+        }
+
+        footer p { margin-bottom: 0.2rem; }
+
+        /* ------------------------------------------------------------------ */
+        /* Print                                                                */
+        /* ------------------------------------------------------------------ */
+        @media print {
+            body { background: #fff; }
+            section { box-shadow: none; border: 1px solid #dee2e6; }
+            details { display: block; }
+            summary::after { display: none; }
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Responsive                                                           */
+        /* ------------------------------------------------------------------ */
+        @media (max-width: 640px) {
+            header h1 { font-size: 1.4rem; }
+            section { padding: 1.25rem 1rem; }
+            .metric-card { flex: 1 1 130px; }
+            .metric-value { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>Analytics Report</h1>
+        <p class="subtitle">Generated on 2026-03-24 02:31 UTC</p>
+        <p class="question-label">Business Question</p>
+        <p class="question-text">What product categories drive the most revenue, and how has this changed over the past 12 months?</p>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+
+        
+
+        <!-- Executive Summary -->
+        <section id="executive-summary">
+            <h2>Executive Summary</h2>
+            <p>Health & Beauty is the top revenue-generating category overall with $1.23M in total revenue from 9,465 items sold, narrowly ahead of Watches & Gifts ($1.17M) and Bed, Bath & Table ($1.02M). The top 5 categories — Health & Beauty, Watches & Gifts, Bed/Bath/Table, Sports & Leisure, and Computers & Accessories — collectively account for the dominant share of platform revenue. Over the past 12 months, Health & Beauty has meaningfully strengthened its position, gaining +3.16 percentage points of revenue share (from 8.53% to 11.69%), making it the fastest-growing major category. Conversely, categories like Bed/Bath/Table and Sports & Leisure have seen modest share erosion, while Housewares surged +2.88 percentage points in share. Revenue peaks sharply in November across all top categories, driven by volume spikes consistent with seasonal promotions.</p>
+
+            
+            <div class="key-metrics">
+                
+                <div class="metric-card">
+                    <div class="metric-value">Health & Beauty — $1.23M</div>
+                    <div class="metric-label">#1 Category by Revenue</div>
+                    
+                    <div class="metric-context">9,465 items sold across 8,647 orders</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">Health & Beauty +3.16 pp</div>
+                    <div class="metric-label">Biggest Revenue Share Gainer</div>
+                    
+                    <div class="metric-context">Share rose from 8.53% to 11.69% comparing prior vs. recent 6 months</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">+2.88 percentage points</div>
+                    <div class="metric-label">Housewares Share Growth</div>
+                    
+                    <div class="metric-context">Revenue grew from $195.8K to $262.5K period-over-period</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">$5.27M</div>
+                    <div class="metric-label">Top 5 Categories Combined Revenue</div>
+                    
+                    <div class="metric-context">Health Beauty, Watches/Gifts, Bed/Bath/Table, Sports/Leisure, Computers/Accessories</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">$79K in single month</div>
+                    <div class="metric-label">Peak Month (Nov 2017) — Health & Beauty</div>
+                    
+                    <div class="metric-context">529 orders vs. 156 in October — a 3.4x volume surge</div>
+                    
+                </div>
+                
+            </div>
+            
+        </section>
+
+        <!-- Analysis: Charts + Data Tables -->
+        
+        <section id="analysis">
+            <h2>Analysis</h2>
+
+            
+            <div class="chart-container">
+                <h3>Top 15 Product Categories by Total Revenue</h3>
+                <div>                            <div id="top_categories_total_revenue" class="plotly-graph-div" style="height:500px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("top_categories_total_revenue")) {                    Plotly.newPlot(                        "top_categories_total_revenue",                        [{"hovertemplate":"total_revenue=%{x}\u003cbr\u003eproduct_category=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"","orientation":"h","showlegend":false,"textposition":"auto","x":[1233131.7200000174,1166176.980000011,1023434.7600000391,954852.5500000175,888724.6100000145,711927.6900000053,615628.6899999948,610204.0999999933,578966.6499999943,471286.4799999903,470495.2799999904,400421.83999999525,390144.6499999944,309860.2299999987,268154.31000000157],"xaxis":"x","y":["health_beauty","watches_gifts","bed_bath_table","sports_leisure","computers_accessories","furniture_decor","housewares","cool_stuff","auto","toys","garden_tools","baby","perfumery","telephony","office_furniture"],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Total Revenue (R$)"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Category"}},"legend":{"tracegroupgap":0},"title":{"text":"Top 15 Product Categories by Total Revenue"},"barmode":"relative","height":500,"showlegend":false},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Monthly Revenue Trend — Top 10 Categories (Last 12 Months)</h3>
+                <div>                            <div id="monthly_revenue_trend_top_categories" class="plotly-graph-div" style="height:450px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("monthly_revenue_trend_top_categories")) {                    Plotly.newPlot(                        "monthly_revenue_trend_top_categories",                        [{"hovertemplate":"category=health_beauty\u003cbr\u003eMonth=%{x}\u003cbr\u003eRevenue (R$)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"health_beauty","line":{"color":"#636efa","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"health_beauty","orientation":"v","showlegend":true,"x":["2017-10-01T00:00:00.000000","2017-11-01T00:00:00.000000","2017-12-01T00:00:00.000000","2018-01-01T00:00:00.000000","2018-02-01T00:00:00.000000","2018-03-01T00:00:00.000000","2018-04-01T00:00:00.000000","2018-05-01T00:00:00.000000","2018-06-01T00:00:00.000000","2018-07-01T00:00:00.000000","2018-08-01T00:00:00.000000"],"xaxis":"x","y":[18531.63,78976.65,61264.66,72190.49,86561.78,89759.44,91751.04,95950.68,107795.99,105517.68,120475.71],"yaxis":"y","type":"scatter"},{"hovertemplate":"category=watches_gifts\u003cbr\u003eMonth=%{x}\u003cbr\u003eRevenue (R$)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"watches_gifts","line":{"color":"#EF553B","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"watches_gifts","orientation":"v","showlegend":true,"x":["2017-10-01T00:00:00.000000","2017-11-01T00:00:00.000000","2017-12-01T00:00:00.000000","2018-01-01T00:00:00.000000","2018-02-01T00:00:00.000000","2018-03-01T00:00:00.000000","2018-04-01T00:00:00.000000","2018-05-01T00:00:00.000000","2018-06-01T00:00:00.000000","2018-07-01T00:00:00.000000","2018-08-01T00:00:00.000000"],"xaxis":"x","y":[29732.07,96575.58,71611.62,75552.24,62986.19,97861.08,92658.57,123872.66,86885.56,96212.59,72277.06],"yaxis":"y","type":"scatter"},{"hovertemplate":"category=bed_bath_table\u003cbr\u003eMonth=%{x}\u003cbr\u003eRevenue (R$)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"bed_bath_table","line":{"color":"#00cc96","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"bed_bath_table","orientation":"v","showlegend":true,"x":["2017-10-01T00:00:00.000000","2017-11-01T00:00:00.000000","2017-12-01T00:00:00.000000","2018-01-01T00:00:00.000000","2018-02-01T00:00:00.000000","2018-03-01T00:00:00.000000","2018-04-01T00:00:00.000000","2018-05-01T00:00:00.000000","2018-06-01T00:00:00.000000","2018-07-01T00:00:00.000000","2018-08-01T00:00:00.000000"],"xaxis":"x","y":[22776.79,89172.65,50505.85,76281.9,60496.18,69256.39,72328.35,71664.93,71545.58,54904.92,61035.88],"yaxis":"y","type":"scatter"},{"hovertemplate":"category=sports_leisure\u003cbr\u003eMonth=%{x}\u003cbr\u003eRevenue (R$)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"sports_leisure","line":{"color":"#ab63fa","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"sports_leisure","orientation":"v","showlegend":true,"x":["2017-10-01T00:00:00.000000","2017-11-01T00:00:00.000000","2017-12-01T00:00:00.000000","2018-01-01T00:00:00.000000","2018-02-01T00:00:00.000000","2018-03-01T00:00:00.000000","2018-04-01T00:00:00.000000","2018-05-01T00:00:00.000000","2018-06-01T00:00:00.000000","2018-07-01T00:00:00.000000","2018-08-01T00:00:00.000000"],"xaxis":"x","y":[21902.38,63730.92,59547.97,91368.43,75308.83,84654.27,67346.58,59599.12,45542.01,55172.78,51190.16],"yaxis":"y","type":"scatter"},{"hovertemplate":"category=computers_accessories\u003cbr\u003eMonth=%{x}\u003cbr\u003eRevenue (R$)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"computers_accessories","line":{"color":"#FFA15A","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"computers_accessories","orientation":"v","showlegend":true,"x":["2017-10-01T00:00:00.000000","2017-11-01T00:00:00.000000","2017-12-01T00:00:00.000000","2018-01-01T00:00:00.000000","2018-02-01T00:00:00.000000","2018-03-01T00:00:00.000000","2018-04-01T00:00:00.000000","2018-05-01T00:00:00.000000","2018-06-01T00:00:00.000000","2018-07-01T00:00:00.000000","2018-08-01T00:00:00.000000"],"xaxis":"x","y":[19644.68,71356.01,37880.65,81685.38,100367.79,85592.53,59596.0,51340.73,41999.25,41581.48,40268.93],"yaxis":"y","type":"scatter"},{"hovertemplate":"category=furniture_decor\u003cbr\u003eMonth=%{x}\u003cbr\u003eRevenue (R$)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"furniture_decor","line":{"color":"#19d3f3","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"furniture_decor","orientation":"v","showlegend":true,"x":["2017-10-01T00:00:00.000000","2017-11-01T00:00:00.000000","2017-12-01T00:00:00.000000","2018-01-01T00:00:00.000000","2018-02-01T00:00:00.000000","2018-03-01T00:00:00.000000","2018-04-01T00:00:00.000000","2018-05-01T00:00:00.000000","2018-06-01T00:00:00.000000","2018-07-01T00:00:00.000000","2018-08-01T00:00:00.000000"],"xaxis":"x","y":[15679.55,63011.03,32011.75,54821.79,38386.96,52134.24,56743.11,54056.05,42190.22,45659.39,41320.25],"yaxis":"y","type":"scatter"},{"hovertemplate":"category=housewares\u003cbr\u003eMonth=%{x}\u003cbr\u003eRevenue (R$)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"housewares","line":{"color":"#FF6692","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"housewares","orientation":"v","showlegend":true,"x":["2017-10-01T00:00:00.000000","2017-11-01T00:00:00.000000","2017-12-01T00:00:00.000000","2018-01-01T00:00:00.000000","2018-02-01T00:00:00.000000","2018-03-01T00:00:00.000000","2018-04-01T00:00:00.000000","2018-05-01T00:00:00.000000","2018-06-01T00:00:00.000000","2018-07-01T00:00:00.000000","2018-08-01T00:00:00.000000"],"xaxis":"x","y":[7325.14,34486.22,25921.95,37717.44,35204.03,37463.4,45405.96,63003.57,55976.5,63146.37,59770.79],"yaxis":"y","type":"scatter"},{"hovertemplate":"category=auto\u003cbr\u003eMonth=%{x}\u003cbr\u003eRevenue (R$)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"auto","line":{"color":"#B6E880","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"auto","orientation":"v","showlegend":true,"x":["2017-10-01T00:00:00.000000","2017-11-01T00:00:00.000000","2017-12-01T00:00:00.000000","2018-01-01T00:00:00.000000","2018-02-01T00:00:00.000000","2018-03-01T00:00:00.000000","2018-04-01T00:00:00.000000","2018-05-01T00:00:00.000000","2018-06-01T00:00:00.000000","2018-07-01T00:00:00.000000","2018-08-01T00:00:00.000000"],"xaxis":"x","y":[7156.76,34955.38,39287.64,35855.02,41617.31,44753.24,49351.89,40900.24,45407.49,43564.79,45182.46],"yaxis":"y","type":"scatter"},{"hovertemplate":"category=cool_stuff\u003cbr\u003eMonth=%{x}\u003cbr\u003eRevenue (R$)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"cool_stuff","line":{"color":"#FF97FF","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"cool_stuff","orientation":"v","showlegend":true,"x":["2017-10-01T00:00:00.000000","2017-11-01T00:00:00.000000","2017-12-01T00:00:00.000000","2018-01-01T00:00:00.000000","2018-02-01T00:00:00.000000","2018-03-01T00:00:00.000000","2018-04-01T00:00:00.000000","2018-05-01T00:00:00.000000","2018-06-01T00:00:00.000000","2018-07-01T00:00:00.000000","2018-08-01T00:00:00.000000"],"xaxis":"x","y":[20865.59,56265.34,38211.55,39524.7,30787.21,38353.22,35025.41,30039.11,19316.37,21351.81,16354.58],"yaxis":"y","type":"scatter"},{"hovertemplate":"category=baby\u003cbr\u003eMonth=%{x}\u003cbr\u003eRevenue (R$)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"baby","line":{"color":"#FECB52","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"baby","orientation":"v","showlegend":true,"x":["2017-10-01T00:00:00.000000","2017-11-01T00:00:00.000000","2017-12-01T00:00:00.000000","2018-01-01T00:00:00.000000","2018-02-01T00:00:00.000000","2018-03-01T00:00:00.000000","2018-04-01T00:00:00.000000","2018-05-01T00:00:00.000000","2018-06-01T00:00:00.000000","2018-07-01T00:00:00.000000","2018-08-01T00:00:00.000000"],"xaxis":"x","y":[7088.15,21718.88,19943.08,30031.67,25896.25,41767.94,49791.85,33863.61,30755.12,22024.01,21956.25],"yaxis":"y","type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Month"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Revenue (R$)"}},"legend":{"title":{"text":"category"},"tracegroupgap":0},"title":{"text":"Monthly Revenue Trend \u2014 Top 10 Categories (Last 12 Months)"},"height":450,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Revenue Share Change by Category: Recent 6M vs Prior 6M (Percentage Points)</h3>
+                <div>                            <div id="revenue_share_change" class="plotly-graph-div" style="height:500px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("revenue_share_change")) {                    Plotly.newPlot(                        "revenue_share_change",                        [{"hovertemplate":"share_change_pct_points=%{x}\u003cbr\u003ecategory=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"","orientation":"h","showlegend":false,"textposition":"auto","x":[3.1561,2.8785,1.525,1.2786,0.8275,0.7343,0.4504,0.4305,0.3766,0.3318,0.3118,0.2669,0.2593,0.211,0.165,0.1462,0.1458,0.1113,0.1046,0.099],"xaxis":"x","y":["health_beauty","housewares","watches_gifts","construction_tools_construction","pet_shop","telephony","construction_tools_lights","home_appliances_2","auto","small_appliances_home_oven_and_coffee","home_construction","signaling_and_security","food","books_general_interest","fixed_telephony","art","furniture_living_room","costruction_tools_tools","books_technical","portateis_cozinha_e_preparadores_de_alimentos"],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Share Change (pp)"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Category"}},"legend":{"tracegroupgap":0},"title":{"text":"Revenue Share Change by Category: Recent 6M vs Prior 6M (Percentage Points)"},"barmode":"relative","height":500,"showlegend":false},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+
+            
+            <div class="table-container">
+                <h3>Product Categories Ranked by Total Revenue</h3>
+                <table class="data-table"><thead><tr><th>Product Category</th><th>Total Revenue</th><th>Total Orders</th><th>Total Items Sold</th></tr></thead><tbody><tr><td>health_beauty</td><td>$1,233,132</td><td>8,647</td><td>9,465</td></tr><tr><td>watches_gifts</td><td>$1,166,177</td><td>5,495</td><td>5,859</td></tr><tr><td>bed_bath_table</td><td>$1,023,435</td><td>9,272</td><td>10,953</td></tr><tr><td>sports_leisure</td><td>$954,853</td><td>7,530</td><td>8,431</td></tr><tr><td>computers_accessories</td><td>$888,725</td><td>6,530</td><td>7,644</td></tr><tr><td>furniture_decor</td><td>$711,928</td><td>6,307</td><td>8,160</td></tr><tr><td>housewares</td><td>$615,629</td><td>5,743</td><td>6,795</td></tr><tr><td>cool_stuff</td><td>$610,204</td><td>3,559</td><td>3,718</td></tr><tr><td>auto</td><td>$578,967</td><td>3,810</td><td>4,140</td></tr><tr><td>toys</td><td>$471,286</td><td>3,804</td><td>4,030</td></tr><tr><td>garden_tools</td><td>$470,495</td><td>3,448</td><td>4,268</td></tr><tr><td>baby</td><td>$400,422</td><td>2,809</td><td>2,982</td></tr><tr><td>perfumery</td><td>$390,145</td><td>3,086</td><td>3,340</td></tr><tr><td>telephony</td><td>$309,860</td><td>4,093</td><td>4,430</td></tr><tr><td>office_furniture</td><td>$268,154</td><td>1,254</td><td>1,668</td></tr><tr><td>stationery</td><td>$223,789</td><td>2,264</td><td>2,466</td></tr><tr><td>computers</td><td>$218,684</td><td>177</td><td>199</td></tr><tr><td>pet_shop</td><td>$211,696</td><td>1,688</td><td>1,924</td></tr><tr><td>musical_instruments</td><td>$184,316</td><td>611</td><td>651</td></tr><tr><td>small_appliances</td><td>$182,754</td><td>609</td><td>658</td></tr></tbody></table>
+            </div>
+            
+            <div class="table-container">
+                <h3>Category Revenue Share: Recent 6 Months vs Prior 6 Months</h3>
+                <table class="data-table"><thead><tr><th>Category</th><th>Recent 6M Revenue</th><th>Prior 6M Revenue</th><th>Recent 6M Share Pct</th><th>Prior 6M Share Pct</th><th>Share Change Pct Points</th></tr></thead><tbody><tr><td>health_beauty</td><td>$464,361</td><td>$448,035</td><td>11.7%</td><td>8.5%</td><td>3.2%</td></tr><tr><td>housewares</td><td>$262,493</td><td>$195,793</td><td>6.6%</td><td>3.7%</td><td>2.9%</td></tr><tr><td>watches_gifts</td><td>$414,524</td><td>$467,814</td><td>10.4%</td><td>8.9%</td><td>1.5%</td></tr><tr><td>construction_tools_construction</td><td>$87,587</td><td>$48,626</td><td>2.2%</td><td>0.9%</td><td>1.3%</td></tr><tr><td>pet_shop</td><td>$82,399</td><td>$65,457</td><td>2.1%</td><td>1.2%</td><td>0.8%</td></tr><tr><td>telephony</td><td>$113,238</td><td>$111,112</td><td>2.9%</td><td>2.1%</td><td>0.7%</td></tr><tr><td>construction_tools_lights</td><td>$26,780</td><td>$11,749</td><td>0.7%</td><td>0.2%</td><td>0.5%</td></tr><tr><td>home_appliances_2</td><td>$50,664</td><td>$44,359</td><td>1.3%</td><td>0.8%</td><td>0.4%</td></tr><tr><td>auto</td><td>$191,199</td><td>$232,942</td><td>4.8%</td><td>4.4%</td><td>0.4%</td></tr><tr><td>small_appliances_home_oven_and_coffee</td><td>$27,254</td><td>$18,601</td><td>0.7%</td><td>0.4%</td><td>0.3%</td></tr><tr><td>home_construction</td><td>$37,434</td><td>$33,101</td><td>0.9%</td><td>0.6%</td><td>0.3%</td></tr><tr><td>signaling_and_security</td><td>$14,025</td><td>$4,524</td><td>0.4%</td><td>0.1%</td><td>0.3%</td></tr><tr><td>food</td><td>$15,339</td><td>$6,661</td><td>0.4%</td><td>0.1%</td><td>0.3%</td></tr><tr><td>books_general_interest</td><td>$18,600</td><td>$13,508</td><td>0.5%</td><td>0.3%</td><td>0.2%</td></tr><tr><td>fixed_telephony</td><td>$16,364</td><td>$12,964</td><td>0.4%</td><td>0.2%</td><td>0.2%</td></tr><tr><td>art</td><td>$9,711</td><td>$5,155</td><td>0.2%</td><td>0.1%</td><td>0.1%</td></tr><tr><td>furniture_living_room</td><td>$21,587</td><td>$20,879</td><td>0.5%</td><td>0.4%</td><td>0.1%</td></tr><tr><td>costruction_tools_tools</td><td>$7,885</td><td>$4,580</td><td>0.2%</td><td>0.1%</td><td>0.1%</td></tr><tr><td>books_technical</td><td>$8,901</td><td>$6,274</td><td>0.2%</td><td>0.1%</td><td>0.1%</td></tr><tr><td>portateis_cozinha_e_preparadores_de_alimentos</td><td>$3,934</td><td>$0</td><td>0.1%</td><td>0.0%</td><td>0.1%</td></tr></tbody></table>
+            </div>
+            
+        </section>
+        
+
+        <!-- Methodology -->
+        <section id="methodology">
+            <h2>Methodology</h2>
+            
+            <p><strong>Data Sources:</strong> olist_customers_dataset, olist_geolocation_dataset, olist_order_items_dataset, olist_order_payments_dataset, olist_order_reviews_dataset, olist_orders_dataset, olist_products_dataset, olist_sellers_dataset, product_category_name_translation</p>
+            
+            <p><strong>Analysis Approach:</strong> To answer what product categories drive the most revenue and how this has changed over the past 12 months, we need to: (1) compute total revenue by category across all time to establish overall rankings, (2) break down category revenue by month over the past 12 months to reveal trends and shifts. Revenue is measured using order item prices (sum of price) joined with product category data and filtered to delivered/valid orders. We use order_purchase_timestamp as the time dimension. Category names are translated to English via the translation table. We avoid double-counting by using item-level price rather than payment_value (which can span multiple items).</p>
+
+            
+            <details>
+                <summary>SQL Queries Used</summary>
+                
+                <div class="query-block">
+                    <p>Rank all product categories by total revenue (sum of item prices) to identify the top revenue-driving categories overall, providing a baseline for comparison.</p>
+                    <pre><code>SELECT
+    COALESCE(t.product_category_name_english, p.product_category_name, 'Unknown') AS product_category,
+    SUM(oi.price) AS total_revenue,
+    COUNT(DISTINCT oi.order_id) AS total_orders,
+    COUNT(oi.order_item_id) AS total_items_sold
+FROM olist_order_items_dataset oi
+JOIN olist_orders_dataset o ON oi.order_id = o.order_id
+JOIN olist_products_dataset p ON oi.product_id = p.product_id
+LEFT JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name
+WHERE o.order_status = 'delivered'
+GROUP BY COALESCE(t.product_category_name_english, p.product_category_name, 'Unknown')
+ORDER BY total_revenue DESC</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Show monthly revenue by product category over the past 12 months to reveal how each category's contribution has changed over time, identifying growth or decline trends.</p>
+                    <pre><code>WITH max_date AS (
+    SELECT MAX(order_purchase_timestamp) AS max_ts
+    FROM olist_orders_dataset
+),
+filtered_orders AS (
+    SELECT
+        o.order_id,
+        o.order_purchase_timestamp
+    FROM olist_orders_dataset o, max_date
+    WHERE o.order_status = 'delivered'
+      AND o.order_purchase_timestamp >= max_date.max_ts - INTERVAL '12 months'
+),
+joined AS (
+    SELECT
+        DATE_TRUNC('month', fo.order_purchase_timestamp) AS order_month,
+        COALESCE(t.product_category_name_english, p.product_category_name, 'unknown') AS category,
+        SUM(oi.price) AS monthly_revenue
+    FROM filtered_orders fo
+    JOIN olist_order_items_dataset oi ON fo.order_id = oi.order_id
+    JOIN olist_products_dataset p ON oi.product_id = p.product_id
+    LEFT JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name
+    GROUP BY 1, 2
+)
+SELECT
+    order_month,
+    category,
+    monthly_revenue
+FROM joined
+ORDER BY order_month ASC, monthly_revenue DESC</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Compare each category's share of total revenue in the most recent 6 months versus the prior 6 months to highlight which categories are gaining or losing revenue share.</p>
+                    <pre><code>WITH max_date AS (
+    SELECT MAX(order_purchase_timestamp) AS max_ts
+    FROM olist_orders_dataset
+),
+period_bounds AS (
+    SELECT
+        max_ts,
+        max_ts - INTERVAL '6 months' AS recent_start,
+        max_ts - INTERVAL '12 months' AS prior_start
+    FROM max_date
+),
+filtered_orders AS (
+    SELECT
+        o.order_id,
+        o.order_purchase_timestamp,
+        CASE
+            WHEN o.order_purchase_timestamp >= pb.recent_start THEN 'recent_6_months'
+            WHEN o.order_purchase_timestamp >= pb.prior_start THEN 'prior_6_months'
+        END AS period
+    FROM olist_orders_dataset o
+    CROSS JOIN period_bounds pb
+    WHERE o.order_status = 'delivered'
+      AND o.order_purchase_timestamp >= pb.prior_start
+),
+joined AS (
+    SELECT
+        fo.period,
+        COALESCE(t.product_category_name_english, p.product_category_name, 'unknown') AS category,
+        oi.price
+    FROM filtered_orders fo
+    JOIN olist_order_items_dataset oi ON fo.order_id = oi.order_id
+    JOIN olist_products_dataset p ON oi.product_id = p.product_id
+    LEFT JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name
+    WHERE fo.period IS NOT NULL
+),
+category_period_revenue AS (
+    SELECT
+        category,
+        period,
+        SUM(price) AS revenue
+    FROM joined
+    GROUP BY category, period
+),
+period_totals AS (
+    SELECT
+        period,
+        SUM(revenue) AS total_revenue
+    FROM category_period_revenue
+    GROUP BY period
+),
+shares AS (
+    SELECT
+        cpr.category,
+        cpr.period,
+        cpr.revenue,
+        pt.total_revenue,
+        ROUND(100.0 * cpr.revenue / pt.total_revenue, 4) AS revenue_share_pct
+    FROM category_period_revenue cpr
+    JOIN period_totals pt ON cpr.period = pt.period
+),
+pivoted AS (
+    SELECT
+        category,
+        MAX(CASE WHEN period = 'recent_6_months' THEN revenue END) AS recent_revenue,
+        MAX(CASE WHEN period = 'prior_6_months' THEN revenue END) AS prior_revenue,
+        MAX(CASE WHEN period = 'recent_6_months' THEN revenue_share_pct END) AS recent_share_pct,
+        MAX(CASE WHEN period = 'prior_6_months' THEN revenue_share_pct END) AS prior_share_pct
+    FROM shares
+    GROUP BY category
+)
+SELECT
+    category,
+    ROUND(COALESCE(recent_revenue, 0), 2) AS recent_6m_revenue,
+    ROUND(COALESCE(prior_revenue, 0), 2) AS prior_6m_revenue,
+    ROUND(COALESCE(recent_share_pct, 0), 4) AS recent_6m_share_pct,
+    ROUND(COALESCE(prior_share_pct, 0), 4) AS prior_6m_share_pct,
+    ROUND(COALESCE(recent_share_pct, 0) - COALESCE(prior_share_pct, 0), 4) AS share_change_pct_points
+FROM pivoted
+ORDER BY share_change_pct_points DESC</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Provide monthly order count and average order value by category over the past 12 months for the top categories, to distinguish whether revenue changes are driven by volume or pricing shifts.</p>
+                    <pre><code>WITH date_range AS (
+    SELECT
+        MAX(order_purchase_timestamp) AS max_date,
+        MAX(order_purchase_timestamp) - INTERVAL '12 months' AS min_date
+    FROM olist_orders_dataset
+),
+top_categories AS (
+    SELECT
+        COALESCE(t.product_category_name_english, p.product_category_name) AS category,
+        SUM(oi.price) AS total_revenue
+    FROM olist_order_items_dataset oi
+    JOIN olist_orders_dataset o ON oi.order_id = o.order_id
+    JOIN olist_products_dataset p ON oi.product_id = p.product_id
+    LEFT JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name
+    JOIN date_range dr ON o.order_purchase_timestamp >= dr.min_date
+        AND o.order_purchase_timestamp <= dr.max_date
+    WHERE o.order_status NOT IN ('canceled', 'unavailable')
+      AND p.product_category_name IS NOT NULL
+    GROUP BY 1
+    ORDER BY total_revenue DESC
+    LIMIT 10
+),
+monthly_data AS (
+    SELECT
+        DATE_TRUNC('month', o.order_purchase_timestamp) AS order_month,
+        COALESCE(t.product_category_name_english, p.product_category_name) AS category,
+        COUNT(DISTINCT oi.order_id) AS order_count,
+        SUM(oi.price) AS total_revenue,
+        SUM(oi.price) / COUNT(DISTINCT oi.order_id) AS avg_order_value
+    FROM olist_order_items_dataset oi
+    JOIN olist_orders_dataset o ON oi.order_id = o.order_id
+    JOIN olist_products_dataset p ON oi.product_id = p.product_id
+    LEFT JOIN product_category_name_translation t ON p.product_category_name = t.product_category_name
+    JOIN date_range dr ON o.order_purchase_timestamp >= dr.min_date
+        AND o.order_purchase_timestamp <= dr.max_date
+    WHERE o.order_status NOT IN ('canceled', 'unavailable')
+      AND p.product_category_name IS NOT NULL
+    GROUP BY 1, 2
+)
+SELECT
+    md.order_month,
+    md.category,
+    md.order_count,
+    ROUND(md.total_revenue, 2) AS total_revenue,
+    ROUND(md.avg_order_value, 2) AS avg_order_value
+FROM monthly_data md
+INNER JOIN top_categories tc ON md.category = tc.category
+ORDER BY md.order_month ASC, tc.total_revenue DESC</code></pre>
+                </div>
+                
+            </details>
+            
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    <p>Generated by <strong>Autonomous Analytics Agent</strong></p>
+    <p>Pipeline execution time: 14.6s</p>
+</footer>
+
+</body>
+</html>
