@@ -110,7 +110,7 @@ export const projects: Project[] = [
             "Binary encoding guard: Catches Plotly's bdata regression, where chart data silently corrupts during serialization.",
             "Zero-variance detection: Catches wrong column mappings where every bar is the same height."
           ]},
-          { type: "callout", value: "Demo 1 failed repeatedly and needed manual fixes. Demos 2 and 3 ran clean on the first try. The system learns from its failures structurally — not through better prompts, but through validators that make the same mistake impossible twice." }
+          { type: "callout", value: "The first demo failed repeatedly and needed manual fixes. Every subsequent demo ran clean on the first try. The system learns from its failures structurally — not through better prompts, but through validators that make the same mistake impossible twice." }
         ]
       }
     ]
