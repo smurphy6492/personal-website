@@ -1,3 +1,8 @@
+export interface CaseStudySection {
+  heading: string;
+  body: string;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -7,6 +12,7 @@ export interface Project {
   stack: string[];
   status: "Live" | "In Progress" | "Planned";
   githubUrl?: string;
+  caseStudy?: CaseStudySection[];
 }
 
 export const projects: Project[] = [
@@ -24,10 +30,71 @@ export const projects: Project[] = [
     id: "autonomous-analytics-agent",
     name: "Autonomous Analytics Agent",
     tagline: "Ask a business question. Get SQL, charts, and an executive summary — automatically.",
-    problem: "Business teams waste hours manually querying databases, building charts, and writing reports. This agent automates the entire analytics workflow end-to-end.",
-    workflow: ["User Question", "Orchestrator", "SQL Agent", "Viz Agent", "Report Builder", "Executive Summary"],
-    stack: ["Python", "Claude API", "DuckDB", "Plotly", "Pandas"],
-    status: "In Progress"
+    problem: "Every analytics team knows the pattern: a stakeholder asks a question, an analyst writes SQL, builds a chart, drafts the summary, and two hours later delivers something that prompts three follow-up questions. It's not that the work is hard — it's that the work is repetitive, and the cycle time kills momentum. I wanted to build a system where a question goes in and a self-contained report comes out, with no human in the loop unless something breaks.",
+    workflow: [
+      "Data Profiler → DuckDB schema + stats",
+      "Orchestrator → SQL query plan",
+      "SQL Analyst → execute + retry on error (×3)",
+      "Orchestrator → executive summary + chart specs",
+      "Viz Agent → Plotly charts (deterministic)",
+      "Report Builder → self-contained HTML"
+    ],
+    stack: ["Python", "Claude API", "DuckDB", "Plotly", "Pydantic", "Jinja2", "Typer"],
+    status: "Live",
+    githubUrl: "https://github.com/smurphy6492/autonomous-analytics-agent",
+    caseStudy: [
+      {
+        heading: "What I Built",
+        body: "A multi-agent pipeline that takes a natural language business question and produces a complete HTML report — SQL queries, rendered Plotly charts, and a written executive summary — with no manual intervention. Six specialized agents handle different stages of the workflow, from schema discovery to final report assembly. The output is a single self-contained HTML file you can email to a stakeholder or drop into Slack."
+      },
+      {
+        heading: "The Architecture",
+        body: "The pipeline chains six agents in sequence. Data Profiler connects to DuckDB and extracts schema metadata plus summary statistics. Orchestrator takes the user's question and the schema context, then plans which queries are needed. SQL Analyst generates the SQL and executes it — if execution fails, it feeds the DuckDB error back to Claude for correction, retrying up to three times. Orchestrator runs again to synthesize results and specify chart types. Viz Agent renders Plotly charts deterministically with no API call. Report Builder assembles everything into a Jinja2 HTML template."
+      },
+      {
+        heading: "Key Technical Decisions",
+        body: "DuckDB handles all data access — it's in-memory, requires zero setup, and reads CSVs natively, so there's no Postgres to spin up or connection strings to manage. All inter-agent communication uses JSON mode with Pydantic validation; Claude outputs structured JSON that Pydantic models validate before the next agent touches it, eliminating the hallucinated field names that silently break pipelines. The SQL retry loop is the self-correcting heart of the system: when a query fails, the actual DuckDB error message goes back to Claude with the original context, letting the model fix its own mistakes without hardcoded fallbacks."
+      },
+      {
+        heading: "What It Demonstrates",
+        body: "This project proves that autonomous task execution across multiple specialized agents is production-viable when you enforce structure at every boundary. Typed contracts between agents and self-correcting loops that consume real error messages — not just retry blindly — are what make agentic systems work with messy real-world data instead of just clean demos."
+      }
+    ]
+  },
+  {
+    id: "ecommerce-data-story",
+    name: "E-Commerce Disruption Analysis",
+    tagline: "25 years of US retail data reveal which categories e-commerce has gutted — and which it hasn't touched.",
+    problem: "Everyone knows e-commerce has transformed retail, but the disruption hasn't been uniform. Electronics stores have been hollowed out while grocery barely flinched. I wanted to quantify this — not with opinions, but with 25 years of official US Census Bureau data. The goal: a single, polished analytical artifact that answers \"which retail categories have been most disrupted by e-commerce?\" with specific numbers, not hand-waving.",
+    workflow: [
+      "Claude API → 7 testable hypotheses",
+      "FRED data download → 9 time series (2000–2025)",
+      "DuckDB → SQL analysis + derived metrics",
+      "Python → 5 core analyses + Disruption Index",
+      "Claude API → executive summary + chart captions",
+      "Plotly + Jinja2 → self-contained HTML report"
+    ],
+    stack: ["Python", "Claude API", "DuckDB", "Plotly", "Pandas", "Jinja2"],
+    status: "Live",
+    githubUrl: "https://github.com/smurphy6492/ecommerce-data-story",
+    caseStudy: [
+      {
+        heading: "The Business Question",
+        body: "How has the shift to e-commerce reshaped US retail, and which categories are still being disrupted? E-commerce grew from 0.8% of US retail in Q1 2000 to 16.4% by Q3 2025 — a 20x increase. But the disruption has been wildly uneven. I used 9 FRED time series covering retail categories from electronics to groceries to gasoline stations, spanning 25 years of quarterly and monthly data."
+      },
+      {
+        heading: "AI Integration Design",
+        body: "Claude bookended the analysis — it didn't do it. Before any code was written, I prompted Claude with the data dictionary and business question to generate 7 testable hypotheses. These structured the entire investigation: instead of fishing for patterns, I was testing specific claims. After the analysis, I fed Claude the actual metrics and it wrote the executive summary and chart captions. I reviewed every cited number against the data. The AI helped me think before I started and communicate after I finished."
+      },
+      {
+        heading: "Key Findings",
+        body: "Electronics scored 98.7 on the Disruption Index — essentially zero growth over 25 years while nonstore retailers grew 9.4% annually. Furniture (81.8) and Books/Hobby/Music (81.6) followed. Food & Beverage (62.8) and Gasoline (59.6) proved most resilient. COVID permanently accelerated e-commerce by 4.1 percentage points above the pre-COVID trend — it stuck. The biggest surprise: Clothing's 5-year CAGR of 7.2% versus its 25-year CAGR of 2.9% marks it as the next major disruption battleground."
+      },
+      {
+        heading: "What It Demonstrates",
+        body: "This project complements the Autonomous Analytics Agent: that project shows the system, this one shows the output. It demonstrates business question framing, genuine SQL/Python analysis with real government data, a custom Disruption Index metric, and practical AI integration where Claude adds value at specific points rather than running the whole show. Six of seven AI-generated hypotheses were confirmed by the data — one was nuanced when Electronics, not Books, turned out to be the most disrupted category."
+      }
+    ]
   },
 ];
 
