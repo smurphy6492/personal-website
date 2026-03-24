@@ -96,6 +96,41 @@ export const projects: Project[] = [
       }
     ]
   },
+  {
+    id: "tableau-migration-toolkit",
+    name: "Tableau Migration Toolkit",
+    tagline: "98 dashboards migrated from Redshift to Databricks — then the process got packaged into portable AI tooling.",
+    problem: "BI migrations are one of the most tedious jobs in analytics. You're not doing anything intellectually hard — you're copying Custom SQL out of Tableau, updating table names, translating dialect-specific functions, validating row counts, and reconnecting data sources. Multiply that by 98 dashboards and you've got weeks of repetitive work where the real risk isn't complexity, it's human error on dashboard number 73. I did the migration manually, dashboard by dashboard, assisted by Claude Code. Then I extracted the repeatable methodology and packaged it as a skill and agent that any team can drop into their workspace.",
+    workflow: [
+      "Migration Notes PDF → methodology extraction",
+      "98 SQL files → pattern analysis",
+      "METHODOLOGY.md → portable 8-step process",
+      "Sanitize SQL → 5 public examples",
+      "Claude Code skill → 7-step guided workflow",
+      "Agent persona → planning + edge case advisor"
+    ],
+    stack: ["Claude Code", "SQL", "Databricks", "Tableau", "Python", "Redshift"],
+    status: "Live",
+    githubUrl: "https://github.com/smurphy6492/tableau-migration-toolkit",
+    caseStudy: [
+      {
+        heading: "The Real Work",
+        body: "At an e-commerce company, I migrated 98 Tableau dashboards from Redshift to Databricks. Every dashboard followed the same pattern: download the workbook, extract the Custom SQL, translate Redshift syntax to Spark SQL, update table names from the old schema to Unity Catalog, materialize as a gold table, validate row counts against the source, reconnect Tableau, and set up the refresh schedule. The work wasn't hard. It was just 98 repetitions of the same 8-step process, where each dashboard had its own edge cases — date spines, LOD expressions, Initial SQL temp tables, blended data sources."
+      },
+      {
+        heading: "What I Extracted",
+        body: "After the migration was done, the methodology was in my head and scattered across commit messages. Nothing was portable. So I went back and extracted the process into a structured METHODOLOGY.md — a platform-agnostic guide that any analyst could follow without knowing which company it came from. I sanitized 5 representative SQL files (from simple SELECTs to 300-line cohort analyses with window functions) to show the real patterns at each complexity level. All company-specific table names, column names, and business logic were replaced with a fictional demo schema."
+      },
+      {
+        heading: "The Toolkit",
+        body: "The methodology became two Claude Code artifacts. A skill (/migrate-tableau-workbook) that walks an analyst through migrating a single workbook in 7 steps — inventory, extract SQL, map tables, adapt dialect, build the target table, validate, and reconnect Tableau. And an agent persona that can plan a full migration project: scope it, batch workbooks by complexity, estimate timelines, and advise on edge cases like RAWSQL calculated fields or Tableau parameters embedded in Custom SQL. Both reference the same set of documents: a dialect translation table covering 40+ function differences across Redshift, SQL Server, and Postgres, a validation query reference, and a naming convention guide."
+      },
+      {
+        heading: "What It Demonstrates",
+        body: "This project is about the difference between doing work and packaging work. The 98-dashboard migration was a job. The toolkit is an asset — it turns one person's experience into something any team can use. It also shows a practical use case for Claude Code skills and agents beyond toy examples: a real workflow with real edge cases, built from real production migrations, not hypothetical scenarios. The sanitization pipeline (including a Python script that applies regex-based table name mapping and checks output against a blocklist of sensitive patterns) is itself a reusable tool."
+      }
+    ]
+  },
 ];
 
 export const personalInfo = {
