@@ -98,6 +98,20 @@ export const projects: Project[] = [
           ]},
           { type: "callout", value: "Typed contracts between agents and self-correcting loops that consume real error messages are what make agentic systems work with messy data — not just clean demos." }
         ]
+      },
+      {
+        heading: "Self-Review Loop",
+        content: [
+          { type: "text", value: "The first demo required hours of manual debugging. Charts showed row indices instead of revenue figures. Queries returned zero rows because of date filter edge cases. Reports answered half the question and ignored the rest. So I built the debugging into the pipeline itself." },
+          { type: "bullets", items: [
+            "Coverage validation: After the orchestrator proposes a report layout, a separate LLM call reviews it against the original question. Multi-part questions like \"Which states have the highest CLV AND what payment methods do they prefer?\" get checked for dedicated coverage of each facet. Gaps trigger automatic re-synthesis with specific feedback.",
+            "Zero-row detection: Catches date filter bugs on historical data before they produce empty charts.",
+            "Sequential-index detection: Flags when chart axes show 0, 1, 2, 3 instead of actual values — a symptom of column encoding bugs.",
+            "Binary encoding guard: Catches Plotly's bdata regression, where chart data silently corrupts during serialization.",
+            "Zero-variance detection: Catches wrong column mappings where every bar is the same height."
+          ]},
+          { type: "callout", value: "Demo 1 failed repeatedly and needed manual fixes. Demos 2 and 3 ran clean on the first try. The system learns from its failures structurally — not through better prompts, but through validators that make the same mistake impossible twice." }
+        ]
       }
     ]
   },
