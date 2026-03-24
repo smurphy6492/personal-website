@@ -61,10 +61,10 @@ export const projects: Project[] = [
     status: "Live",
     githubUrl: "https://github.com/smurphy6492/autonomous-analytics-agent",
     metrics: [
+      { value: "~60s", label: "Question to Report", detail: "Replaces a ~2hr analyst workflow" },
       { value: "6", label: "Specialized Agents" },
-      { value: "3x", label: "Self-Correcting Retries" },
       { value: "0", label: "Human Steps Required" },
-      { value: "~60s", label: "Question to Report" }
+      { value: "3x", label: "Self-Correcting Retries" }
     ],
     sections: [
       {
@@ -208,9 +208,9 @@ export const projects: Project[] = [
     status: "Complete",
     githubUrl: "https://github.com/smurphy6492/tableau-migration-toolkit",
     metrics: [
+      { value: "8→1 wk", label: "Timeline with Claude", detail: "8-week estimate cut to 1 week" },
       { value: "98", label: "Dashboards Migrated" },
       { value: "40+", label: "Dialect Translations", detail: "Redshift → Spark SQL" },
-      { value: "8", label: "Step Methodology" },
       { value: "2", label: "Packaged Artifacts", detail: "Claude Code skill + agent" }
     ],
     sections: [
