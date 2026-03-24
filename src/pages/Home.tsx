@@ -122,7 +122,7 @@ export function Home() {
             </h2>
             <div className="w-20 h-1.5 bg-accent rounded-full" />
             <p className="text-muted-foreground mt-6 max-w-2xl text-lg">
-              This site was built by an AI agent — not with AI assistance, but <em>by</em> an AI agent. Here's how.
+              This site was built by an AI agent. Not with AI assistance, but <em>by</em> an AI agent. Here's how.
             </p>
           </div>
 
@@ -151,14 +151,14 @@ export function Home() {
               </div>
               <h3 className="font-display font-semibold text-lg text-foreground mb-2">Visible Proof</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                The GitHub commit history is the record. Every feature, every content update, every deployment — all routed through an agentic workflow. The work is auditable.
+                The GitHub commit history is the record. Every feature, every content update, every deployment. All routed through an agentic workflow. The work is auditable.
               </p>
             </div>
           </div>
 
           <div className="bg-card/50 border border-border rounded-2xl p-6 md:p-8">
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Most portfolios claim AI skills and then show a static list of technologies. This site is the proof. If you're evaluating whether I can build with AI agents — you're looking at the output right now.
+              Most portfolios claim AI skills and then show a static list of technologies. This site is the proof. If you're evaluating whether I can build with AI agents, you're looking at the output right now.
             </p>
             <div className="flex flex-wrap gap-2">
               {["React", "Vite", "Tailwind", "shadcn/ui", "Claude Code", "GitHub", "Netlify"].map((tech) => (
@@ -180,7 +180,7 @@ export function Home() {
           <div className="w-20 h-1.5 bg-primary rounded-full mx-auto mb-12" />
 
           <p className="text-xl text-muted-foreground mb-12">
-            Looking to lead data teams where AI agents aren't a buzzword — they're how the work gets done.
+            Looking to lead data teams where AI agents aren't a buzzword. They're how the work gets done.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center items-center gap-6">

@@ -38,14 +38,14 @@ export const projects: Project[] = [
   {
     id: "autonomous-analytics-agent",
     name: "Autonomous Analytics Agent",
-    tagline: "Ask a business question. Get SQL, charts, and an executive summary — automatically.",
+    tagline: "Ask a business question. Get SQL, charts, and an executive summary. Automatically.",
     problem: [
       { type: "text", value: "Every analytics team knows this cycle: a stakeholder asks a question, an analyst writes SQL, builds a chart, drafts a summary, and two hours later delivers something that prompts three follow-up questions." },
       { type: "bullets", items: [
         "Stakeholder asks a business question",
         "Analyst writes SQL, builds chart, drafts summary",
         "Two hours later: answer prompts follow-up questions",
-        "Cycle repeats — the work isn't hard, it's repetitive"
+        "Cycle repeats. The work isn't hard, it's repetitive"
       ]},
       { type: "callout", value: "I wanted to build a system where a question goes in and a complete report comes out, with no human in the loop unless something breaks." }
     ],
@@ -75,7 +75,7 @@ export const projects: Project[] = [
           { type: "bullets", items: [
             "Data Profiler connects to DuckDB and extracts schema metadata plus summary statistics",
             "Orchestrator takes the user's question and schema context, then plans which queries are needed",
-            "SQL Analyst generates and executes SQL — if it fails, the DuckDB error feeds back to Claude for self-correction, up to 3 retries",
+            "SQL Analyst generates and executes SQL. If it fails, the DuckDB error feeds back to Claude for self-correction, up to 3 retries",
             "Viz Agent renders Plotly charts deterministically with no API call",
             "Report Builder assembles everything into a self-contained HTML file via Jinja2"
           ]}
@@ -92,11 +92,11 @@ export const projects: Project[] = [
         heading: "Key Technical Decisions",
         content: [
           { type: "bullets", items: [
-            "DuckDB for all data access — in-memory, zero setup, reads CSVs natively. No Postgres to spin up or connection strings to manage.",
-            "Pydantic JSON contracts between agents — Claude outputs structured JSON that gets validated before the next agent touches it. Eliminates hallucinated field names that silently break pipelines.",
-            "Self-correcting SQL — when a query fails, the actual DuckDB error message goes back to Claude with original context. The model fixes its own mistakes without hardcoded fallbacks."
+            "DuckDB for all data access: in-memory, zero setup, reads CSVs natively. No Postgres to spin up or connection strings to manage.",
+            "Pydantic JSON contracts between agents. Claude outputs structured JSON that gets validated before the next agent touches it. Eliminates hallucinated field names that silently break pipelines.",
+            "Self-correcting SQL: when a query fails, the actual DuckDB error message goes back to Claude with original context. The model fixes its own mistakes without hardcoded fallbacks."
           ]},
-          { type: "callout", value: "Typed contracts between agents and self-correcting loops that consume real error messages are what make agentic systems work with messy data — not just clean demos." }
+          { type: "callout", value: "Typed contracts between agents and self-correcting loops that consume real error messages are what make agentic systems work with messy data, not just clean demos." }
         ]
       },
       {
@@ -106,11 +106,11 @@ export const projects: Project[] = [
           { type: "bullets", items: [
             "Coverage validation: After the orchestrator proposes a report layout, a separate LLM call reviews it against the original question. Multi-part questions like \"Which states have the highest CLV AND what payment methods do they prefer?\" get checked for dedicated coverage of each facet. Gaps trigger automatic re-synthesis with specific feedback.",
             "Zero-row detection: Catches date filter bugs on historical data before they produce empty charts.",
-            "Sequential-index detection: Flags when chart axes show 0, 1, 2, 3 instead of actual values — a symptom of column encoding bugs.",
+            "Sequential-index detection: Flags when chart axes show 0, 1, 2, 3 instead of actual values, which signals column encoding bugs.",
             "Binary encoding guard: Catches Plotly's bdata regression, where chart data silently corrupts during serialization.",
             "Zero-variance detection: Catches wrong column mappings where every bar is the same height."
           ]},
-          { type: "callout", value: "The first demo failed repeatedly and needed manual fixes. Every subsequent demo ran clean on the first try. The system learns from its failures structurally — not through better prompts, but through validators that make the same mistake impossible twice." }
+          { type: "callout", value: "The first demo failed repeatedly and needed manual fixes. Every subsequent demo ran clean on the first try. The system learns from its failures structurally. Not through better prompts, but through validators that make the same mistake impossible twice." }
         ]
       }
     ]
@@ -118,7 +118,7 @@ export const projects: Project[] = [
   {
     id: "ecommerce-data-story",
     name: "E-Commerce Disruption Analysis",
-    tagline: "25 years of US retail data reveal which categories e-commerce has gutted — and which it hasn't touched.",
+    tagline: "25 years of US retail data reveal which categories e-commerce has gutted, and which it hasn't touched.",
     problem: [
       { type: "text", value: "Everyone knows e-commerce transformed retail, but the disruption hasn't been uniform. Electronics stores have been hollowed out while grocery barely flinched." },
       { type: "callout", value: "Which retail categories have been most disrupted by e-commerce? I wanted to answer that with 25 years of Census Bureau data, not opinions." }
@@ -150,13 +150,13 @@ export const projects: Project[] = [
               ["Electronics", "98.7", "Essentially zero growth in 25 years"],
               ["Furniture", "81.8", "Showrooming gutted physical retail"],
               ["Books / Hobby / Music", "81.6", "Amazon's original beachhead"],
-              ["Clothing", "73.4", "5yr CAGR 7.2% — next battleground"],
-              ["Food & Beverage", "62.8", "Most resilient — physical stays"],
+              ["Clothing", "73.4", "5yr CAGR 7.2%, next battleground"],
+              ["Food & Beverage", "62.8", "Most resilient, physical stays"],
               ["Gasoline", "59.6", "Immune to e-commerce disruption"]
             ]
           },
           { type: "bullets", items: [
-            "COVID permanently accelerated e-commerce by 4.1 percentage points above the pre-COVID trend — it stuck",
+            "COVID permanently accelerated e-commerce by 4.1 percentage points above the pre-COVID trend. It stuck.",
             "Clothing's 5-year CAGR of 7.2% vs. its 25-year CAGR of 2.9% marks it as the next major disruption battleground",
             "Nonstore retailers grew 9.4% annually while Electronics barely moved"
           ]},
@@ -166,11 +166,11 @@ export const projects: Project[] = [
       {
         heading: "How It Was Built",
         content: [
-          { type: "text", value: "Claude bookended the analysis — it didn't do it. The AI helped me think before I started and communicate after I finished." },
+          { type: "text", value: "Claude bookended the analysis. It didn't do it. The AI helped me think before I started and communicate after I finished." },
           { type: "workflow" },
           { type: "bullets", items: [
-            "Before: Claude generated 7 testable hypotheses from the data dictionary — these structured the entire investigation",
-            "During: I directed the SQL/Python analysis against 9 FRED time series. Claude Code wrote the code — I decided what to ask and how to interpret it.",
+            "Before: Claude generated 7 testable hypotheses from the data dictionary. These structured the entire investigation.",
+            "During: I directed the SQL/Python analysis against 9 FRED time series. Claude Code wrote the code. I decided what to ask and how to interpret it.",
             "After: Claude wrote the executive summary and chart captions from actual metrics. I reviewed every cited number against the data."
           ]},
           { type: "callout", value: "Six of seven AI-generated hypotheses were confirmed by the data. The surprise: Electronics, not Books, turned out to be the most disrupted category." }
@@ -181,9 +181,9 @@ export const projects: Project[] = [
   {
     id: "tableau-migration-toolkit",
     name: "Tableau Migration Toolkit",
-    tagline: "98 dashboards migrated from Redshift to Databricks — then the process got packaged into portable AI tooling.",
+    tagline: "98 dashboards migrated from Redshift to Databricks. Then the process got packaged into portable AI tooling.",
     problem: [
-      { type: "text", value: "BI migrations are one of the most tedious jobs in analytics. Nothing intellectually hard — just repetitive work where the real risk is human error on dashboard #73. I ran this migration in production with Claude Code as my copilot throughout — translating SQL dialects, catching edge cases, and validating patterns across 98 real Tableau workbooks on live clusters." },
+      { type: "text", value: "BI migrations are one of the most tedious jobs in analytics. Nothing intellectually hard, just repetitive work where the real risk is human error on dashboard #73. I ran this migration in production with Claude Code as my copilot throughout, translating SQL dialects, catching edge cases, and validating patterns across 98 real Tableau workbooks on live clusters." },
       { type: "bullets", items: [
         "Extract Custom SQL from each Tableau workbook",
         "Translate Redshift dialect → Spark SQL",
@@ -192,7 +192,7 @@ export const projects: Project[] = [
         "Validate row counts against the source",
         "Reconnect Tableau and set refresh schedules"
       ]},
-      { type: "callout", value: "98 dashboards. Same 8-step process. Each one with its own edge cases — date spines, LOD expressions, Initial SQL temp tables, blended data sources. Claude handled the dialect translation and pattern matching; I handled the judgment calls." }
+      { type: "callout", value: "98 dashboards. Same 8-step process. Each one with its own edge cases: date spines, LOD expressions, Initial SQL temp tables, blended data sources. Claude handled the dialect translation and pattern matching; I handled the judgment calls." }
     ],
     workflow: [
       "Download Tableau workbook (.twb/.twbx)",
@@ -217,11 +217,11 @@ export const projects: Project[] = [
       {
         heading: "The Toolkit",
         content: [
-          { type: "text", value: "The migration itself was AI-assisted — Claude Code was in the loop for every dashboard. Afterward, I packaged the methodology into portable tooling that any team can drop into their workspace." },
+          { type: "text", value: "The migration itself was AI-assisted. Claude Code was in the loop for every dashboard. Afterward, I packaged the methodology into portable tooling that any team can drop into their workspace." },
           { type: "bullets", items: [
-            "A Claude Code skill (/migrate-tableau-workbook) — walks an analyst through migrating a single workbook in 7 guided steps",
-            "An agent persona — plans full migration projects, batches workbooks by complexity, estimates timelines, advises on edge cases like RAWSQL fields or parameters embedded in Custom SQL",
-            "Reference docs — dialect translation table covering 40+ function differences across Redshift, SQL Server, and Postgres, plus validation queries and naming conventions"
+            "A Claude Code skill (/migrate-tableau-workbook) that walks an analyst through migrating a single workbook in 7 guided steps",
+            "An agent persona that plans full migration projects, batches workbooks by complexity, estimates timelines, and advises on edge cases like RAWSQL fields or parameters embedded in Custom SQL",
+            "Reference docs: dialect translation table covering 40+ function differences across Redshift, SQL Server, and Postgres, plus validation queries and naming conventions"
           ]},
           { type: "workflow" }
         ]
@@ -263,13 +263,13 @@ export const projects: Project[] = [
       {
         heading: "From Job to Asset",
         content: [
-          { type: "text", value: "After the migration, the methodology lived in my Claude Code session history and commit messages. Nothing was portable. So I extracted it into a structured METHODOLOGY.md — a platform-agnostic guide any analyst could follow." },
+          { type: "text", value: "After the migration, the methodology lived in my Claude Code session history and commit messages. Nothing was portable. So I extracted it into a structured METHODOLOGY.md, a platform-agnostic guide any analyst could follow." },
           { type: "bullets", items: [
             "5 sanitized SQL files from simple SELECTs to 300-line cohort analyses with window functions",
             "All company-specific table names, column names, and business logic replaced with a fictional demo schema",
             "A Python sanitization script that applies regex-based table name mapping and checks output against a blocklist of sensitive patterns"
           ]},
-          { type: "callout", value: "The 98-dashboard migration was a job. The toolkit is an asset — it turns one person's experience into something any team can use." }
+          { type: "callout", value: "The 98-dashboard migration was a job. The toolkit is an asset. It turns one person's experience into something any team can use." }
         ]
       }
     ]
@@ -280,11 +280,11 @@ export const personalInfo = {
   name: "Sean Murphy",
   title: "Analytics + AI Systems Builder",
   headline: "I lead analytics teams and build the AI systems that scale them.",
-  subtext: "Analytics leader and multi-agent systems builder — designing the AI infrastructure that lets small teams operate at scale.",
+  subtext: "Analytics leader and multi-agent systems builder. Designing the AI infrastructure that lets small teams operate at scale.",
   about: [
     "I spent years directing analytics teams, and the pattern was always the same: talented people burning hours on tasks a machine should handle. Writing routine SQL. Debugging pipeline failures at 2am. Manually formatting the same executive summary every Monday. The strategic work got whatever time was left over.",
-    "Now I build systems that change that ratio. Using the Claude API and Python, I design multi-agent architectures with custom orchestration — specialized agents collaborate on analytics workflows, from data profiling and SQL generation to visualization and executive summary writing.",
-    "My goal isn't to replace data professionals. It's to multiply them. A single analytics engineer paired with the right agent infrastructure should be able to operate at the scale of a full team. That's what I'm building toward — and proving out — with every project on this site."
+    "Now I build systems that change that ratio. Using the Claude API and Python, I design multi-agent architectures with custom orchestration. Specialized agents collaborate on analytics workflows, from data profiling and SQL generation to visualization and executive summary writing.",
+    "My goal isn't to replace data professionals. It's to multiply them. A single analytics engineer paired with the right agent infrastructure should be able to operate at the scale of a full team. That's what I'm building toward, and proving out, with every project on this site."
   ],
   links: {
     linkedin: "https://www.linkedin.com/in/seanmurphy2014/",

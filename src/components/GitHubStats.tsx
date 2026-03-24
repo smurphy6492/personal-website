@@ -58,7 +58,7 @@ export function GitHubStats() {
         </h2>
         <div className="w-20 h-1.5 bg-primary rounded-full" />
         <p className="text-muted-foreground mt-6 max-w-2xl text-lg">
-          Stats fetched daily from GitHub API and cached as static data — a live data pipeline baked into the build process.
+          Stats fetched daily from GitHub API and cached as static data. A live data pipeline baked into the build process.
         </p>
       </div>
 
