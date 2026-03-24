@@ -169,7 +169,7 @@ export const projects: Project[] = [
     name: "Tableau Migration Toolkit",
     tagline: "98 dashboards migrated from Redshift to Databricks — then the process got packaged into portable AI tooling.",
     problem: [
-      { type: "text", value: "BI migrations are one of the most tedious jobs in analytics. Nothing intellectually hard — just repetitive work where the real risk is human error on dashboard #73. I did this migration in production: real Tableau workbooks, live clusters, stakeholders waiting on dashboards." },
+      { type: "text", value: "BI migrations are one of the most tedious jobs in analytics. Nothing intellectually hard — just repetitive work where the real risk is human error on dashboard #73. I ran this migration in production with Claude Code as my copilot throughout — translating SQL dialects, catching edge cases, and validating patterns across 98 real Tableau workbooks on live clusters." },
       { type: "bullets", items: [
         "Extract Custom SQL from each Tableau workbook",
         "Translate Redshift dialect → Spark SQL",
@@ -178,7 +178,7 @@ export const projects: Project[] = [
         "Validate row counts against the source",
         "Reconnect Tableau and set refresh schedules"
       ]},
-      { type: "callout", value: "98 dashboards. Same 8-step process. Each one with its own edge cases — date spines, LOD expressions, Initial SQL temp tables, blended data sources." }
+      { type: "callout", value: "98 dashboards. Same 8-step process. Each one with its own edge cases — date spines, LOD expressions, Initial SQL temp tables, blended data sources. Claude handled the dialect translation and pattern matching; I handled the judgment calls." }
     ],
     workflow: [
       "Download Tableau workbook (.twb/.twbx)",
@@ -203,7 +203,7 @@ export const projects: Project[] = [
       {
         heading: "The Toolkit",
         content: [
-          { type: "text", value: "After the migration was done, I extracted the methodology into portable AI tooling that any team can use." },
+          { type: "text", value: "The migration itself was AI-assisted — Claude Code was in the loop for every dashboard. Afterward, I packaged the methodology into portable tooling that any team can drop into their workspace." },
           { type: "bullets", items: [
             "A Claude Code skill (/migrate-tableau-workbook) — walks an analyst through migrating a single workbook in 7 guided steps",
             "An agent persona — plans full migration projects, batches workbooks by complexity, estimates timelines, advises on edge cases like RAWSQL fields or parameters embedded in Custom SQL",
@@ -249,7 +249,7 @@ export const projects: Project[] = [
       {
         heading: "From Job to Asset",
         content: [
-          { type: "text", value: "After the migration, the methodology was in my head and scattered across commit messages. Nothing was portable. So I extracted it into a structured METHODOLOGY.md — a platform-agnostic guide any analyst could follow." },
+          { type: "text", value: "After the migration, the methodology lived in my Claude Code session history and commit messages. Nothing was portable. So I extracted it into a structured METHODOLOGY.md — a platform-agnostic guide any analyst could follow." },
           { type: "bullets", items: [
             "5 sanitized SQL files from simple SELECTs to 300-line cohort analyses with window functions",
             "All company-specific table names, column names, and business logic replaced with a fictional demo schema",
