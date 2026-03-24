@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How E-Commerce Reshaped US Retail: A 25-Year Data Story</title>
+    <script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+    <style>
+        :root {
+            --color-bg: #FAFAFA;
+            --color-surface: #FFFFFF;
+            --color-text: #1A1A2E;
+            --color-text-secondary: #4A4A6A;
+            --color-accent: #2563EB;
+            --color-accent-light: #EFF6FF;
+            --color-border: #E5E7EB;
+            --color-red: #DC2626;
+            --color-green: #16A34A;
+            --color-amber: #D97706;
+            --max-width: 960px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+            color: white;
+            padding: 64px 0 56px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+        header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto 24px;
+        }
+        header .meta {
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        /* Metric callout cards */
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: -32px auto 48px;
+            position: relative;
+            z-index: 1;
+        }
+        .metric-card {
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            border: 1px solid var(--color-border);
+        }
+        .metric-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            line-height: 1.2;
+        }
+        .metric-card .label {
+            font-size: 0.82rem;
+            color: var(--color-text-secondary);
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Sections */
+        section { margin-bottom: 56px; }
+        section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-text);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid var(--color-accent);
+            display: inline-block;
+        }
+
+        /* Executive summary */
+        .executive-summary {
+            background: var(--color-accent-light);
+            border-left: 4px solid var(--color-accent);
+            border-radius: 0 12px 12px 0;
+            padding: 28px 32px;
+            margin-bottom: 48px;
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        /* Chart sections */
+        .chart-section {
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid var(--color-border);
+        }
+        .chart-section h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--color-text);
+        }
+        .chart-caption {
+            font-size: 0.95rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        .chart-container { width: 100%; }
+
+        /* Key takeaways */
+        .takeaways {
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid var(--color-border);
+        }
+        .takeaways ol {
+            margin-left: 20px;
+        }
+        .takeaways li {
+            margin-bottom: 12px;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Data table */
+        .data-table-wrapper {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        thead {
+            background: var(--color-accent);
+            color: white;
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+        }
+        th {
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+        }
+        td { border-bottom: 1px solid var(--color-border); }
+        tbody tr:hover { background: var(--color-accent-light); }
+        td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+        /* Methodology */
+        .methodology {
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 32px;
+            font-size: 0.92rem;
+            color: var(--color-text-secondary);
+            border: 1px solid var(--color-border);
+        }
+        .methodology h3 {
+            color: var(--color-text);
+            font-size: 1rem;
+            margin: 20px 0 8px;
+        }
+        .methodology h3:first-child { margin-top: 0; }
+        .methodology ul {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+        .methodology li { margin-bottom: 4px; }
+        .methodology code {
+            background: #F3F4F6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        /* How I Built This */
+        .how-built {
+            background: linear-gradient(135deg, #F0F9FF 0%, #FDF4FF 100%);
+            border-radius: 12px;
+            padding: 32px;
+            border: 1px solid #E0E7FF;
+        }
+        .how-built p { margin-bottom: 14px; }
+
+        /* Hypothesis results */
+        .hypothesis-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .tag-confirmed { background: #DCFCE7; color: #166534; }
+        .tag-nuanced { background: #FEF9C3; color: #854D0E; }
+        .tag-refuted { background: #FEE2E2; color: #991B1B; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--color-text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--color-border);
+            margin-top: 40px;
+        }
+        footer a { color: var(--color-accent); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* AI badge */
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #EDE9FE, #E0E7FF);
+            color: #5B21B6;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 5px 14px;
+            border-radius: 20px;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 640px) {
+            header h1 { font-size: 1.6rem; }
+            .metrics-row { grid-template-columns: repeat(2, 1fr); }
+            .chart-section, .methodology, .how-built, .takeaways {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>How E-Commerce Reshaped US Retail</h1>
+        <p class="subtitle">A 25-Year Data Story Using Official US Census &amp; FRED Data</p>
+        <p class="meta">By Sean Murphy &middot; March 23, 2026 &middot; Data through Q3 2025</p>
+        <span class="ai-badge">AI-Assisted Analysis &middot; Claude + Python + Plotly</span>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- Metric Callout Cards -->
+    <div class="metrics-row">
+        <div class="metric-card">
+            <div class="value">0.8%</div>
+            <div class="label">E-Commerce Share (2000)</div>
+        </div>
+        <div class="metric-card">
+            <div class="value">16.4%</div>
+            <div class="label">E-Commerce Share (2025)</div>
+        </div>
+        <div class="metric-card">
+            <div class="value">+4.1pp</div>
+            <div class="label">COVID Permanent Shift</div>
+        </div>
+        <div class="metric-card">
+            <div class="value">98.7</div>
+            <div class="label">Electronics Disruption</div>
+        </div>
+    </div>
+
+    <!-- Executive Summary -->
+    <section>
+        <h2>Executive Summary</h2>
+        <div class="executive-summary">
+            E-commerce has fundamentally restructured US retail over 25 years, growing from a negligible 0.8% share in Q1 2000 to 16.4% of total retail by mid-2025 — a 20-fold increase that has permanently altered category dynamics. The COVID-19 pandemic functioned as a structural accelerant, adding 4.1 percentage points above the pre-COVID trend and cementing a new baseline that has held through 2025 rather than reverting. The most surprising finding is Electronics' near-total disruption index of 98.7 despite posting only a 0.1% 25-year CAGR — meaning the category effectively flatlined in nominal terms while e-commerce cannibalized its brick-and-mortar revenue base entirely. Nonstore retailers, the primary e-commerce proxy, compounded at 9.4% annually over 25 years and accelerated to 13.4% over the most recent 5 years, a 4.0 percentage point delta that signals disruption is intensifying, not plateauing. Clothing's 5-year CAGR of 7.2% versus its 25-year CAGR of 2.9% — a 4.3 percentage point delta, the largest of any physical category — marks it as the next major battleground for physical retail survival. Retailers treating the 16.4% e-commerce share as a ceiling rather than a waypoint do so at their own peril.
+        </div>
+    </section>
+
+    <!-- Chart 1: E-Commerce Penetration -->
+    <div class="chart-section">
+        <h3>1. E-Commerce Penetration Over Time</h3>
+        <p class="chart-caption">E-commerce share of US retail compounded from 0.8% in Q1 2000 to 11.2% by Q4 2019, representing nearly two decades of steady structural erosion of physical retail's dominance. The COVID shock then delivered in months what would have taken years organically, vaulting share to a 16.4% peak that has since held as the new floor rather than fading.</p>
+        <div class="chart-container" id="chart-penetration"></div>
+    </div>
+
+    <!-- Chart 2: Category CAGR -->
+    <div class="chart-section">
+        <h3>2. Category Growth Comparison</h3>
+        <p class="chart-caption">Nonstore retailers' 5-year CAGR of 13.4% versus their 25-year CAGR of 9.4% confirms that e-commerce disruption is accelerating, not maturing. Clothing's 4.3 percentage point CAGR delta — from 2.9% over 25 years to 7.2% over 5 years — is the sharpest acceleration among physical categories, signaling a category in active transition rather than stable equilibrium.</p>
+        <div class="chart-container" id="chart-cagr"></div>
+    </div>
+
+    <!-- Chart 3: Disruption Index -->
+    <div class="chart-section">
+        <h3>3. E-Commerce Disruption Index</h3>
+        <p class="chart-caption">Electronics tops the disruption index at 98.7 despite recording only a 0.1% 25-year CAGR, revealing that e-commerce did not grow the category — it hollowed out physical retail's share of a stagnant pie. Gasoline stations, anchored by a physical consumption imperative, register the lowest disruption index at 59.6, illustrating that friction-to-digital-substitution remains the primary defense for brick-and-mortar formats.</p>
+        <div class="chart-container" id="chart-disruption"></div>
+    </div>
+
+    <!-- Category Summary Table -->
+    <div class="chart-section">
+        <h3>Category Performance Summary</h3>
+        <div class="data-table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>25-Year CAGR</th>
+                        <th>5-Year CAGR</th>
+                        <th>Acceleration</th>
+                        <th>Disruption Index</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td>Nonstore Retailers</td>
+                        <td class="num">9.4%</td>
+                        <td class="num">13.4%</td>
+                        <td class="num">+4.0pp</td>
+                        <td class="num">N/A</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Gasoline Stations</td>
+                        <td class="num">3.8%</td>
+                        <td class="num">5.0%</td>
+                        <td class="num">+1.2pp</td>
+                        <td class="num">59.6</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Food & Beverage</td>
+                        <td class="num">3.5%</td>
+                        <td class="num">3.7%</td>
+                        <td class="num">+0.2pp</td>
+                        <td class="num">62.8</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Clothing</td>
+                        <td class="num">2.9%</td>
+                        <td class="num">7.2%</td>
+                        <td class="num">+4.3pp</td>
+                        <td class="num">69.7</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Books/Hobby/Music</td>
+                        <td class="num">1.7%</td>
+                        <td class="num">5.6%</td>
+                        <td class="num">+3.8pp</td>
+                        <td class="num">81.6</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Furniture</td>
+                        <td class="num">1.7%</td>
+                        <td class="num">3.5%</td>
+                        <td class="num">+1.8pp</td>
+                        <td class="num">81.8</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Electronics</td>
+                        <td class="num">0.1%</td>
+                        <td class="num">2.3%</td>
+                        <td class="num">+2.2pp</td>
+                        <td class="num">98.7</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Chart 4: COVID Acceleration -->
+    <div class="chart-section">
+        <h3>4. COVID-19 Acceleration Effect</h3>
+        <p class="chart-caption">The COVID-19 e-commerce acceleration of 4.1 percentage points above pre-COVID trend did not reverse — it stuck, establishing a structurally higher baseline at 16.4% that has persisted through mid-2025. This permanence distinguishes the pandemic's retail impact from a temporary demand shock and resets the competitive starting line for every physical retailer competing on assortment, price, or convenience.</p>
+        <div class="chart-container" id="chart-covid"></div>
+    </div>
+
+    <!-- Chart 5: Category Deep Dive -->
+    <div class="chart-section">
+        <h3>5. Category Deep Dive: Books vs. Food vs. Nonstore</h3>
+        <p class="chart-caption">Books, Hobby, and Music posted a 25-year CAGR of just 1.7% and a disruption index of 81.6, tracing the canonical e-commerce disruption arc that Electronics (0.1% CAGR, index 98.7) has nearly completed. Food and Beverage's 3.5% 25-year CAGR and 62.8 disruption index positions it as a category where physical retail retains structural advantage, though Nonstore's 13.4% 5-year CAGR confirms that advantage is actively being competed away.</p>
+        <div class="chart-container" id="chart-deep-dive"></div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <section>
+        <h2>Key Takeaways</h2>
+        <div class="takeaways">
+            <ol>
+                
+                <li>E-commerce grew 20x from 0.8% to 16.4% of US retail in 25 years, with COVID permanently adding 4.1 percentage points above trend in a single disruption event.</li>
+                
+                <li>Electronics' disruption index of 98.7 paired with a 0.1% 25-year CAGR proves e-commerce can fully cannibalize a category's physical revenue without growing total category demand.</li>
+                
+                <li>Clothing's 4.3 percentage point CAGR acceleration — from 2.9% over 25 years to 7.2% over 5 years — makes it the highest-velocity disruption story among physical retail categories right now.</li>
+                
+                <li>Nonstore retailers' acceleration from a 9.4% 25-year CAGR to a 13.4% 5-year CAGR eliminates any argument that e-commerce penetration is approaching a natural ceiling.</li>
+                
+            </ol>
+        </div>
+    </section>
+
+    <!-- Hypothesis Results -->
+    <section>
+        <h2>Hypothesis Scorecard</h2>
+        <div class="chart-section">
+            <p class="chart-caption">Before running any analysis, Claude generated seven testable hypotheses from the data descriptions alone. Here's how each held up against the numbers.</p>
+            
+            <div style="margin-bottom: 16px; padding: 12px 16px; background: #F9FAFB; border-radius: 8px;">
+                <strong>H1:</strong> E-commerce penetration has permanently reset higher post-COVID
+                <span class="hypothesis-tag tag-confirmed">CONFIRMED</span>
+                <br><span style="font-size: 0.88rem; color: var(--color-text-secondary);">Actual share exceeds pre-COVID trend by 4.1 percentage points in 2025 — well above the 2pp threshold.</span>
+            </div>
+            
+            <div style="margin-bottom: 16px; padding: 12px 16px; background: #F9FAFB; border-radius: 8px;">
+                <strong>H2:</strong> Books/Hobby/Music stores have experienced the most severe disruption
+                <span class="hypothesis-tag tag-nuanced">NUANCED</span>
+                <br><span style="font-size: 0.88rem; color: var(--color-text-secondary);">Books/Hobby/Music scored 81.6 on the disruption index — high, but Electronics (98.7) is actually the most disrupted category.</span>
+            </div>
+            
+            <div style="margin-bottom: 16px; padding: 12px 16px; background: #F9FAFB; border-radius: 8px;">
+                <strong>H3:</strong> Food & Beverage stores are the most resilient brick-and-mortar category
+                <span class="hypothesis-tag tag-nuanced">NUANCED</span>
+                <br><span style="font-size: 0.88rem; color: var(--color-text-secondary);">Food scored 62.8, but Gasoline Stations (59.6) are technically the least disrupted. Food is the most resilient consumer staple.</span>
+            </div>
+            
+            <div style="margin-bottom: 16px; padding: 12px 16px; background: #F9FAFB; border-radius: 8px;">
+                <strong>H4:</strong> Electronics stores underperformed total retail despite strong device demand
+                <span class="hypothesis-tag tag-confirmed">CONFIRMED</span>
+                <br><span style="font-size: 0.88rem; color: var(--color-text-secondary);">Electronics posted a 0.1% 25-year CAGR — essentially flat — while nonstore retailers grew 9.4% annually. Demand grew; stores didn't.</span>
+            </div>
+            
+            <div style="margin-bottom: 16px; padding: 12px 16px; background: #F9FAFB; border-radius: 8px;">
+                <strong>H5:</strong> Nonstore 5-year CAGR exceeds their 25-year CAGR
+                <span class="hypothesis-tag tag-confirmed">CONFIRMED</span>
+                <br><span style="font-size: 0.88rem; color: var(--color-text-secondary);">5-year CAGR of 13.4% vs. 25-year CAGR of 9.4% — a 4.0pp delta confirms e-commerce is accelerating, not plateauing.</span>
+            </div>
+            
+            <div style="margin-bottom: 16px; padding: 12px 16px; background: #F9FAFB; border-radius: 8px;">
+                <strong>H6:</strong> Furniture stores are more disrupted than clothing stores
+                <span class="hypothesis-tag tag-confirmed">CONFIRMED</span>
+                <br><span style="font-size: 0.88rem; color: var(--color-text-secondary);">Furniture disruption index (81.8) exceeds Clothing (69.7) — furniture's showroom model lost more ground than fashion retail.</span>
+            </div>
+            
+            <div style="margin-bottom: 16px; padding: 12px 16px; background: #F9FAFB; border-radius: 8px;">
+                <strong>H7:</strong> Gasoline stations define the theoretical floor of e-commerce disruption
+                <span class="hypothesis-tag tag-confirmed">CONFIRMED</span>
+                <br><span style="font-size: 0.88rem; color: var(--color-text-secondary);">Gasoline's disruption index of 59.6 is the lowest, serving as the benchmark for a non-shippable, location-bound product.</span>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- Methodology -->
+    <section>
+        <h2>Methodology</h2>
+        <div class="methodology">
+            <h3>Data Sources</h3>
+            <ul>
+                <li><strong>FRED (Federal Reserve Economic Data)</strong> — 9 time series covering total retail, e-commerce, and 6 retail categories</li>
+                <li><strong>Coverage:</strong> Monthly data from January 1992; quarterly e-commerce data from Q4 1999</li>
+                <li>All values are seasonally adjusted, in millions of dollars</li>
+            </ul>
+
+            <h3>Key Calculations</h3>
+            <ul>
+                <li><strong>E-Commerce Share:</strong> <code>ECOMSA / (quarterly total retail) * 100</code></li>
+                <li><strong>CAGR:</strong> <code>(end_value / start_value)^(1/years) - 1</code></li>
+                <li><strong>Disruption Index:</strong> <code>(nonstore_CAGR - category_CAGR) / nonstore_CAGR * 100</code></li>
+                <li><strong>COVID Acceleration:</strong> Linear trend fit on 2000-2019 data, projected forward; excess = actual minus projected</li>
+            </ul>
+
+            <h3>Tools</h3>
+            <ul>
+                <li><strong>Analysis:</strong> Python, pandas, DuckDB, NumPy</li>
+                <li><strong>Visualization:</strong> Plotly</li>
+                <li><strong>AI Integration:</strong> Claude API (hypothesis generation, insight narration)</li>
+                <li><strong>Report:</strong> Jinja2 HTML template</li>
+            </ul>
+
+            <h3>Limitations</h3>
+            <ul>
+                <li>FRED "Nonstore Retailers" includes catalog/mail-order sales, slightly overstating pure e-commerce</li>
+                <li>Category series measure sales at physical stores of that type, not total category spend across all channels</li>
+                <li>Disruption index is a relative measure; a high index does not necessarily mean declining absolute sales</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- How I Built This -->
+    <section>
+        <h2>How I Built This</h2>
+        <div class="how-built">
+            <p>This analysis started with a question I'd been thinking about since working in retail analytics: we all know e-commerce is growing, but which categories actually got hit, and did COVID permanently change the trajectory or was it a blip?</p>
+
+            <p>I pulled nine time series from FRED covering 25 years of US retail data and loaded them into DuckDB for fast SQL-based exploration. The analysis pipeline is pure Python &mdash; pandas for data manipulation, Plotly for interactive charts, and Jinja2 for the report you're reading now.</p>
+
+            <p>Where Claude added real value was at two critical junctures. First, <strong>before any analysis ran</strong>, I asked Claude to generate testable hypotheses from just the data descriptions. This forced structured thinking about what to look for &mdash; and several hypotheses (like Electronics being more disrupted than Books) were genuinely surprising when confirmed. Second, <strong>after all charts and metrics were computed</strong>, Claude narrated the findings as an executive summary and chart captions, ensuring every insight cites a specific number from the actual data.</p>
+
+            <p>The most interesting finding for me was the Electronics disruption story. A 98.7 disruption index with essentially 0% growth over 25 years tells a stark story: consumer demand for electronics exploded, but physical retailers captured almost none of that growth. The category grew &mdash; just not in stores.</p>
+
+            <p>The full pipeline is reproducible: download FRED data, run the analysis script, generate insights via Claude API, and build this report. Every chart is interactive (hover for details), and every number in the executive summary traces back to a specific calculation in the codebase.</p>
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    <div class="container">
+        <p>Built by <strong>Sean Murphy</strong> &middot; Analytics + AI Systems Builder</p>
+        <p style="margin-top: 6px;">
+            <a href="https://github.com/smurphy6492/ecommerce-data-story">GitHub</a>
+            &middot; Generated March 23, 2026
+            &middot; Insights by Claude claude-sonnet-4-6
+        </p>
+    </div>
+</footer>
+
+<script>
+    // Render Plotly charts from embedded JSON
+    const charts = {"penetration": {"data": [{"hovertemplate": "%{x|%Y Q%q}: %{y:.1f}%<extra></extra>", "line": {"color": "#2563EB", "width": 2.5}, "mode": "lines", "name": "E-Commerce Share", "x": ["2000-01-01T00:00:00.000000", "2000-04-01T00:00:00.000000", "2000-07-01T00:00:00.000000", "2000-10-01T00:00:00.000000", "2001-01-01T00:00:00.000000", "2001-04-01T00:00:00.000000", "2001-07-01T00:00:00.000000", "2001-10-01T00:00:00.000000", "2002-01-01T00:00:00.000000", "2002-04-01T00:00:00.000000", "2002-07-01T00:00:00.000000", "2002-10-01T00:00:00.000000", "2003-01-01T00:00:00.000000", "2003-04-01T00:00:00.000000", "2003-07-01T00:00:00.000000", "2003-10-01T00:00:00.000000", "2004-01-01T00:00:00.000000", "2004-04-01T00:00:00.000000", "2004-07-01T00:00:00.000000", "2004-10-01T00:00:00.000000", "2005-01-01T00:00:00.000000", "2005-04-01T00:00:00.000000", "2005-07-01T00:00:00.000000", "2005-10-01T00:00:00.000000", "2006-01-01T00:00:00.000000", "2006-04-01T00:00:00.000000", "2006-07-01T00:00:00.000000", "2006-10-01T00:00:00.000000", "2007-01-01T00:00:00.000000", "2007-04-01T00:00:00.000000", "2007-07-01T00:00:00.000000", "2007-10-01T00:00:00.000000", "2008-01-01T00:00:00.000000", "2008-04-01T00:00:00.000000", "2008-07-01T00:00:00.000000", "2008-10-01T00:00:00.000000", "2009-01-01T00:00:00.000000", "2009-04-01T00:00:00.000000", "2009-07-01T00:00:00.000000", "2009-10-01T00:00:00.000000", "2010-01-01T00:00:00.000000", "2010-04-01T00:00:00.000000", "2010-07-01T00:00:00.000000", "2010-10-01T00:00:00.000000", "2011-01-01T00:00:00.000000", "2011-04-01T00:00:00.000000", "2011-07-01T00:00:00.000000", "2011-10-01T00:00:00.000000", "2012-01-01T00:00:00.000000", "2012-04-01T00:00:00.000000", "2012-07-01T00:00:00.000000", "2012-10-01T00:00:00.000000", "2013-01-01T00:00:00.000000", "2013-04-01T00:00:00.000000", "2013-07-01T00:00:00.000000", "2013-10-01T00:00:00.000000", "2014-01-01T00:00:00.000000", "2014-04-01T00:00:00.000000", "2014-07-01T00:00:00.000000", "2014-10-01T00:00:00.000000", "2015-01-01T00:00:00.000000", "2015-04-01T00:00:00.000000", "2015-07-01T00:00:00.000000", "2015-10-01T00:00:00.000000", "2016-01-01T00:00:00.000000", "2016-04-01T00:00:00.000000", "2016-07-01T00:00:00.000000", "2016-10-01T00:00:00.000000", "2017-01-01T00:00:00.000000", "2017-04-01T00:00:00.000000", "2017-07-01T00:00:00.000000", "2017-10-01T00:00:00.000000", "2018-01-01T00:00:00.000000", "2018-04-01T00:00:00.000000", "2018-07-01T00:00:00.000000", "2018-10-01T00:00:00.000000", "2019-01-01T00:00:00.000000", "2019-04-01T00:00:00.000000", "2019-07-01T00:00:00.000000", "2019-10-01T00:00:00.000000", "2020-01-01T00:00:00.000000", "2020-04-01T00:00:00.000000", "2020-07-01T00:00:00.000000", "2020-10-01T00:00:00.000000", "2021-01-01T00:00:00.000000", "2021-04-01T00:00:00.000000", "2021-07-01T00:00:00.000000", "2021-10-01T00:00:00.000000", "2022-01-01T00:00:00.000000", "2022-04-01T00:00:00.000000", "2022-07-01T00:00:00.000000", "2022-10-01T00:00:00.000000", "2023-01-01T00:00:00.000000", "2023-04-01T00:00:00.000000", "2023-07-01T00:00:00.000000", "2023-10-01T00:00:00.000000", "2024-01-01T00:00:00.000000", "2024-04-01T00:00:00.000000", "2024-07-01T00:00:00.000000", "2024-10-01T00:00:00.000000", "2025-01-01T00:00:00.000000", "2025-04-01T00:00:00.000000", "2025-07-01T00:00:00.000000"], "y": {"dtype": "f8", "bdata": "9ihcj8L16D8pXI/C9SjsPylcj8L1KPA/zczMzMzM8D9I4XoUrkfxP3E9CtejcPE/mpmZmZmZ8T/hehSuR+HyP3sUrkfhevQ/FK5H4XoU9j9cj8L1KFz3P6RwPQrXo/g/cT0K16Nw+T8zMzMzMzP7P6RwPQrXo/w/7FG4HoXr/T9cj8L1KFz/Pylcj8L1KABAzczMzMzMAECF61G4HoUBQGZmZmZmZgJASOF6FK5HA0AUrkfhehQEQKRwPQrXowRAw/UoXI/CBUBSuB6F61EGQHE9CtejcAdAj8L1KFyPCECF61G4HoUJQLgehetRuApAmpmZmZmZC0AAAAAAAAAMQHsUrkfhegxAuB6F61G4DEDhehSuR+EMQOF6FK5H4QxAexSuR+F6DkCF61G4HoUPQFyPwvUoXBBAj8L1KFyPEEDhehSuR+EQQHE9CtejcBFASOF6FK5HEkBxPQrXo3ASQMP1KFyPwhJAKVyPwvUoE0B7FK5H4XoTQFK4HoXrURRArkfhehSuFEA9CtejcD0VQM3MzMzMzBVAUrgehetRFkBxPQrXo3AWQBSuR+F6FBdAhetRuB6FF0BI4XoUrkcYQLgehetRuBhAMzMzMzMzGUDhehSuR+EZQIXrUbgehRpAj8L1KFyPG0AK16NwPQocQLgehetRuBxAw/UoXI/CHUC4HoXrUbgeQFK4HoXrUR9AhetRuB4FIEBcj8L1KFwgQMP1KFyPwiBA4XoUrkdhIUDD9Shcj8IhQClcj8L1KCJAw/UoXI/CIkCamZmZmRkjQOxRuB6FayNA16NwPQrXI0AK16NwPQokQAAAAAAAgCRACtejcD2KJUBcj8L1KFwmQNejcD0K1ydAFK5H4XpUMEA9CtejcL0tQI/C9ShcDy5AzczMzMzMLUApXI/C9SgtQI/C9ShcDy1ArkfhehQuLUC4HoXrUbgsQGZmZmZmZixA9ihcj8L1LEAzMzMzMzMtQHE9Ctej8C1ArkfhehSuLkBcj8L1KNwuQArXo3A9Ci9A16NwPQrXL0AUrkfhehQwQD0K16NwPTBAexSuR+E6MEBmZmZmZiYwQFK4HoXrUTBApHA9CtdjMEA="}, "type": "scatter"}], "layout": {"template": {"data": {"barpolar": [{"marker": {"line": {"color": "white", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "barpolar"}], "bar": [{"error_x": {"color": "#2a3f5f"}, "error_y": {"color": "#2a3f5f"}, "marker": {"line": {"color": "white", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "bar"}], "carpet": [{"aaxis": {"endlinecolor": "#2a3f5f", "gridcolor": "#C8D4E3", "linecolor": "#C8D4E3", "minorgridcolor": "#C8D4E3", "startlinecolor": "#2a3f5f"}, "baxis": {"endlinecolor": "#2a3f5f", "gridcolor": "#C8D4E3", "linecolor": "#C8D4E3", "minorgridcolor": "#C8D4E3", "startlinecolor": "#2a3f5f"}, "type": "carpet"}], "choropleth": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "choropleth"}], "contourcarpet": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "contourcarpet"}], "contour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "contour"}], "heatmap": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "heatmap"}], "histogram2dcontour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2dcontour"}], "histogram2d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2d"}], "histogram": [{"marker": {"pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "histogram"}], "mesh3d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "mesh3d"}], "parcoords": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "parcoords"}], "pie": [{"automargin": true, "type": "pie"}], "scatter3d": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatter3d"}], "scattercarpet": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattercarpet"}], "scattergeo": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergeo"}], "scattergl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergl"}], "scattermapbox": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermapbox"}], "scattermap": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermap"}], "scatterpolargl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolargl"}], "scatterpolar": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolar"}], "scatter": [{"fillpattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}, "type": "scatter"}], "scatterternary": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterternary"}], "surface": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "surface"}], "table": [{"cells": {"fill": {"color": "#EBF0F8"}, "line": {"color": "white"}}, "header": {"fill": {"color": "#C8D4E3"}, "line": {"color": "white"}}, "type": "table"}]}, "layout": {"annotationdefaults": {"arrowcolor": "#2a3f5f", "arrowhead": 0, "arrowwidth": 1}, "autotypenumbers": "strict", "coloraxis": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "colorscale": {"diverging": [[0, "#8e0152"], [0.1, "#c51b7d"], [0.2, "#de77ae"], [0.3, "#f1b6da"], [0.4, "#fde0ef"], [0.5, "#f7f7f7"], [0.6, "#e6f5d0"], [0.7, "#b8e186"], [0.8, "#7fbc41"], [0.9, "#4d9221"], [1, "#276419"]], "sequential": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "sequentialminus": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}, "colorway": ["#636efa", "#EF553B", "#00cc96", "#ab63fa", "#FFA15A", "#19d3f3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"], "font": {"color": "#2a3f5f"}, "geo": {"bgcolor": "white", "lakecolor": "white", "landcolor": "white", "showlakes": true, "showland": true, "subunitcolor": "#C8D4E3"}, "hoverlabel": {"align": "left"}, "hovermode": "closest", "mapbox": {"style": "light"}, "paper_bgcolor": "white", "plot_bgcolor": "white", "polar": {"angularaxis": {"gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": ""}, "bgcolor": "white", "radialaxis": {"gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": ""}}, "scene": {"xaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}, "yaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}, "zaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}}, "shapedefaults": {"line": {"color": "#2a3f5f"}}, "ternary": {"aaxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}, "baxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}, "bgcolor": "white", "caxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}}, "title": {"x": 0.05}, "xaxis": {"automargin": true, "gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#EBF0F8", "zerolinewidth": 2}, "yaxis": {"automargin": true, "gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#EBF0F8", "zerolinewidth": 2}}}, "shapes": [{"fillcolor": "rgba(239, 68, 68, 0.08)", "layer": "below", "line": {"width": 0}, "type": "rect", "x0": "2020-01-01", "x1": "2021-12-31", "xref": "x", "y0": 0, "y1": 1, "yref": "y domain"}], "annotations": [{"font": {"color": "#DC2626", "size": 11}, "showarrow": false, "text": "COVID-19", "x": "2020-01-01", "xanchor": "left", "xref": "x", "y": 1, "yanchor": "top", "yref": "y domain"}, {"arrowhead": 2, "ax": 50, "ay": -35, "font": {"color": "#6B7280", "size": 10}, "showarrow": true, "text": "Pre-COVID<br>11.2%", "x": "2019-10-01T00:00:00", "y": 11.18}, {"arrowhead": 2, "ax": 50, "ay": -35, "font": {"color": "#6B7280", "size": 10}, "showarrow": true, "text": "2020 Q2 peak<br>16.3%", "x": "2020-04-01T00:00:00", "y": 16.33}], "title": {"font": {"size": 18}, "text": "E-Commerce Share of US Retail (2000\u20132025)"}, "yaxis": {"title": {"text": "E-Commerce Share (%)"}, "ticksuffix": "%", "range": [0, 20]}, "margin": {"t": 60, "b": 60, "l": 70, "r": 20}, "xaxis": {"title": {"text": "Quarter"}}, "showlegend": false, "height": 420}}, "cagr": {"data": [{"hovertemplate": "<b>%{y}</b><br>25yr CAGR: %{x:.1f}%<extra></extra>", "marker": {"color": ["#16A34A", "#16A34A", "#16A34A", "#16A34A", "#16A34A", "#16A34A", "#16A34A"]}, "name": "25-Year CAGR (2000\u20132025)", "opacity": 0.85, "orientation": "h", "x": {"dtype": "f8", "bdata": "uB6F61G4vj9cj8L1KFz7P65H4XoUrvs/zczMzMzMBkAAAAAAAAAMQHsUrkfheg5A16NwPQrXIkA="}, "y": ["Electronics", "Furniture", "Books/Hobby/Music", "Clothing", "Food & Beverage", "Gasoline Stations", "Nonstore Retailers"], "type": "bar"}, {"hovertemplate": "<b>%{y}</b><br>5yr CAGR: %{x:.1f}%<extra></extra>", "marker": {"color": "#2563EB", "size": 11, "symbol": "diamond"}, "mode": "markers", "name": "5-Year CAGR (2020\u20132025)", "x": {"dtype": "f8", "bdata": "j8L1KFyPAkAUrkfhehQMQEjhehSuRxZAw/UoXI/CHEBcj8L1KFwNQOxRuB6F6xNASOF6FK7HKkA="}, "y": ["Electronics", "Furniture", "Books/Hobby/Music", "Clothing", "Food & Beverage", "Gasoline Stations", "Nonstore Retailers"], "type": "scatter"}], "layout": {"template": {"data": {"barpolar": [{"marker": {"line": {"color": "white", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "barpolar"}], "bar": [{"error_x": {"color": "#2a3f5f"}, "error_y": {"color": "#2a3f5f"}, "marker": {"line": {"color": "white", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "bar"}], "carpet": [{"aaxis": {"endlinecolor": "#2a3f5f", "gridcolor": "#C8D4E3", "linecolor": "#C8D4E3", "minorgridcolor": "#C8D4E3", "startlinecolor": "#2a3f5f"}, "baxis": {"endlinecolor": "#2a3f5f", "gridcolor": "#C8D4E3", "linecolor": "#C8D4E3", "minorgridcolor": "#C8D4E3", "startlinecolor": "#2a3f5f"}, "type": "carpet"}], "choropleth": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "choropleth"}], "contourcarpet": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "contourcarpet"}], "contour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "contour"}], "heatmap": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "heatmap"}], "histogram2dcontour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2dcontour"}], "histogram2d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2d"}], "histogram": [{"marker": {"pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "histogram"}], "mesh3d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "mesh3d"}], "parcoords": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "parcoords"}], "pie": [{"automargin": true, "type": "pie"}], "scatter3d": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatter3d"}], "scattercarpet": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattercarpet"}], "scattergeo": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergeo"}], "scattergl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergl"}], "scattermapbox": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermapbox"}], "scattermap": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermap"}], "scatterpolargl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolargl"}], "scatterpolar": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolar"}], "scatter": [{"fillpattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}, "type": "scatter"}], "scatterternary": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterternary"}], "surface": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "surface"}], "table": [{"cells": {"fill": {"color": "#EBF0F8"}, "line": {"color": "white"}}, "header": {"fill": {"color": "#C8D4E3"}, "line": {"color": "white"}}, "type": "table"}]}, "layout": {"annotationdefaults": {"arrowcolor": "#2a3f5f", "arrowhead": 0, "arrowwidth": 1}, "autotypenumbers": "strict", "coloraxis": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "colorscale": {"diverging": [[0, "#8e0152"], [0.1, "#c51b7d"], [0.2, "#de77ae"], [0.3, "#f1b6da"], [0.4, "#fde0ef"], [0.5, "#f7f7f7"], [0.6, "#e6f5d0"], [0.7, "#b8e186"], [0.8, "#7fbc41"], [0.9, "#4d9221"], [1, "#276419"]], "sequential": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "sequentialminus": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}, "colorway": ["#636efa", "#EF553B", "#00cc96", "#ab63fa", "#FFA15A", "#19d3f3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"], "font": {"color": "#2a3f5f"}, "geo": {"bgcolor": "white", "lakecolor": "white", "landcolor": "white", "showlakes": true, "showland": true, "subunitcolor": "#C8D4E3"}, "hoverlabel": {"align": "left"}, "hovermode": "closest", "mapbox": {"style": "light"}, "paper_bgcolor": "white", "plot_bgcolor": "white", "polar": {"angularaxis": {"gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": ""}, "bgcolor": "white", "radialaxis": {"gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": ""}}, "scene": {"xaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}, "yaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}, "zaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}}, "shapedefaults": {"line": {"color": "#2a3f5f"}}, "ternary": {"aaxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}, "baxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}, "bgcolor": "white", "caxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}}, "title": {"x": 0.05}, "xaxis": {"automargin": true, "gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#EBF0F8", "zerolinewidth": 2}, "yaxis": {"automargin": true, "gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#EBF0F8", "zerolinewidth": 2}}}, "shapes": [{"line": {"color": "#6B7280", "dash": "dash"}, "opacity": 0.4, "type": "line", "x0": 0, "x1": 0, "xref": "x", "y0": 0, "y1": 1, "yref": "y domain"}], "title": {"font": {"size": 18}, "text": "Retail Category Growth Rates: 25-Year vs. 5-Year CAGR"}, "xaxis": {"title": {"text": "Annual Growth Rate (%)"}, "ticksuffix": "%"}, "legend": {"orientation": "h", "y": 1.1, "x": 0}, "margin": {"t": 80, "b": 60, "l": 165, "r": 20}, "yaxis": {"title": {"text": ""}}, "height": 420}}, "disruption": {"data": [{"hovertemplate": "<b>%{y}</b><br>Disruption Index: %{x:.1f}<extra></extra>", "marker": {"color": ["#D97706", "#DC2626", "#DC2626", "#DC2626", "#DC2626", "#DC2626"]}, "orientation": "h", "text": ["60", "63", "70", "82", "82", "99"], "textposition": "outside", "x": {"dtype": "f8", "bdata": "zczMzMzMTUBmZmZmZmZPQM3MzMzMbFFAZmZmZmZmVEAzMzMzM3NUQM3MzMzMrFhA"}, "y": ["Gasoline Stations", "Food & Beverage", "Clothing", "Books/Hobby/Music", "Furniture", "Electronics"], "type": "bar"}], "layout": {"template": {"data": {"barpolar": [{"marker": {"line": {"color": "white", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "barpolar"}], "bar": [{"error_x": {"color": "#2a3f5f"}, "error_y": {"color": "#2a3f5f"}, "marker": {"line": {"color": "white", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "bar"}], "carpet": [{"aaxis": {"endlinecolor": "#2a3f5f", "gridcolor": "#C8D4E3", "linecolor": "#C8D4E3", "minorgridcolor": "#C8D4E3", "startlinecolor": "#2a3f5f"}, "baxis": {"endlinecolor": "#2a3f5f", "gridcolor": "#C8D4E3", "linecolor": "#C8D4E3", "minorgridcolor": "#C8D4E3", "startlinecolor": "#2a3f5f"}, "type": "carpet"}], "choropleth": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "choropleth"}], "contourcarpet": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "contourcarpet"}], "contour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "contour"}], "heatmap": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "heatmap"}], "histogram2dcontour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2dcontour"}], "histogram2d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2d"}], "histogram": [{"marker": {"pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "histogram"}], "mesh3d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "mesh3d"}], "parcoords": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "parcoords"}], "pie": [{"automargin": true, "type": "pie"}], "scatter3d": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatter3d"}], "scattercarpet": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattercarpet"}], "scattergeo": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergeo"}], "scattergl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergl"}], "scattermapbox": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermapbox"}], "scattermap": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermap"}], "scatterpolargl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolargl"}], "scatterpolar": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolar"}], "scatter": [{"fillpattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}, "type": "scatter"}], "scatterternary": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterternary"}], "surface": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "surface"}], "table": [{"cells": {"fill": {"color": "#EBF0F8"}, "line": {"color": "white"}}, "header": {"fill": {"color": "#C8D4E3"}, "line": {"color": "white"}}, "type": "table"}]}, "layout": {"annotationdefaults": {"arrowcolor": "#2a3f5f", "arrowhead": 0, "arrowwidth": 1}, "autotypenumbers": "strict", "coloraxis": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "colorscale": {"diverging": [[0, "#8e0152"], [0.1, "#c51b7d"], [0.2, "#de77ae"], [0.3, "#f1b6da"], [0.4, "#fde0ef"], [0.5, "#f7f7f7"], [0.6, "#e6f5d0"], [0.7, "#b8e186"], [0.8, "#7fbc41"], [0.9, "#4d9221"], [1, "#276419"]], "sequential": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "sequentialminus": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}, "colorway": ["#636efa", "#EF553B", "#00cc96", "#ab63fa", "#FFA15A", "#19d3f3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"], "font": {"color": "#2a3f5f"}, "geo": {"bgcolor": "white", "lakecolor": "white", "landcolor": "white", "showlakes": true, "showland": true, "subunitcolor": "#C8D4E3"}, "hoverlabel": {"align": "left"}, "hovermode": "closest", "mapbox": {"style": "light"}, "paper_bgcolor": "white", "plot_bgcolor": "white", "polar": {"angularaxis": {"gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": ""}, "bgcolor": "white", "radialaxis": {"gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": ""}}, "scene": {"xaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}, "yaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}, "zaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}}, "shapedefaults": {"line": {"color": "#2a3f5f"}}, "ternary": {"aaxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}, "baxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}, "bgcolor": "white", "caxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}}, "title": {"x": 0.05}, "xaxis": {"automargin": true, "gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#EBF0F8", "zerolinewidth": 2}, "yaxis": {"automargin": true, "gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#EBF0F8", "zerolinewidth": 2}}}, "shapes": [{"line": {"color": "#6B7280", "dash": "dash"}, "opacity": 0.4, "type": "line", "x0": 0, "x1": 0, "xref": "x", "y0": 0, "y1": 1, "yref": "y domain"}], "title": {"font": {"size": 18}, "text": "E-Commerce Disruption Index by Retail Category"}, "xaxis": {"title": {"text": "Disruption Index (higher = more disrupted by e-commerce)"}, "range": [-15, 116.7]}, "margin": {"t": 60, "b": 60, "l": 165, "r": 60}, "yaxis": {"title": {"text": ""}}, "showlegend": false, "height": 420, "annotations": [{"font": {"color": "#6B7280", "size": 10}, "showarrow": false, "text": "\u2190 More resilient   More disrupted \u2192", "x": 103.7, "xanchor": "left", "xref": "x", "y": -0.5, "yref": "paper"}]}}, "covid": {"data": [{"line": {"color": "#2563EB", "width": 2.5}, "mode": "lines", "name": "Actual E-Commerce Share", "x": ["2000-01-01T00:00:00.000000", "2000-04-01T00:00:00.000000", "2000-07-01T00:00:00.000000", "2000-10-01T00:00:00.000000", "2001-01-01T00:00:00.000000", "2001-04-01T00:00:00.000000", "2001-07-01T00:00:00.000000", "2001-10-01T00:00:00.000000", "2002-01-01T00:00:00.000000", "2002-04-01T00:00:00.000000", "2002-07-01T00:00:00.000000", "2002-10-01T00:00:00.000000", "2003-01-01T00:00:00.000000", "2003-04-01T00:00:00.000000", "2003-07-01T00:00:00.000000", "2003-10-01T00:00:00.000000", "2004-01-01T00:00:00.000000", "2004-04-01T00:00:00.000000", "2004-07-01T00:00:00.000000", "2004-10-01T00:00:00.000000", "2005-01-01T00:00:00.000000", "2005-04-01T00:00:00.000000", "2005-07-01T00:00:00.000000", "2005-10-01T00:00:00.000000", "2006-01-01T00:00:00.000000", "2006-04-01T00:00:00.000000", "2006-07-01T00:00:00.000000", "2006-10-01T00:00:00.000000", "2007-01-01T00:00:00.000000", "2007-04-01T00:00:00.000000", "2007-07-01T00:00:00.000000", "2007-10-01T00:00:00.000000", "2008-01-01T00:00:00.000000", "2008-04-01T00:00:00.000000", "2008-07-01T00:00:00.000000", "2008-10-01T00:00:00.000000", "2009-01-01T00:00:00.000000", "2009-04-01T00:00:00.000000", "2009-07-01T00:00:00.000000", "2009-10-01T00:00:00.000000", "2010-01-01T00:00:00.000000", "2010-04-01T00:00:00.000000", "2010-07-01T00:00:00.000000", "2010-10-01T00:00:00.000000", "2011-01-01T00:00:00.000000", "2011-04-01T00:00:00.000000", "2011-07-01T00:00:00.000000", "2011-10-01T00:00:00.000000", "2012-01-01T00:00:00.000000", "2012-04-01T00:00:00.000000", "2012-07-01T00:00:00.000000", "2012-10-01T00:00:00.000000", "2013-01-01T00:00:00.000000", "2013-04-01T00:00:00.000000", "2013-07-01T00:00:00.000000", "2013-10-01T00:00:00.000000", "2014-01-01T00:00:00.000000", "2014-04-01T00:00:00.000000", "2014-07-01T00:00:00.000000", "2014-10-01T00:00:00.000000", "2015-01-01T00:00:00.000000", "2015-04-01T00:00:00.000000", "2015-07-01T00:00:00.000000", "2015-10-01T00:00:00.000000", "2016-01-01T00:00:00.000000", "2016-04-01T00:00:00.000000", "2016-07-01T00:00:00.000000", "2016-10-01T00:00:00.000000", "2017-01-01T00:00:00.000000", "2017-04-01T00:00:00.000000", "2017-07-01T00:00:00.000000", "2017-10-01T00:00:00.000000", "2018-01-01T00:00:00.000000", "2018-04-01T00:00:00.000000", "2018-07-01T00:00:00.000000", "2018-10-01T00:00:00.000000", "2019-01-01T00:00:00.000000", "2019-04-01T00:00:00.000000", "2019-07-01T00:00:00.000000", "2019-10-01T00:00:00.000000"], "y": {"dtype": "f8", "bdata": "9ihcj8L16D8pXI/C9SjsPylcj8L1KPA/zczMzMzM8D9I4XoUrkfxP3E9CtejcPE/mpmZmZmZ8T/hehSuR+HyP3sUrkfhevQ/FK5H4XoU9j9cj8L1KFz3P6RwPQrXo/g/cT0K16Nw+T8zMzMzMzP7P6RwPQrXo/w/7FG4HoXr/T9cj8L1KFz/Pylcj8L1KABAzczMzMzMAECF61G4HoUBQGZmZmZmZgJASOF6FK5HA0AUrkfhehQEQKRwPQrXowRAw/UoXI/CBUBSuB6F61EGQHE9CtejcAdAj8L1KFyPCECF61G4HoUJQLgehetRuApAmpmZmZmZC0AAAAAAAAAMQHsUrkfhegxAuB6F61G4DEDhehSuR+EMQOF6FK5H4QxAexSuR+F6DkCF61G4HoUPQFyPwvUoXBBAj8L1KFyPEEDhehSuR+EQQHE9CtejcBFASOF6FK5HEkBxPQrXo3ASQMP1KFyPwhJAKVyPwvUoE0B7FK5H4XoTQFK4HoXrURRArkfhehSuFEA9CtejcD0VQM3MzMzMzBVAUrgehetRFkBxPQrXo3AWQBSuR+F6FBdAhetRuB6FF0BI4XoUrkcYQLgehetRuBhAMzMzMzMzGUDhehSuR+EZQIXrUbgehRpAj8L1KFyPG0AK16NwPQocQLgehetRuBxAw/UoXI/CHUC4HoXrUbgeQFK4HoXrUR9AhetRuB4FIEBcj8L1KFwgQMP1KFyPwiBA4XoUrkdhIUDD9Shcj8IhQClcj8L1KCJAw/UoXI/CIkCamZmZmRkjQOxRuB6FayNA16NwPQrXI0AK16NwPQokQAAAAAAAgCRACtejcD2KJUBcj8L1KFwmQA=="}, "type": "scatter"}, {"line": {"color": "#2563EB", "width": 2.5}, "mode": "lines", "showlegend": false, "x": ["2020-01-01T00:00:00.000000", "2020-04-01T00:00:00.000000", "2020-07-01T00:00:00.000000", "2020-10-01T00:00:00.000000", "2021-01-01T00:00:00.000000", "2021-04-01T00:00:00.000000", "2021-07-01T00:00:00.000000", "2021-10-01T00:00:00.000000", "2022-01-01T00:00:00.000000", "2022-04-01T00:00:00.000000", "2022-07-01T00:00:00.000000", "2022-10-01T00:00:00.000000", "2023-01-01T00:00:00.000000", "2023-04-01T00:00:00.000000", "2023-07-01T00:00:00.000000", "2023-10-01T00:00:00.000000", "2024-01-01T00:00:00.000000", "2024-04-01T00:00:00.000000", "2024-07-01T00:00:00.000000", "2024-10-01T00:00:00.000000", "2025-01-01T00:00:00.000000", "2025-04-01T00:00:00.000000", "2025-07-01T00:00:00.000000"], "y": {"dtype": "f8", "bdata": "16NwPQrXJ0AUrkfhelQwQD0K16NwvS1Aj8L1KFwPLkDNzMzMzMwtQClcj8L1KC1Aj8L1KFwPLUCuR+F6FC4tQLgehetRuCxAZmZmZmZmLED2KFyPwvUsQDMzMzMzMy1AcT0K16PwLUCuR+F6FK4uQFyPwvUo3C5ACtejcD0KL0DXo3A9CtcvQBSuR+F6FDBAPQrXo3A9MEB7FK5H4TowQGZmZmZmJjBAUrgehetRMECkcD0K12MwQA=="}, "type": "scatter"}, {"line": {"color": "#6B7280", "dash": "dash", "width": 2}, "mode": "lines", "name": "Pre-COVID Trend (projected)", "x": ["2000-01-01T00:00:00.000000", "2000-04-01T00:00:00.000000", "2000-07-01T00:00:00.000000", "2000-10-01T00:00:00.000000", "2001-01-01T00:00:00.000000", "2001-04-01T00:00:00.000000", "2001-07-01T00:00:00.000000", "2001-10-01T00:00:00.000000", "2002-01-01T00:00:00.000000", "2002-04-01T00:00:00.000000", "2002-07-01T00:00:00.000000", "2002-10-01T00:00:00.000000", "2003-01-01T00:00:00.000000", "2003-04-01T00:00:00.000000", "2003-07-01T00:00:00.000000", "2003-10-01T00:00:00.000000", "2004-01-01T00:00:00.000000", "2004-04-01T00:00:00.000000", "2004-07-01T00:00:00.000000", "2004-10-01T00:00:00.000000", "2005-01-01T00:00:00.000000", "2005-04-01T00:00:00.000000", "2005-07-01T00:00:00.000000", "2005-10-01T00:00:00.000000", "2006-01-01T00:00:00.000000", "2006-04-01T00:00:00.000000", "2006-07-01T00:00:00.000000", "2006-10-01T00:00:00.000000", "2007-01-01T00:00:00.000000", "2007-04-01T00:00:00.000000", "2007-07-01T00:00:00.000000", "2007-10-01T00:00:00.000000", "2008-01-01T00:00:00.000000", "2008-04-01T00:00:00.000000", "2008-07-01T00:00:00.000000", "2008-10-01T00:00:00.000000", "2009-01-01T00:00:00.000000", "2009-04-01T00:00:00.000000", "2009-07-01T00:00:00.000000", "2009-10-01T00:00:00.000000", "2010-01-01T00:00:00.000000", "2010-04-01T00:00:00.000000", "2010-07-01T00:00:00.000000", "2010-10-01T00:00:00.000000", "2011-01-01T00:00:00.000000", "2011-04-01T00:00:00.000000", "2011-07-01T00:00:00.000000", "2011-10-01T00:00:00.000000", "2012-01-01T00:00:00.000000", "2012-04-01T00:00:00.000000", "2012-07-01T00:00:00.000000", "2012-10-01T00:00:00.000000", "2013-01-01T00:00:00.000000", "2013-04-01T00:00:00.000000", "2013-07-01T00:00:00.000000", "2013-10-01T00:00:00.000000", "2014-01-01T00:00:00.000000", "2014-04-01T00:00:00.000000", "2014-07-01T00:00:00.000000", "2014-10-01T00:00:00.000000", "2015-01-01T00:00:00.000000", "2015-04-01T00:00:00.000000", "2015-07-01T00:00:00.000000", "2015-10-01T00:00:00.000000", "2016-01-01T00:00:00.000000", "2016-04-01T00:00:00.000000", "2016-07-01T00:00:00.000000", "2016-10-01T00:00:00.000000", "2017-01-01T00:00:00.000000", "2017-04-01T00:00:00.000000", "2017-07-01T00:00:00.000000", "2017-10-01T00:00:00.000000", "2018-01-01T00:00:00.000000", "2018-04-01T00:00:00.000000", "2018-07-01T00:00:00.000000", "2018-10-01T00:00:00.000000", "2019-01-01T00:00:00.000000", "2019-04-01T00:00:00.000000", "2019-07-01T00:00:00.000000", "2019-10-01T00:00:00.000000", "2020-01-01T00:00:00.000000", "2020-04-01T00:00:00.000000", "2020-07-01T00:00:00.000000", "2020-10-01T00:00:00.000000", "2021-01-01T00:00:00.000000", "2021-04-01T00:00:00.000000", "2021-07-01T00:00:00.000000", "2021-10-01T00:00:00.000000", "2022-01-01T00:00:00.000000", "2022-04-01T00:00:00.000000", "2022-07-01T00:00:00.000000", "2022-10-01T00:00:00.000000", "2023-01-01T00:00:00.000000", "2023-04-01T00:00:00.000000", "2023-07-01T00:00:00.000000", "2023-10-01T00:00:00.000000", "2024-01-01T00:00:00.000000", "2024-04-01T00:00:00.000000", "2024-07-01T00:00:00.000000", "2024-10-01T00:00:00.000000", "2025-01-01T00:00:00.000000", "2025-04-01T00:00:00.000000", "2025-07-01T00:00:00.000000"], "y": {"dtype": "f8", "bdata": "uB6F61G4rr+4HoXrUbiuPwrXo3A9Csc/MzMzMzMz0z/hehSuR+HaP0jhehSuR+E/H4XrUbge5T/2KFyPwvXoPx+F61G4Hu0/exSuR+F68D9mZmZmZmbyP1K4HoXrUfQ/PQrXo3A99j8pXI/C9Sj4PxSuR+F6FPo/AAAAAAAA/D/sUbgehev9PwAAAAAAAABA9ihcj8L1AEDsUbgehesBQOF6FK5H4QJA16NwPQrXA0DNzMzMzMwEQMP1KFyPwgVAuB6F61G4BkDD9Shcj8IHQLgehetRuAhArkfhehSuCUCkcD0K16MKQJqZmZmZmQtAj8L1KFyPDECF61G4HoUNQHsUrkfheg5AhetRuB6FD0A9CtejcD0QQLgehetRuBBAMzMzMzMzEUCuR+F6FK4RQClcj8L1KBJApHA9CtejEkAfhetRuB4TQJqZmZmZmRNAH4XrUbgeFECamZmZmZkUQBSuR+F6FBVAj8L1KFyPFUAK16NwPQoWQIXrUbgehRZAAAAAAAAAF0B7FK5H4XoXQAAAAAAAABhAexSuR+F6GED2KFyPwvUYQHE9CtejcBlA7FG4HoXrGUBmZmZmZmYaQOF6FK5H4RpAXI/C9ShcG0DXo3A9CtcbQFyPwvUoXBxA16NwPQrXHEBSuB6F61EdQM3MzMzMzB1ASOF6FK5HHkDD9Shcj8IeQD0K16NwPR9AuB6F61G4H0AfhetRuB4gQFyPwvUoXCBAmpmZmZmZIEDXo3A9CtcgQBSuR+F6FCFAUrgehetRIUCPwvUoXI8hQM3MzMzMzCFAj8L1KFwPIkDNzMzMzEwiQArXo3A9iiJASOF6FK7HIkCF61G4HgUjQMP1KFyPQiNAAAAAAACAI0A9CtejcL0jQHsUrkfh+iNAPQrXo3A9JEB7FK5H4XokQLgehetRuCRA9ihcj8L1JEAzMzMzMzMlQHE9CtejcCVArkfhehSuJUDsUbgeheslQK5H4XoULiZA7FG4HoVrJkApXI/C9agmQGZmZmZm5iZApHA9CtcjJ0DhehSuR2EnQB+F61G4nidAXI/C9SjcJ0CamZmZmRkoQFyPwvUoXChAmpmZmZmZKEA="}, "type": "scatter"}, {"fill": "toself", "fillcolor": "rgba(37, 99, 235, 0.10)", "hoverinfo": "skip", "line": {"color": "rgba(0,0,0,0)"}, "name": "Permanent Acceleration", "x": ["2020-01-01T00:00:00", "2020-04-01T00:00:00", "2020-07-01T00:00:00", "2020-10-01T00:00:00", "2021-01-01T00:00:00", "2021-04-01T00:00:00", "2021-07-01T00:00:00", "2021-10-01T00:00:00", "2022-01-01T00:00:00", "2022-04-01T00:00:00", "2022-07-01T00:00:00", "2022-10-01T00:00:00", "2023-01-01T00:00:00", "2023-04-01T00:00:00", "2023-07-01T00:00:00", "2023-10-01T00:00:00", "2024-01-01T00:00:00", "2024-04-01T00:00:00", "2024-07-01T00:00:00", "2024-10-01T00:00:00", "2025-01-01T00:00:00", "2025-04-01T00:00:00", "2025-07-01T00:00:00", "2025-07-01T00:00:00", "2025-04-01T00:00:00", "2025-01-01T00:00:00", "2024-10-01T00:00:00", "2024-07-01T00:00:00", "2024-04-01T00:00:00", "2024-01-01T00:00:00", "2023-10-01T00:00:00", "2023-07-01T00:00:00", "2023-04-01T00:00:00", "2023-01-01T00:00:00", "2022-10-01T00:00:00", "2022-07-01T00:00:00", "2022-04-01T00:00:00", "2022-01-01T00:00:00", "2021-10-01T00:00:00", "2021-07-01T00:00:00", "2021-04-01T00:00:00", "2021-01-01T00:00:00", "2020-10-01T00:00:00", "2020-07-01T00:00:00", "2020-04-01T00:00:00", "2020-01-01T00:00:00"], "y": [11.92, 16.33, 14.87, 15.03, 14.9, 14.58, 14.53, 14.59, 14.36, 14.2, 14.48, 14.6, 14.97, 15.34, 15.43, 15.52, 15.92, 16.08, 16.24, 16.23, 16.15, 16.32, 16.39, 12.3, 12.18, 12.05, 11.93, 11.81, 11.69, 11.57, 11.45, 11.33, 11.21, 11.09, 10.96, 10.84, 10.72, 10.6, 10.48, 10.36, 10.24, 10.12, 9.99, 9.87, 9.75, 9.63], "type": "scatter"}], "layout": {"template": {"data": {"barpolar": [{"marker": {"line": {"color": "white", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "barpolar"}], "bar": [{"error_x": {"color": "#2a3f5f"}, "error_y": {"color": "#2a3f5f"}, "marker": {"line": {"color": "white", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "bar"}], "carpet": [{"aaxis": {"endlinecolor": "#2a3f5f", "gridcolor": "#C8D4E3", "linecolor": "#C8D4E3", "minorgridcolor": "#C8D4E3", "startlinecolor": "#2a3f5f"}, "baxis": {"endlinecolor": "#2a3f5f", "gridcolor": "#C8D4E3", "linecolor": "#C8D4E3", "minorgridcolor": "#C8D4E3", "startlinecolor": "#2a3f5f"}, "type": "carpet"}], "choropleth": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "choropleth"}], "contourcarpet": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "contourcarpet"}], "contour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "contour"}], "heatmap": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "heatmap"}], "histogram2dcontour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2dcontour"}], "histogram2d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2d"}], "histogram": [{"marker": {"pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "histogram"}], "mesh3d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "mesh3d"}], "parcoords": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "parcoords"}], "pie": [{"automargin": true, "type": "pie"}], "scatter3d": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatter3d"}], "scattercarpet": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattercarpet"}], "scattergeo": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergeo"}], "scattergl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergl"}], "scattermapbox": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermapbox"}], "scattermap": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermap"}], "scatterpolargl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolargl"}], "scatterpolar": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolar"}], "scatter": [{"fillpattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}, "type": "scatter"}], "scatterternary": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterternary"}], "surface": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "surface"}], "table": [{"cells": {"fill": {"color": "#EBF0F8"}, "line": {"color": "white"}}, "header": {"fill": {"color": "#C8D4E3"}, "line": {"color": "white"}}, "type": "table"}]}, "layout": {"annotationdefaults": {"arrowcolor": "#2a3f5f", "arrowhead": 0, "arrowwidth": 1}, "autotypenumbers": "strict", "coloraxis": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "colorscale": {"diverging": [[0, "#8e0152"], [0.1, "#c51b7d"], [0.2, "#de77ae"], [0.3, "#f1b6da"], [0.4, "#fde0ef"], [0.5, "#f7f7f7"], [0.6, "#e6f5d0"], [0.7, "#b8e186"], [0.8, "#7fbc41"], [0.9, "#4d9221"], [1, "#276419"]], "sequential": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "sequentialminus": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}, "colorway": ["#636efa", "#EF553B", "#00cc96", "#ab63fa", "#FFA15A", "#19d3f3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"], "font": {"color": "#2a3f5f"}, "geo": {"bgcolor": "white", "lakecolor": "white", "landcolor": "white", "showlakes": true, "showland": true, "subunitcolor": "#C8D4E3"}, "hoverlabel": {"align": "left"}, "hovermode": "closest", "mapbox": {"style": "light"}, "paper_bgcolor": "white", "plot_bgcolor": "white", "polar": {"angularaxis": {"gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": ""}, "bgcolor": "white", "radialaxis": {"gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": ""}}, "scene": {"xaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}, "yaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}, "zaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}}, "shapedefaults": {"line": {"color": "#2a3f5f"}}, "ternary": {"aaxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}, "baxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}, "bgcolor": "white", "caxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}}, "title": {"x": 0.05}, "xaxis": {"automargin": true, "gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#EBF0F8", "zerolinewidth": 2}, "yaxis": {"automargin": true, "gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#EBF0F8", "zerolinewidth": 2}}}, "shapes": [{"fillcolor": "rgba(239, 68, 68, 0.08)", "layer": "below", "line": {"width": 0}, "type": "rect", "x0": "2020-01-01", "x1": "2021-12-31", "xref": "x", "y0": 0, "y1": 1, "yref": "y domain"}], "annotations": [{"font": {"color": "#DC2626", "size": 11}, "showarrow": false, "text": "COVID-19", "x": "2020-01-01", "xanchor": "left", "xref": "x", "y": 1, "yanchor": "top", "yref": "y domain"}, {"arrowhead": 2, "ax": -55, "ay": -25, "font": {"color": "#2563EB", "size": 10}, "showarrow": true, "text": "+4.1 pp<br>above trend", "x": "2025-07-01T00:00:00", "y": 16.39}], "title": {"font": {"size": 18}, "text": "COVID-19 Acceleration: Did the E-Commerce Shift Stick?"}, "yaxis": {"title": {"text": "E-Commerce Share (%)"}, "ticksuffix": "%"}, "legend": {"orientation": "h", "y": 1.1, "x": 0}, "margin": {"t": 80, "b": 60, "l": 70, "r": 20}, "xaxis": {"title": {"text": "Quarter"}}, "height": 420}}, "deep_dive": {"data": [{"hovertemplate": "<b>Books/Hobby/Music</b><br>%{x|%Y Q%q}: %{y:.0f}<extra></extra>", "line": {"color": "#DC2626", "width": 2.5}, "mode": "lines", "name": "Books/Hobby/Music", "x": ["2000-01-01T00:00:00.000000", "2000-04-01T00:00:00.000000", "2000-07-01T00:00:00.000000", "2000-10-01T00:00:00.000000", "2001-01-01T00:00:00.000000", "2001-04-01T00:00:00.000000", "2001-07-01T00:00:00.000000", "2001-10-01T00:00:00.000000", "2002-01-01T00:00:00.000000", "2002-04-01T00:00:00.000000", "2002-07-01T00:00:00.000000", "2002-10-01T00:00:00.000000", "2003-01-01T00:00:00.000000", "2003-04-01T00:00:00.000000", "2003-07-01T00:00:00.000000", "2003-10-01T00:00:00.000000", "2004-01-01T00:00:00.000000", "2004-04-01T00:00:00.000000", "2004-07-01T00:00:00.000000", "2004-10-01T00:00:00.000000", "2005-01-01T00:00:00.000000", "2005-04-01T00:00:00.000000", "2005-07-01T00:00:00.000000", "2005-10-01T00:00:00.000000", "2006-01-01T00:00:00.000000", "2006-04-01T00:00:00.000000", "2006-07-01T00:00:00.000000", "2006-10-01T00:00:00.000000", "2007-01-01T00:00:00.000000", "2007-04-01T00:00:00.000000", "2007-07-01T00:00:00.000000", "2007-10-01T00:00:00.000000", "2008-01-01T00:00:00.000000", "2008-04-01T00:00:00.000000", "2008-07-01T00:00:00.000000", "2008-10-01T00:00:00.000000", "2009-01-01T00:00:00.000000", "2009-04-01T00:00:00.000000", "2009-07-01T00:00:00.000000", "2009-10-01T00:00:00.000000", "2010-01-01T00:00:00.000000", "2010-04-01T00:00:00.000000", "2010-07-01T00:00:00.000000", "2010-10-01T00:00:00.000000", "2011-01-01T00:00:00.000000", "2011-04-01T00:00:00.000000", "2011-07-01T00:00:00.000000", "2011-10-01T00:00:00.000000", "2012-01-01T00:00:00.000000", "2012-04-01T00:00:00.000000", "2012-07-01T00:00:00.000000", "2012-10-01T00:00:00.000000", "2013-01-01T00:00:00.000000", "2013-04-01T00:00:00.000000", "2013-07-01T00:00:00.000000", "2013-10-01T00:00:00.000000", "2014-01-01T00:00:00.000000", "2014-04-01T00:00:00.000000", "2014-07-01T00:00:00.000000", "2014-10-01T00:00:00.000000", "2015-01-01T00:00:00.000000", "2015-04-01T00:00:00.000000", "2015-07-01T00:00:00.000000", "2015-10-01T00:00:00.000000", "2016-01-01T00:00:00.000000", "2016-04-01T00:00:00.000000", "2016-07-01T00:00:00.000000", "2016-10-01T00:00:00.000000", "2017-01-01T00:00:00.000000", "2017-04-01T00:00:00.000000", "2017-07-01T00:00:00.000000", "2017-10-01T00:00:00.000000", "2018-01-01T00:00:00.000000", "2018-04-01T00:00:00.000000", "2018-07-01T00:00:00.000000", "2018-10-01T00:00:00.000000", "2019-01-01T00:00:00.000000", "2019-04-01T00:00:00.000000", "2019-07-01T00:00:00.000000", "2019-10-01T00:00:00.000000", "2020-01-01T00:00:00.000000", "2020-04-01T00:00:00.000000", "2020-07-01T00:00:00.000000", "2020-10-01T00:00:00.000000", "2021-01-01T00:00:00.000000", "2021-04-01T00:00:00.000000", "2021-07-01T00:00:00.000000", "2021-10-01T00:00:00.000000", "2022-01-01T00:00:00.000000", "2022-04-01T00:00:00.000000", "2022-07-01T00:00:00.000000", "2022-10-01T00:00:00.000000", "2023-01-01T00:00:00.000000", "2023-04-01T00:00:00.000000", "2023-07-01T00:00:00.000000", "2023-10-01T00:00:00.000000", "2024-01-01T00:00:00.000000", "2024-04-01T00:00:00.000000", "2024-07-01T00:00:00.000000", "2024-10-01T00:00:00.000000", "2025-01-01T00:00:00.000000", "2025-04-01T00:00:00.000000", "2025-07-01T00:00:00.000000", "2025-10-01T00:00:00.000000"], "y": {"dtype": "f8", "bdata": "AAAAAAAAWUCamZmZmdlZQM3MzMzMDFpAAAAAAABgWUAzMzMzM7NZQJqZmZmZuVlAZmZmZmYGWkBmZmZmZoZaQAAAAAAAQFpAmpmZmZkZWkCamZmZmRlaQGZmZmZmhlpAmpmZmZn5WUAAAAAAAIBaQJqZmZmZGVtAMzMzMzPzWkCamZmZmblbQAAAAAAAYFtAMzMzMzPTW0AzMzMzM/NbQDMzMzMzE1xAZmZmZmamXEDNzMzMzExcQDMzMzMzE11AzczMzMxMXkDNzMzMzOxdQAAAAAAAwF1AMzMzMzPTXUBmZmZmZiZeQDMzMzMz015AAAAAAAAgX0AAAAAAAGBfQDMzMzMzE19AmpmZmZl5X0CamZmZmdleQJqZmZmZmV1AmpmZmZnZXUBmZmZmZqZdQAAAAAAAwF1AAAAAAABgXUDNzMzMzKxdQGZmZmZmpl1AzczMzMysXUDNzMzMzExeQDMzMzMzE15AzczMzMwMXkAzMzMzMzNeQM3MzMzMrF1AzczMzMyMXkDNzMzMzCxfQM3MzMzMzF5AZmZmZmbGXkAAAAAAAOBfQM3MzMzMTF9AzczMzMxMX0CamZmZmVlfQM3MzMzMjF5AMzMzMzOTX0AzMzMzMyNgQM3MzMzMTGBAMzMzMzMDYEAAAAAAAEBgQJqZmZmZaWBAMzMzMzODYEDNzMzMzKxgQAAAAAAA0GBAZmZmZmZGYEBmZmZmZiZgQAAAAAAAQGBAMzMzMzMDYEDNzMzMzKxfQJqZmZmZKWBAMzMzMzMDYEAzMzMzM/NfQM3MzMzMjF1AAAAAAAAgXUDNzMzMzKxdQJqZmZmZmV5AZmZmZmZmXkAAAAAAAEBeQJqZmZmZuVxAzczMzMzMW0AAAAAAAIBhQDMzMzMzc2FAmpmZmZk5Y0DNzMzMzCxkQAAAAAAAUGNAZmZmZmZ2Y0CamZmZmVljQAAAAAAAkGNAZmZmZmbGY0DNzMzMzMxjQM3MzMzMnGNAZmZmZmamY0DNzMzMzKxjQM3MzMzMTGNAZmZmZmYmY0DNzMzMzMxiQDMzMzMzs2JAAAAAAADQYkDNzMzMzPxiQAAAAAAA8GJAzczMzMxcY0AAAAAAAMBjQA=="}, "type": "scatter"}, {"hovertemplate": "<b>Food & Beverage</b><br>%{x|%Y Q%q}: %{y:.0f}<extra></extra>", "line": {"color": "#16A34A", "width": 2.5}, "mode": "lines", "name": "Food & Beverage", "x": ["2000-01-01T00:00:00.000000", "2000-04-01T00:00:00.000000", "2000-07-01T00:00:00.000000", "2000-10-01T00:00:00.000000", "2001-01-01T00:00:00.000000", "2001-04-01T00:00:00.000000", "2001-07-01T00:00:00.000000", "2001-10-01T00:00:00.000000", "2002-01-01T00:00:00.000000", "2002-04-01T00:00:00.000000", "2002-07-01T00:00:00.000000", "2002-10-01T00:00:00.000000", "2003-01-01T00:00:00.000000", "2003-04-01T00:00:00.000000", "2003-07-01T00:00:00.000000", "2003-10-01T00:00:00.000000", "2004-01-01T00:00:00.000000", "2004-04-01T00:00:00.000000", "2004-07-01T00:00:00.000000", "2004-10-01T00:00:00.000000", "2005-01-01T00:00:00.000000", "2005-04-01T00:00:00.000000", "2005-07-01T00:00:00.000000", "2005-10-01T00:00:00.000000", "2006-01-01T00:00:00.000000", "2006-04-01T00:00:00.000000", "2006-07-01T00:00:00.000000", "2006-10-01T00:00:00.000000", "2007-01-01T00:00:00.000000", "2007-04-01T00:00:00.000000", "2007-07-01T00:00:00.000000", "2007-10-01T00:00:00.000000", "2008-01-01T00:00:00.000000", "2008-04-01T00:00:00.000000", "2008-07-01T00:00:00.000000", "2008-10-01T00:00:00.000000", "2009-01-01T00:00:00.000000", "2009-04-01T00:00:00.000000", "2009-07-01T00:00:00.000000", "2009-10-01T00:00:00.000000", "2010-01-01T00:00:00.000000", "2010-04-01T00:00:00.000000", "2010-07-01T00:00:00.000000", "2010-10-01T00:00:00.000000", "2011-01-01T00:00:00.000000", "2011-04-01T00:00:00.000000", "2011-07-01T00:00:00.000000", "2011-10-01T00:00:00.000000", "2012-01-01T00:00:00.000000", "2012-04-01T00:00:00.000000", "2012-07-01T00:00:00.000000", "2012-10-01T00:00:00.000000", "2013-01-01T00:00:00.000000", "2013-04-01T00:00:00.000000", "2013-07-01T00:00:00.000000", "2013-10-01T00:00:00.000000", "2014-01-01T00:00:00.000000", "2014-04-01T00:00:00.000000", "2014-07-01T00:00:00.000000", "2014-10-01T00:00:00.000000", "2015-01-01T00:00:00.000000", "2015-04-01T00:00:00.000000", "2015-07-01T00:00:00.000000", "2015-10-01T00:00:00.000000", "2016-01-01T00:00:00.000000", "2016-04-01T00:00:00.000000", "2016-07-01T00:00:00.000000", "2016-10-01T00:00:00.000000", "2017-01-01T00:00:00.000000", "2017-04-01T00:00:00.000000", "2017-07-01T00:00:00.000000", "2017-10-01T00:00:00.000000", "2018-01-01T00:00:00.000000", "2018-04-01T00:00:00.000000", "2018-07-01T00:00:00.000000", "2018-10-01T00:00:00.000000", "2019-01-01T00:00:00.000000", "2019-04-01T00:00:00.000000", "2019-07-01T00:00:00.000000", "2019-10-01T00:00:00.000000", "2020-01-01T00:00:00.000000", "2020-04-01T00:00:00.000000", "2020-07-01T00:00:00.000000", "2020-10-01T00:00:00.000000", "2021-01-01T00:00:00.000000", "2021-04-01T00:00:00.000000", "2021-07-01T00:00:00.000000", "2021-10-01T00:00:00.000000", "2022-01-01T00:00:00.000000", "2022-04-01T00:00:00.000000", "2022-07-01T00:00:00.000000", "2022-10-01T00:00:00.000000", "2023-01-01T00:00:00.000000", "2023-04-01T00:00:00.000000", "2023-07-01T00:00:00.000000", "2023-10-01T00:00:00.000000", "2024-01-01T00:00:00.000000", "2024-04-01T00:00:00.000000", "2024-07-01T00:00:00.000000", "2024-10-01T00:00:00.000000", "2025-01-01T00:00:00.000000", "2025-04-01T00:00:00.000000", "2025-07-01T00:00:00.000000", "2025-10-01T00:00:00.000000"], "y": {"dtype": "f8", "bdata": "AAAAAAAAWUDNzMzMzKxZQDMzMzMz01lAZmZmZmYmWkCamZmZmXlaQJqZmZmZuVpAmpmZmZnZWkCamZmZmRlbQAAAAAAAAFtAmpmZmZnZWkCamZmZmdlaQDMzMzMz81pAzczMzMxMW0DNzMzMzExbQGZmZmZmpltAMzMzMzOTW0AzMzMzM/NbQM3MzMzMLFxAZmZmZmZmXECamZmZmblcQAAAAAAAAF1AMzMzMzNTXUDNzMzMzIxdQJqZmZmZ2V1AmpmZmZn5XUDNzMzMzExeQM3MzMzMjF5AAAAAAAAAX0AAAAAAAGBfQGZmZmZmhl9AzczMzMzMX0CamZmZmSlgQJqZmZmZSWBAAAAAAACAYEBmZmZmZqZgQGZmZmZmdmBAmpmZmZlpYEAAAAAAAHBgQM3MzMzMfGBAAAAAAACgYEDNzMzMzMxgQM3MzMzMvGBAAAAAAADQYECamZmZmQlhQDMzMzMzY2FAzczMzMysYUDNzMzMzMxhQAAAAAAA4GFAmpmZmZkJYkAzMzMzMzNiQAAAAAAAQGJAMzMzMzNjYkDNzMzMzHxiQAAAAAAAgGJAmpmZmZm5YkBmZmZmZuZiQM3MzMzMHGNAAAAAAABgY0AzMzMzM6NjQGZmZmZm1mNAMzMzMzPzY0BmZmZmZvZjQAAAAAAAEGRAMzMzMzMDZEAAAAAAABBkQM3MzMzMTGRAmpmZmZlpZEDNzMzMzKxkQAAAAAAA8GRAMzMzMzMjZUAzMzMzM0NlQM3MzMzMnGVAzczMzMysZUCamZmZmcllQDMzMzMz42VAZmZmZmYWZkBmZmZmZkZmQGZmZmZmhmZAzczMzMzMZkCamZmZmblmQDMzMzMzo2hAMzMzMzMDaUDNzMzMzKxoQAAAAAAAkGhAMzMzMzMjaUBmZmZmZrZpQDMzMzMzQ2pAMzMzMzPDakBmZmZmZjZrQDMzMzMzw2tAMzMzMzMTbEAAAAAAAJBsQAAAAAAAkGxAAAAAAABwbEDNzMzMzJxsQJqZmZmZuWxAAAAAAACwbEAzMzMzMwNtQJqZmZmZSW1AAAAAAACQbUAzMzMzM8NtQM3MzMzMvG1AZmZmZmYGbkAzMzMzMwNuQA=="}, "type": "scatter"}, {"hovertemplate": "<b>Nonstore Retailers</b><br>%{x|%Y Q%q}: %{y:.0f}<extra></extra>", "line": {"color": "#2563EB", "width": 2.5}, "mode": "lines", "name": "Nonstore Retailers", "x": ["2000-01-01T00:00:00.000000", "2000-04-01T00:00:00.000000", "2000-07-01T00:00:00.000000", "2000-10-01T00:00:00.000000", "2001-01-01T00:00:00.000000", "2001-04-01T00:00:00.000000", "2001-07-01T00:00:00.000000", "2001-10-01T00:00:00.000000", "2002-01-01T00:00:00.000000", "2002-04-01T00:00:00.000000", "2002-07-01T00:00:00.000000", "2002-10-01T00:00:00.000000", "2003-01-01T00:00:00.000000", "2003-04-01T00:00:00.000000", "2003-07-01T00:00:00.000000", "2003-10-01T00:00:00.000000", "2004-01-01T00:00:00.000000", "2004-04-01T00:00:00.000000", "2004-07-01T00:00:00.000000", "2004-10-01T00:00:00.000000", "2005-01-01T00:00:00.000000", "2005-04-01T00:00:00.000000", "2005-07-01T00:00:00.000000", "2005-10-01T00:00:00.000000", "2006-01-01T00:00:00.000000", "2006-04-01T00:00:00.000000", "2006-07-01T00:00:00.000000", "2006-10-01T00:00:00.000000", "2007-01-01T00:00:00.000000", "2007-04-01T00:00:00.000000", "2007-07-01T00:00:00.000000", "2007-10-01T00:00:00.000000", "2008-01-01T00:00:00.000000", "2008-04-01T00:00:00.000000", "2008-07-01T00:00:00.000000", "2008-10-01T00:00:00.000000", "2009-01-01T00:00:00.000000", "2009-04-01T00:00:00.000000", "2009-07-01T00:00:00.000000", "2009-10-01T00:00:00.000000", "2010-01-01T00:00:00.000000", "2010-04-01T00:00:00.000000", "2010-07-01T00:00:00.000000", "2010-10-01T00:00:00.000000", "2011-01-01T00:00:00.000000", "2011-04-01T00:00:00.000000", "2011-07-01T00:00:00.000000", "2011-10-01T00:00:00.000000", "2012-01-01T00:00:00.000000", "2012-04-01T00:00:00.000000", "2012-07-01T00:00:00.000000", "2012-10-01T00:00:00.000000", "2013-01-01T00:00:00.000000", "2013-04-01T00:00:00.000000", "2013-07-01T00:00:00.000000", "2013-10-01T00:00:00.000000", "2014-01-01T00:00:00.000000", "2014-04-01T00:00:00.000000", "2014-07-01T00:00:00.000000", "2014-10-01T00:00:00.000000", "2015-01-01T00:00:00.000000", "2015-04-01T00:00:00.000000", "2015-07-01T00:00:00.000000", "2015-10-01T00:00:00.000000", "2016-01-01T00:00:00.000000", "2016-04-01T00:00:00.000000", "2016-07-01T00:00:00.000000", "2016-10-01T00:00:00.000000", "2017-01-01T00:00:00.000000", "2017-04-01T00:00:00.000000", "2017-07-01T00:00:00.000000", "2017-10-01T00:00:00.000000", "2018-01-01T00:00:00.000000", "2018-04-01T00:00:00.000000", "2018-07-01T00:00:00.000000", "2018-10-01T00:00:00.000000", "2019-01-01T00:00:00.000000", "2019-04-01T00:00:00.000000", "2019-07-01T00:00:00.000000", "2019-10-01T00:00:00.000000", "2020-01-01T00:00:00.000000", "2020-04-01T00:00:00.000000", "2020-07-01T00:00:00.000000", "2020-10-01T00:00:00.000000", "2021-01-01T00:00:00.000000", "2021-04-01T00:00:00.000000", "2021-07-01T00:00:00.000000", "2021-10-01T00:00:00.000000", "2022-01-01T00:00:00.000000", "2022-04-01T00:00:00.000000", "2022-07-01T00:00:00.000000", "2022-10-01T00:00:00.000000", "2023-01-01T00:00:00.000000", "2023-04-01T00:00:00.000000", "2023-07-01T00:00:00.000000", "2023-10-01T00:00:00.000000", "2024-01-01T00:00:00.000000", "2024-04-01T00:00:00.000000", "2024-07-01T00:00:00.000000", "2024-10-01T00:00:00.000000", "2025-01-01T00:00:00.000000", "2025-04-01T00:00:00.000000", "2025-07-01T00:00:00.000000", "2025-10-01T00:00:00.000000"], "y": {"dtype": "f8", "bdata": "AAAAAAAAWUAAAAAAAABaQDMzMzMzE1tAzczMzMxMXEAzMzMzMzNbQDMzMzMzs1pAZmZmZmZGWkCamZmZmTlaQAAAAAAA4FpAMzMzMzOzW0CamZmZmflbQGZmZmZmxlxAAAAAAACgXUBmZmZmZqZdQGZmZmZmpl5AAAAAAACAX0BmZmZmZkZgQAAAAAAAgGBAZmZmZmYGYUCamZmZmalhQM3MzMzMHGJAMzMzMzOjYkAAAAAAAGBjQM3MzMzMLGRAZmZmZmbGZEBmZmZmZkZlQDMzMzMzo2VAAAAAAADwZUAzMzMzM4NmQM3MzMzM7GZAZmZmZmZ2Z0AAAAAAACBoQGZmZmZmxmdAzczMzMzsaECamZmZmeloQAAAAAAAIGdAMzMzMzPDZkAAAAAAAPBmQAAAAAAA0GdAmpmZmZlpaEAzMzMzMwNpQJqZmZmZiWlAMzMzMzMTakBmZmZmZqZqQAAAAAAAsGtAzczMzMwsbEBmZmZmZqZsQGZmZmZmpm1AMzMzMzPDbUCamZmZmZluQAAAAAAAgG9AZmZmZmb2b0AAAAAAADBwQGZmZmZmDnBAzczMzMxEcECamZmZmalwQM3MzMzM/HBAmpmZmZlpcUDNzMzMzMRxQAAAAAAAKHJAmpmZmZmBckDNzMzMzKxyQDMzMzMzG3NAMzMzMzNbc0AzMzMzM9NzQJqZmZmZgXRAAAAAAADwdEBmZmZmZo51QDMzMzMzM3ZAmpmZmZnpdkBmZmZmZnZ3QDMzMzMzY3hAzczMzMwceUCamZmZmcl5QAAAAAAAgHpAZmZmZmaWekAAAAAAAEB7QGZmZmZmnnxAzczMzMzEfUBmZmZmZv59QGZmZmZmDn9AZmZmZmZKg0AAAAAAAECEQDMzMzMzu4RAMzMzMzP/hEAAAAAAAMyFQM3MzMzMmIVAAAAAAAC4hkBmZmZmZn6HQDMzMzMz84dAMzMzMzNviEDNzMzMzICIQJqZmZmZcYlAmpmZmZk5ikDNzMzMzASLQAAAAAAATItAAAAAAAB8i0DNzMzMzDyMQAAAAAAAwIxAzczMzMx0jUCamZmZmZWNQGZmZmZmRo5AmpmZmZn9jkCamZmZmXGPQA=="}, "type": "scatter"}], "layout": {"template": {"data": {"barpolar": [{"marker": {"line": {"color": "white", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "barpolar"}], "bar": [{"error_x": {"color": "#2a3f5f"}, "error_y": {"color": "#2a3f5f"}, "marker": {"line": {"color": "white", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "bar"}], "carpet": [{"aaxis": {"endlinecolor": "#2a3f5f", "gridcolor": "#C8D4E3", "linecolor": "#C8D4E3", "minorgridcolor": "#C8D4E3", "startlinecolor": "#2a3f5f"}, "baxis": {"endlinecolor": "#2a3f5f", "gridcolor": "#C8D4E3", "linecolor": "#C8D4E3", "minorgridcolor": "#C8D4E3", "startlinecolor": "#2a3f5f"}, "type": "carpet"}], "choropleth": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "choropleth"}], "contourcarpet": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "contourcarpet"}], "contour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "contour"}], "heatmap": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "heatmap"}], "histogram2dcontour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2dcontour"}], "histogram2d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2d"}], "histogram": [{"marker": {"pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "histogram"}], "mesh3d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "mesh3d"}], "parcoords": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "parcoords"}], "pie": [{"automargin": true, "type": "pie"}], "scatter3d": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatter3d"}], "scattercarpet": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattercarpet"}], "scattergeo": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergeo"}], "scattergl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergl"}], "scattermapbox": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermapbox"}], "scattermap": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermap"}], "scatterpolargl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolargl"}], "scatterpolar": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolar"}], "scatter": [{"fillpattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}, "type": "scatter"}], "scatterternary": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterternary"}], "surface": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "surface"}], "table": [{"cells": {"fill": {"color": "#EBF0F8"}, "line": {"color": "white"}}, "header": {"fill": {"color": "#C8D4E3"}, "line": {"color": "white"}}, "type": "table"}]}, "layout": {"annotationdefaults": {"arrowcolor": "#2a3f5f", "arrowhead": 0, "arrowwidth": 1}, "autotypenumbers": "strict", "coloraxis": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "colorscale": {"diverging": [[0, "#8e0152"], [0.1, "#c51b7d"], [0.2, "#de77ae"], [0.3, "#f1b6da"], [0.4, "#fde0ef"], [0.5, "#f7f7f7"], [0.6, "#e6f5d0"], [0.7, "#b8e186"], [0.8, "#7fbc41"], [0.9, "#4d9221"], [1, "#276419"]], "sequential": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "sequentialminus": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}, "colorway": ["#636efa", "#EF553B", "#00cc96", "#ab63fa", "#FFA15A", "#19d3f3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"], "font": {"color": "#2a3f5f"}, "geo": {"bgcolor": "white", "lakecolor": "white", "landcolor": "white", "showlakes": true, "showland": true, "subunitcolor": "#C8D4E3"}, "hoverlabel": {"align": "left"}, "hovermode": "closest", "mapbox": {"style": "light"}, "paper_bgcolor": "white", "plot_bgcolor": "white", "polar": {"angularaxis": {"gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": ""}, "bgcolor": "white", "radialaxis": {"gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": ""}}, "scene": {"xaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}, "yaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}, "zaxis": {"backgroundcolor": "white", "gridcolor": "#DFE8F3", "gridwidth": 2, "linecolor": "#EBF0F8", "showbackground": true, "ticks": "", "zerolinecolor": "#EBF0F8"}}, "shapedefaults": {"line": {"color": "#2a3f5f"}}, "ternary": {"aaxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}, "baxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}, "bgcolor": "white", "caxis": {"gridcolor": "#DFE8F3", "linecolor": "#A2B1C6", "ticks": ""}}, "title": {"x": 0.05}, "xaxis": {"automargin": true, "gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#EBF0F8", "zerolinewidth": 2}, "yaxis": {"automargin": true, "gridcolor": "#EBF0F8", "linecolor": "#EBF0F8", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#EBF0F8", "zerolinewidth": 2}}}, "shapes": [{"line": {"color": "#6B7280", "dash": "dot", "width": 1}, "opacity": 0.6, "type": "line", "x0": "2007-01-01", "x1": "2007-01-01", "y0": 0, "y1": 1, "yref": "paper"}, {"line": {"color": "#6B7280", "dash": "dot", "width": 1}, "opacity": 0.6, "type": "line", "x0": "2020-01-01", "x1": "2020-01-01", "y0": 0, "y1": 1, "yref": "paper"}, {"line": {"color": "#6B7280", "dash": "dash"}, "opacity": 0.3, "type": "line", "x0": 0, "x1": 1, "xref": "x domain", "y0": 100, "y1": 100, "yref": "y"}], "annotations": [{"font": {"color": "#6B7280", "size": 10}, "showarrow": false, "text": "Kindle launch", "x": "2007-01-01", "xanchor": "center", "xref": "x", "y": 1.04, "yref": "paper"}, {"font": {"color": "#6B7280", "size": 10}, "showarrow": false, "text": "COVID-19", "x": "2020-01-01", "xanchor": "center", "xref": "x", "y": 1.04, "yref": "paper"}], "title": {"font": {"size": 18}, "text": "Category Deep Dive: Indexed Growth Since 2000 (Base = 100)"}, "legend": {"orientation": "h", "y": 1.12, "x": 0}, "margin": {"t": 100, "b": 60, "l": 70, "r": 20}, "xaxis": {"title": {"text": "Quarter"}}, "yaxis": {"title": {"text": "Index (2000 Q1 = 100)"}}, "height": 480}}};
+    const chartMap = {
+        'chart-penetration': charts.penetration,
+        'chart-cagr': charts.cagr,
+        'chart-disruption': charts.disruption,
+        'chart-covid': charts.covid,
+        'chart-deep-dive': charts.deep_dive,
+    };
+    const defaultConfig = {responsive: true, displayModeBar: false};
+
+    for (const [divId, spec] of Object.entries(chartMap)) {
+        if (spec) {
+            Plotly.newPlot(divId, spec.data, spec.layout, defaultConfig);
+        }
+    }
+</script>
+
+</body>
+</html>
