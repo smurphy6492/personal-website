@@ -3,7 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WorkflowDiagram } from "@/components/WorkflowDiagram";
 import { projects } from "@/data/projects";
-import { ArrowLeft, Github, ExternalLink, Clock, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Github, ExternalLink, Clock, CheckCircle2, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 
@@ -91,21 +91,43 @@ export function ProjectDetail() {
             </p>
           </section>
 
+          {/* Lead section (first case study entry) + live report link — shown before architecture */}
+          {project.caseStudy && project.caseStudy.length > 0 && (
+            <section className="mb-20">
+              <div className="bg-card border border-border rounded-2xl p-8 md:p-10 shadow-lg shadow-black/20">
+                <h2 className="text-2xl font-display font-bold text-foreground mb-4">{project.caseStudy[0].heading}</h2>
+                <p className="text-lg text-muted-foreground leading-relaxed">{project.caseStudy[0].body}</p>
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-lg font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                  >
+                    <FileText className="w-4 h-4" />
+                    View the Full Report
+                    <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+                  </a>
+                )}
+              </div>
+            </section>
+          )}
+
           {/* Workflow Architecture */}
           <section className="mb-24">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-display font-bold text-foreground mb-4">System Architecture</h2>
               <p className="text-muted-foreground">Autonomous agent workflow from request to output.</p>
             </div>
-            
+
             <WorkflowDiagram steps={project.workflow} />
           </section>
 
-          {/* Case Study Sections */}
-          {project.caseStudy && project.caseStudy.length > 0 && (
+          {/* Remaining Case Study Sections */}
+          {project.caseStudy && project.caseStudy.length > 1 && (
             <section className="mb-20 space-y-8">
               <h2 className="text-3xl font-display font-bold text-foreground">How I Built This</h2>
-              {project.caseStudy.map((section) => (
+              {project.caseStudy.slice(1).map((section) => (
                 <div key={section.heading} className="bg-card border border-border rounded-2xl p-8 md:p-10 shadow-lg shadow-black/20">
                   <h3 className="text-xl font-display font-bold text-foreground mb-3">{section.heading}</h3>
                   <p className="text-lg text-muted-foreground leading-relaxed">{section.body}</p>

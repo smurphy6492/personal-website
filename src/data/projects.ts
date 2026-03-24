@@ -12,6 +12,7 @@ export interface Project {
   stack: string[];
   status: "Live" | "In Progress" | "Planned";
   githubUrl?: string;
+  liveUrl?: string;
   caseStudy?: CaseStudySection[];
 }
 
@@ -77,18 +78,19 @@ export const projects: Project[] = [
     stack: ["Python", "Claude API", "DuckDB", "Plotly", "Pandas", "Jinja2"],
     status: "Live",
     githubUrl: "https://github.com/smurphy6492/ecommerce-data-story",
+    liveUrl: "/reports/ecommerce-disruption.html",
     caseStudy: [
       {
-        heading: "The Business Question",
-        body: "How has the shift to e-commerce reshaped US retail, and which categories are still being disrupted? E-commerce grew from 0.8% of US retail in Q1 2000 to 16.4% by Q3 2025 — a 20x increase. But the disruption has been wildly uneven. I used 9 FRED time series covering retail categories from electronics to groceries to gasoline stations, spanning 25 years of quarterly and monthly data."
+        heading: "Key Findings",
+        body: "E-commerce grew from 0.8% of US retail in Q1 2000 to 16.4% by Q3 2025 — a 20x increase. Electronics scored 98.7 on the Disruption Index — essentially zero growth over 25 years while nonstore retailers grew 9.4% annually. Furniture (81.8) and Books/Hobby/Music (81.6) followed. Food & Beverage (62.8) and Gasoline (59.6) proved most resilient. COVID permanently accelerated e-commerce by 4.1 percentage points above the pre-COVID trend — it stuck. The biggest surprise: Clothing's 5-year CAGR of 7.2% versus its 25-year CAGR of 2.9% marks it as the next major disruption battleground."
       },
       {
         heading: "AI Integration Design",
         body: "Claude bookended the analysis — it didn't do it. Before any code was written, I prompted Claude with the data dictionary and business question to generate 7 testable hypotheses. These structured the entire investigation: instead of fishing for patterns, I was testing specific claims. After the analysis, I fed Claude the actual metrics and it wrote the executive summary and chart captions. I reviewed every cited number against the data. The AI helped me think before I started and communicate after I finished."
       },
       {
-        heading: "Key Findings",
-        body: "Electronics scored 98.7 on the Disruption Index — essentially zero growth over 25 years while nonstore retailers grew 9.4% annually. Furniture (81.8) and Books/Hobby/Music (81.6) followed. Food & Beverage (62.8) and Gasoline (59.6) proved most resilient. COVID permanently accelerated e-commerce by 4.1 percentage points above the pre-COVID trend — it stuck. The biggest surprise: Clothing's 5-year CAGR of 7.2% versus its 25-year CAGR of 2.9% marks it as the next major disruption battleground."
+        heading: "The Data",
+        body: "Nine FRED time series covering US retail categories from electronics to groceries to gasoline stations, spanning 25 years of quarterly and monthly data. All from public US Census Bureau sources — no authentication required. Five analyses: penetration timeline, category CAGR comparison, a custom Disruption Index, COVID acceleration measurement, and category deep dives with event annotations."
       },
       {
         heading: "What It Demonstrates",
