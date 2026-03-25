@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign ROI Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        /* ------------------------------------------------------------------ */
+        /* Reset & base                                                         */
+        /* ------------------------------------------------------------------ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { font-size: 16px; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, sans-serif;
+            background: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+        }
+
+        a { color: #0066cc; }
+
+        /* ------------------------------------------------------------------ */
+        /* Layout                                                               */
+        /* ------------------------------------------------------------------ */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Header                                                               */
+        /* ------------------------------------------------------------------ */
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+            color: #fff;
+            padding: 2.5rem 0 2rem;
+        }
+
+        header .container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header .subtitle {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        header .question-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 1rem;
+        }
+
+        header .question-text {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.9);
+            font-style: italic;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Main content                                                         */
+        /* ------------------------------------------------------------------ */
+        main {
+            padding: 2rem 0 3rem;
+        }
+
+        section {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            padding: 1.75rem 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        section h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0f3460;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #343a40;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        section h3:first-child {
+            margin-top: 0;
+        }
+
+        p { margin-bottom: 0.75rem; }
+
+        /* ------------------------------------------------------------------ */
+        /* Key metrics                                                          */
+        /* ------------------------------------------------------------------ */
+        .key-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        .metric-card {
+            flex: 1 1 160px;
+            background: #f1f3f5;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            text-align: center;
+            border-top: 3px solid #0f3460;
+        }
+
+        .metric-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #0f3460;
+            line-height: 1.2;
+        }
+
+        .metric-label {
+            font-size: 0.78rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+
+        .metric-context {
+            font-size: 0.8rem;
+            color: #495057;
+            margin-top: 0.4rem;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Charts                                                               */
+        /* ------------------------------------------------------------------ */
+        .chart-container {
+            margin-bottom: 2rem;
+        }
+
+        .chart-container:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Data tables                                                          */
+        /* ------------------------------------------------------------------ */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .data-table th {
+            background: #0f3460;
+            color: #fff;
+            padding: 0.6rem 0.85rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 0.5rem 0.85rem;
+            border-bottom: 1px solid #dee2e6;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr:nth-child(even) { background: #f8f9fa; }
+        .data-table tbody tr:hover { background: #e9f0fb; }
+
+        /* ------------------------------------------------------------------ */
+        /* Methodology / collapsible                                           */
+        /* ------------------------------------------------------------------ */
+        details {
+            margin-top: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 0.75rem 1rem;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #343a40;
+            list-style: none;
+        }
+
+        summary::after {
+            content: " ▶";
+            float: right;
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        details[open] summary::after { content: " ▼"; }
+
+        .query-block {
+            padding: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .query-block p {
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            color: #343a40;
+        }
+
+        pre {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        code { font-family: "Fira Code", "Cascadia Code", Consolas, monospace; }
+
+        /* ------------------------------------------------------------------ */
+        /* Errors                                                               */
+        /* ------------------------------------------------------------------ */
+        .error-banner {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+        }
+
+        .error-banner strong { color: #856404; }
+
+        /* ------------------------------------------------------------------ */
+        /* Footer                                                               */
+        /* ------------------------------------------------------------------ */
+        footer {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.8rem;
+            padding: 1.5rem 0 2rem;
+        }
+
+        footer p { margin-bottom: 0.2rem; }
+
+        /* ------------------------------------------------------------------ */
+        /* Print                                                                */
+        /* ------------------------------------------------------------------ */
+        @media print {
+            body { background: #fff; }
+            section { box-shadow: none; border: 1px solid #dee2e6; }
+            details { display: block; }
+            summary::after { display: none; }
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Responsive                                                           */
+        /* ------------------------------------------------------------------ */
+        @media (max-width: 640px) {
+            header h1 { font-size: 1.4rem; }
+            section { padding: 1.25rem 1rem; }
+            .metric-card { flex: 1 1 130px; }
+            .metric-value { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>Campaign ROI Analysis</h1>
+        <p class="subtitle">Generated on 2026-03-25 03:50 UTC</p>
+        <p class="question-label">Business Question</p>
+        <p class="question-text">What's the ROI by campaign? Which campaigns should we scale and which should we cut?</p>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+
+        
+
+        <!-- Executive Summary -->
+        <section id="executive-summary">
+            <h2>Executive Summary</h2>
+            <p>Across 7 tracked campaigns with a combined spend of $295,750, only one campaign — Holiday Email — delivered a positive ROI of +202.5%, generating $24,804 in revenue on just $8,200 in spend. The remaining six campaigns all destroyed value, with Back to School (-91.6% ROI) and Social Retargeting (-68.7% ROI) being the worst offenders. At the channel level, email is the standout performer (ROAS of 11.9x), while paid search collectively loses 42 cents on every dollar spent and social loses 73 cents. The recommendation is clear: scale the Holiday Email campaign and the email channel broadly, pause or fundamentally restructure paid search and social campaigns, and investigate why Brand Search — despite driving the most sessions (32,670) and transactions (792) — still yields a -26.4% ROI due to its outsized $109,500 spend.</p>
+
+            
+            <div class="key-metrics">
+                
+                <div class="metric-card">
+                    <div class="metric-value">+202.5%</div>
+                    <div class="metric-label">Best ROI — Holiday Email</div>
+                    
+                    <div class="metric-context">$24,804 revenue on $8,200 spend; email channel</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">-91.6%</div>
+                    <div class="metric-label">Worst ROI — Back to School</div>
+                    
+                    <div class="metric-context">Only $1,072 revenue on $12,800 spend; 0.37% conversion rate</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">11.9x</div>
+                    <div class="metric-label">Email Channel ROAS</div>
+                    
+                    <div class="metric-context">$97,212 revenue on $8,200 spend across email campaigns</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">-73.1%</div>
+                    <div class="metric-label">Social Channel ROI</div>
+                    
+                    <div class="metric-context">$18,202 revenue on $67,550 spend; 0.43% conversion rate</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">-$91,993</div>
+                    <div class="metric-label">Total Paid Search Loss</div>
+                    
+                    <div class="metric-context">$128,007 revenue vs. $220,000 spend; -41.8% ROI</div>
+                    
+                </div>
+                
+            </div>
+            
+        </section>
+
+        <!-- Analysis: Charts + Data Tables -->
+        
+        <section id="analysis">
+            <h2>Analysis</h2>
+
+            
+            <div class="chart-container">
+                <h3>ROI % by Campaign (Scale vs. Cut)</h3>
+                <div>                            <div id="campaign_roi_bar" class="plotly-graph-div" style="height:420px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("campaign_roi_bar")) {                    Plotly.newPlot(                        "campaign_roi_bar",                        [{"hovertemplate":"channel=paid_search\u003cbr\u003eroi_pct=%{x}\u003cbr\u003ecampaign_name=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"paid_search","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"paid_search","orientation":"h","showlegend":true,"textposition":"auto","x":[-26.4,-65.73,-43.39,-41.6],"xaxis":"x","y":["Brand Search","Summer Push","Black Friday","Spring Sale 2025"],"yaxis":"y","type":"bar"},{"hovertemplate":"channel=email\u003cbr\u003eroi_pct=%{x}\u003cbr\u003ecampaign_name=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"email","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"email","orientation":"h","showlegend":true,"textposition":"auto","x":[202.49],"xaxis":"x","y":["Holiday Email"],"yaxis":"y","type":"bar"},{"hovertemplate":"channel=social\u003cbr\u003eroi_pct=%{x}\u003cbr\u003ecampaign_name=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"social","marker":{"color":"#00cc96","pattern":{"shape":""}},"name":"social","orientation":"h","showlegend":true,"textposition":"auto","x":[-68.71,-91.63],"xaxis":"x","y":["Social Retargeting","Back to School"],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"ROI (%)"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Campaign"},"categoryorder":"total ascending"},"legend":{"title":{"text":"channel"},"tracegroupgap":0},"title":{"text":"ROI % by Campaign (Scale vs. Cut)"},"barmode":"relative","height":420,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Revenue vs. Spend by Channel</h3>
+                <div>                            <div id="channel_roas_bar" class="plotly-graph-div" style="height:400px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("channel_roas_bar")) {                    Plotly.newPlot(                        "channel_roas_bar",                        [{"hovertemplate":"channel=%{x}\u003cbr\u003etotal_revenue=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"paid_search","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"paid_search","orientation":"v","showlegend":true,"textposition":"auto","x":["paid_search"],"xaxis":"x","y":[128006.66],"yaxis":"y","type":"bar"},{"hovertemplate":"channel=%{x}\u003cbr\u003etotal_revenue=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"organic_search","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"organic_search","orientation":"v","showlegend":true,"textposition":"auto","x":["organic_search"],"xaxis":"x","y":[117446.32],"yaxis":"y","type":"bar"},{"hovertemplate":"channel=%{x}\u003cbr\u003etotal_revenue=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"email","marker":{"color":"#00cc96","pattern":{"shape":""}},"name":"email","orientation":"v","showlegend":true,"textposition":"auto","x":["email"],"xaxis":"x","y":[97212.43000000005],"yaxis":"y","type":"bar"},{"hovertemplate":"channel=%{x}\u003cbr\u003etotal_revenue=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"direct","marker":{"color":"#ab63fa","pattern":{"shape":""}},"name":"direct","orientation":"v","showlegend":true,"textposition":"auto","x":["direct"],"xaxis":"x","y":[43503.799999999996],"yaxis":"y","type":"bar"},{"hovertemplate":"channel=%{x}\u003cbr\u003etotal_revenue=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"referral","marker":{"color":"#FFA15A","pattern":{"shape":""}},"name":"referral","orientation":"v","showlegend":true,"textposition":"auto","x":["referral"],"xaxis":"x","y":[35379.24999999999],"yaxis":"y","type":"bar"},{"hovertemplate":"channel=%{x}\u003cbr\u003etotal_revenue=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"social","marker":{"color":"#19d3f3","pattern":{"shape":""}},"name":"social","orientation":"v","showlegend":true,"textposition":"auto","x":["social"],"xaxis":"x","y":[18202.34],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"channel"},"categoryorder":"total descending","categoryarray":["paid_search","organic_search","email","direct","referral","social"]},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Total Revenue ($)"}},"legend":{"title":{"text":"channel"},"tracegroupgap":0},"title":{"text":"Revenue vs. Spend by Channel"},"barmode":"relative","height":400,"showlegend":false},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Weekly Revenue by Campaign Over Time</h3>
+                <div>                            <div id="campaign_revenue_trend" class="plotly-graph-div" style="height:450px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("campaign_revenue_trend")) {                    Plotly.newPlot(                        "campaign_revenue_trend",                        [{"hovertemplate":"campaign_name=Spring Sale 2025\u003cbr\u003eWeek=%{x}\u003cbr\u003eRevenue ($)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Spring Sale 2025","line":{"color":"#636efa","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"Spring Sale 2025","orientation":"v","showlegend":true,"x":["2025-02-24T00:00:00.000000","2025-03-03T00:00:00.000000","2025-03-10T00:00:00.000000","2025-03-17T00:00:00.000000","2025-03-24T00:00:00.000000"],"xaxis":"x","y":[420.26,1458.3300000000002,1952.98,2318.3700000000003,2902.7700000000004],"yaxis":"y","type":"scatter"},{"hovertemplate":"campaign_name=Summer Push\u003cbr\u003eWeek=%{x}\u003cbr\u003eRevenue ($)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Summer Push","line":{"color":"#EF553B","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"Summer Push","orientation":"v","showlegend":true,"x":["2025-05-26T00:00:00.000000","2025-06-02T00:00:00.000000","2025-06-09T00:00:00.000000","2025-06-16T00:00:00.000000","2025-06-23T00:00:00.000000","2025-06-30T00:00:00.000000","2025-07-07T00:00:00.000000","2025-07-14T00:00:00.000000","2025-07-21T00:00:00.000000","2025-07-28T00:00:00.000000","2025-08-04T00:00:00.000000","2025-08-11T00:00:00.000000","2025-08-18T00:00:00.000000","2025-08-25T00:00:00.000000"],"xaxis":"x","y":[254.07,2230.03,2832.52,1986.6200000000001,2328.56,1250.3299999999997,1656.02,1731.0699999999997,2290.140000000001,1007.77,1269.71,1596.6100000000001,1699.8200000000002,1515.0799999999997],"yaxis":"y","type":"scatter"},{"hovertemplate":"campaign_name=Back to School\u003cbr\u003eWeek=%{x}\u003cbr\u003eRevenue ($)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Back to School","line":{"color":"#00cc96","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"Back to School","orientation":"v","showlegend":true,"x":["2025-08-11T00:00:00.000000","2025-08-18T00:00:00.000000","2025-08-25T00:00:00.000000","2025-09-01T00:00:00.000000","2025-09-08T00:00:00.000000"],"xaxis":"x","y":[32.49,31.9,132.23,266.03999999999996,376.98],"yaxis":"y","type":"scatter"},{"hovertemplate":"campaign_name=Black Friday\u003cbr\u003eWeek=%{x}\u003cbr\u003eRevenue ($)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Black Friday","line":{"color":"#ab63fa","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"Black Friday","orientation":"v","showlegend":true,"x":["2025-11-17T00:00:00.000000","2025-11-24T00:00:00.000000"],"xaxis":"x","y":[3322.85,9546.12],"yaxis":"y","type":"scatter"},{"hovertemplate":"campaign_name=Holiday Email\u003cbr\u003eWeek=%{x}\u003cbr\u003eRevenue ($)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Holiday Email","line":{"color":"#FFA15A","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"Holiday Email","orientation":"v","showlegend":true,"x":["2025-11-10T00:00:00.000000","2025-11-17T00:00:00.000000","2025-11-24T00:00:00.000000","2025-12-01T00:00:00.000000","2025-12-08T00:00:00.000000","2025-12-15T00:00:00.000000","2025-12-22T00:00:00.000000"],"xaxis":"x","y":[1367.0900000000001,2066.8399999999997,6666.889999999999,5272.86,3280.4000000000005,4980.909999999999,1169.05],"yaxis":"y","type":"scatter"},{"hovertemplate":"campaign_name=Social Retargeting\u003cbr\u003eWeek=%{x}\u003cbr\u003eRevenue ($)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Social Retargeting","line":{"color":"#19d3f3","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"Social Retargeting","orientation":"v","showlegend":true,"x":["2024-12-30T00:00:00.000000","2025-01-06T00:00:00.000000","2025-01-13T00:00:00.000000","2025-01-20T00:00:00.000000","2025-01-27T00:00:00.000000","2025-02-03T00:00:00.000000","2025-02-10T00:00:00.000000","2025-02-17T00:00:00.000000","2025-02-24T00:00:00.000000","2025-03-03T00:00:00.000000","2025-03-10T00:00:00.000000","2025-03-17T00:00:00.000000","2025-03-24T00:00:00.000000","2025-03-31T00:00:00.000000","2025-04-07T00:00:00.000000","2025-04-14T00:00:00.000000","2025-04-21T00:00:00.000000","2025-04-28T00:00:00.000000","2025-05-05T00:00:00.000000","2025-05-12T00:00:00.000000","2025-05-19T00:00:00.000000","2025-05-26T00:00:00.000000","2025-06-02T00:00:00.000000","2025-06-09T00:00:00.000000","2025-06-16T00:00:00.000000","2025-06-23T00:00:00.000000","2025-06-30T00:00:00.000000","2025-07-07T00:00:00.000000","2025-07-14T00:00:00.000000","2025-07-21T00:00:00.000000","2025-07-28T00:00:00.000000","2025-08-04T00:00:00.000000","2025-08-11T00:00:00.000000","2025-08-18T00:00:00.000000","2025-08-25T00:00:00.000000","2025-09-01T00:00:00.000000","2025-09-08T00:00:00.000000","2025-09-15T00:00:00.000000","2025-09-22T00:00:00.000000","2025-09-29T00:00:00.000000","2025-10-06T00:00:00.000000","2025-10-13T00:00:00.000000","2025-10-20T00:00:00.000000","2025-10-27T00:00:00.000000","2025-11-03T00:00:00.000000","2025-11-10T00:00:00.000000","2025-11-17T00:00:00.000000","2025-11-24T00:00:00.000000","2025-12-01T00:00:00.000000","2025-12-08T00:00:00.000000","2025-12-15T00:00:00.000000","2025-12-22T00:00:00.000000","2025-12-29T00:00:00.000000"],"xaxis":"x","y":[101.35,0.0,544.66,54.93,110.91,308.7,276.23,797.9499999999999,768.79,61.7,0.0,370.87,273.62,934.08,216.45999999999998,707.69,119.80000000000001,121.27,357.59000000000003,315.5,55.59,412.75,0.0,240.76000000000002,285.41999999999996,468.04,292.33,0.0,377.07000000000005,205.20000000000002,140.13,375.94,80.71,0.0,0.0,0.0,0.0,139.95,98.83,361.34000000000003,41.82,306.09000000000003,299.27,305.84000000000003,1191.33,704.8199999999999,434.57,580.85,417.63,561.8299999999999,1940.9200000000003,369.45,0.0],"yaxis":"y","type":"scatter"},{"hovertemplate":"campaign_name=Brand Search\u003cbr\u003eWeek=%{x}\u003cbr\u003eRevenue ($)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Brand Search","line":{"color":"#FF6692","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"Brand Search","orientation":"v","showlegend":true,"x":["2024-12-30T00:00:00.000000","2025-01-06T00:00:00.000000","2025-01-13T00:00:00.000000","2025-01-20T00:00:00.000000","2025-01-27T00:00:00.000000","2025-02-03T00:00:00.000000","2025-02-10T00:00:00.000000","2025-02-17T00:00:00.000000","2025-02-24T00:00:00.000000","2025-03-03T00:00:00.000000","2025-03-10T00:00:00.000000","2025-03-17T00:00:00.000000","2025-03-24T00:00:00.000000","2025-03-31T00:00:00.000000","2025-04-07T00:00:00.000000","2025-04-14T00:00:00.000000","2025-04-21T00:00:00.000000","2025-04-28T00:00:00.000000","2025-05-05T00:00:00.000000","2025-05-12T00:00:00.000000","2025-05-19T00:00:00.000000","2025-05-26T00:00:00.000000","2025-06-02T00:00:00.000000","2025-06-09T00:00:00.000000","2025-06-16T00:00:00.000000","2025-06-23T00:00:00.000000","2025-06-30T00:00:00.000000","2025-07-07T00:00:00.000000","2025-07-14T00:00:00.000000","2025-07-21T00:00:00.000000","2025-07-28T00:00:00.000000","2025-08-04T00:00:00.000000","2025-08-11T00:00:00.000000","2025-08-18T00:00:00.000000","2025-08-25T00:00:00.000000","2025-09-01T00:00:00.000000","2025-09-08T00:00:00.000000","2025-09-15T00:00:00.000000","2025-09-22T00:00:00.000000","2025-09-29T00:00:00.000000","2025-10-06T00:00:00.000000","2025-10-13T00:00:00.000000","2025-10-20T00:00:00.000000","2025-10-27T00:00:00.000000","2025-11-03T00:00:00.000000","2025-11-10T00:00:00.000000","2025-11-17T00:00:00.000000","2025-11-24T00:00:00.000000","2025-12-01T00:00:00.000000","2025-12-08T00:00:00.000000","2025-12-15T00:00:00.000000","2025-12-22T00:00:00.000000","2025-12-29T00:00:00.000000"],"xaxis":"x","y":[805.1700000000001,2238.5799999999995,2437.8199999999997,1642.2400000000002,1729.1099999999997,1497.27,1848.61,2139.9,2106.65,0.0,0.0,0.0,0.0,2597.0699999999997,987.0999999999999,2131.9100000000003,1865.1200000000001,1471.61,2147.14,2020.83,1023.7700000000001,1110.3400000000001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2511.4400000000005,2703.8999999999996,3099.94,3288.07,2116.57,1916.5499999999997,2220.76,3424.2799999999997,2585.31,2748.77,3219.0,1486.0,0.0,3414.2,4526.25,6368.420000000001,2709.6399999999994,447.49],"yaxis":"y","type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Week"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Revenue ($)"}},"legend":{"title":{"text":"campaign_name"},"tracegroupgap":0},"title":{"text":"Weekly Revenue by Campaign Over Time"},"height":450,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Conversion Rate vs. Bounce Rate by Campaign</h3>
+                <div>                            <div id="engagement_scatter" class="plotly-graph-div" style="height:420px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("engagement_scatter")) {                    Plotly.newPlot(                        "engagement_scatter",                        [{"hovertemplate":"campaign_name=Holiday Email\u003cbr\u003ebounce_rate_pct=%{x}\u003cbr\u003eavg_revenue_per_transaction=%{y}\u003cbr\u003etotal_sessions=%{marker.size}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Holiday Email","marker":{"color":"#636efa","size":[5546],"sizemode":"area","sizeref":99.3275,"symbol":"circle"},"mode":"markers","name":"Holiday Email","orientation":"v","showlegend":true,"x":[26.6],"xaxis":"x","y":[106.91],"yaxis":"y","type":"scatter"},{"hovertemplate":"campaign_name=Brand Search\u003cbr\u003ebounce_rate_pct=%{x}\u003cbr\u003eavg_revenue_per_transaction=%{y}\u003cbr\u003etotal_sessions=%{marker.size}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Brand Search","marker":{"color":"#EF553B","size":[32670],"sizemode":"area","sizeref":99.3275,"symbol":"circle"},"mode":"markers","name":"Brand Search","orientation":"v","showlegend":true,"x":[37.39],"xaxis":"x","y":[101.75],"yaxis":"y","type":"scatter"},{"hovertemplate":"campaign_name=Black Friday\u003cbr\u003ebounce_rate_pct=%{x}\u003cbr\u003eavg_revenue_per_transaction=%{y}\u003cbr\u003etotal_sessions=%{marker.size}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Black Friday","marker":{"color":"#00cc96","size":[3953],"sizemode":"area","sizeref":99.3275,"symbol":"circle"},"mode":"markers","name":"Black Friday","orientation":"v","showlegend":true,"x":[37.84],"xaxis":"x","y":[100.81],"yaxis":"y","type":"scatter"},{"hovertemplate":"campaign_name=Spring Sale 2025\u003cbr\u003ebounce_rate_pct=%{x}\u003cbr\u003eavg_revenue_per_transaction=%{y}\u003cbr\u003etotal_sessions=%{marker.size}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Spring Sale 2025","marker":{"color":"#ab63fa","size":[4338],"sizemode":"area","sizeref":99.3275,"symbol":"circle"},"mode":"markers","name":"Spring Sale 2025","orientation":"v","showlegend":true,"x":[37.6],"xaxis":"x","y":[99.48],"yaxis":"y","type":"scatter"},{"hovertemplate":"campaign_name=Social Retargeting\u003cbr\u003ebounce_rate_pct=%{x}\u003cbr\u003eavg_revenue_per_transaction=%{y}\u003cbr\u003etotal_sessions=%{marker.size}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Social Retargeting","marker":{"color":"#FFA15A","size":[39731],"sizemode":"area","sizeref":99.3275,"symbol":"circle"},"mode":"markers","name":"Social Retargeting","orientation":"v","showlegend":true,"x":[58.85],"xaxis":"x","y":[98.45],"yaxis":"y","type":"scatter"},{"hovertemplate":"campaign_name=Summer Push\u003cbr\u003ebounce_rate_pct=%{x}\u003cbr\u003eavg_revenue_per_transaction=%{y}\u003cbr\u003etotal_sessions=%{marker.size}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Summer Push","marker":{"color":"#19d3f3","size":[11652],"sizemode":"area","sizeref":99.3275,"symbol":"circle"},"mode":"markers","name":"Summer Push","orientation":"v","showlegend":true,"x":[38.14],"xaxis":"x","y":[94.22],"yaxis":"y","type":"scatter"},{"hovertemplate":"campaign_name=Back to School\u003cbr\u003ebounce_rate_pct=%{x}\u003cbr\u003eavg_revenue_per_transaction=%{y}\u003cbr\u003etotal_sessions=%{marker.size}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Back to School","marker":{"color":"#FF6692","size":[3237],"sizemode":"area","sizeref":99.3275,"symbol":"circle"},"mode":"markers","name":"Back to School","orientation":"v","showlegend":true,"x":[58.63],"xaxis":"x","y":[89.31],"yaxis":"y","type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Bounce Rate (%)"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Avg Revenue per Transaction ($)"}},"legend":{"title":{"text":"campaign_name"},"tracegroupgap":0,"itemsizing":"constant"},"title":{"text":"Conversion Rate vs. Bounce Rate by Campaign"},"height":420,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+
+            
+            <div class="table-container">
+                <h3>Full Campaign ROI Summary — Scale vs. Cut Decision Table</h3>
+                <table class="data-table"><thead><tr><th>Campaign Name</th><th>Channel</th><th>Total Spend</th><th>Total Revenue</th><th>Roi Pct</th><th>Conversion Rate Pct</th><th>Attributed Sessions</th><th>Num Transactions</th></tr></thead><tbody><tr><td>Brand Search</td><td>paid_search</td><td>$109,500</td><td>$80,587</td><td>-26.4%</td><td>2.4%</td><td>32,670</td><td>792</td></tr><tr><td>Holiday Email</td><td>email</td><td>$8,200</td><td>$24,804</td><td>202.5%</td><td>4.2%</td><td>5,546</td><td>232</td></tr><tr><td>Summer Push</td><td>paid_search</td><td>$69,000</td><td>$23,648</td><td>-65.7%</td><td>2.1%</td><td>11,652</td><td>251</td></tr><tr><td>Social Retargeting</td><td>social</td><td>$54,750</td><td>$17,131</td><td>-68.7%</td><td>0.4%</td><td>39,731</td><td>174</td></tr><tr><td>Black Friday</td><td>paid_search</td><td>$26,000</td><td>$14,719</td><td>-43.4%</td><td>3.7%</td><td>3,953</td><td>146</td></tr><tr><td>Spring Sale 2025</td><td>paid_search</td><td>$15,500</td><td>$9,053</td><td>-41.6%</td><td>2.1%</td><td>4,338</td><td>91</td></tr><tr><td>Back to School</td><td>social</td><td>$12,800</td><td>$1,072</td><td>-91.6%</td><td>0.4%</td><td>3,237</td><td>12</td></tr></tbody></table>
+            </div>
+            
+            <div class="table-container">
+                <h3>Campaign Engagement Quality Metrics</h3>
+                <table class="data-table"><thead><tr><th>Campaign Name</th><th>Total Sessions</th><th>Avg Pages Viewed</th><th>Avg Session Duration Seconds</th><th>Bounce Rate Pct</th><th>Avg Revenue Per Transaction</th></tr></thead><tbody><tr><td>Holiday Email</td><td>5,546</td><td>5.39</td><td>345.3%</td><td>26.6%</td><td>$107</td></tr><tr><td>Brand Search</td><td>32,670</td><td>4.77</td><td>296.3%</td><td>37.4%</td><td>$102</td></tr><tr><td>Black Friday</td><td>3,953</td><td>4.76</td><td>299.2%</td><td>37.8%</td><td>$101</td></tr><tr><td>Spring Sale 2025</td><td>4,338</td><td>4.75</td><td>297.4%</td><td>37.6%</td><td>$99</td></tr><tr><td>Social Retargeting</td><td>39,731</td><td>3.46</td><td>201.6%</td><td>58.9%</td><td>$98</td></tr><tr><td>Summer Push</td><td>11,652</td><td>4.71</td><td>292.4%</td><td>38.1%</td><td>$94</td></tr><tr><td>Back to School</td><td>3,237</td><td>3.47</td><td>201.3%</td><td>58.6%</td><td>$89</td></tr></tbody></table>
+            </div>
+            
+        </section>
+        
+
+        <!-- Methodology -->
+        <section id="methodology">
+            <h2>Methodology</h2>
+            
+            <p><strong>Data Sources:</strong> campaigns, pageviews, sessions, transactions</p>
+            
+            <p><strong>Analysis Approach:</strong> To answer the ROI and campaign scaling question, we need to: (1) compute per-campaign spend, revenue, and ROI by joining campaigns → sessions → transactions; (2) analyze engagement and conversion metrics per campaign to understand quality of traffic; (3) break down performance by channel to see if certain channels drive better returns. We must account for the 57.7% null campaign_id in sessions by restricting to attributed sessions only. ROI is defined as (Revenue - Spend) / Spend * 100.</p>
+
+            
+            <details>
+                <summary>SQL Queries Used</summary>
+                
+                <div class="query-block">
+                    <p>Calculate total spend, total revenue, ROI, number of attributed sessions, number of transactions, and conversion rate for each campaign. This is the primary metric for deciding which campaigns to scale or cut.</p>
+                    <pre><code>SELECT
+  c.campaign_id,
+  c.campaign_name,
+  c.channel,
+  c.total_spend,
+  COUNT(DISTINCT s.session_id) AS attributed_sessions,
+  COUNT(DISTINCT t.transaction_id) AS num_transactions,
+  SUM(t.revenue) AS total_revenue,
+  ROUND(
+    (SUM(t.revenue) - c.total_spend) / NULLIF(c.total_spend, 0) * 100,
+    2
+  ) AS roi_pct,
+  ROUND(
+    COUNT(DISTINCT t.transaction_id) * 1.0 / NULLIF(COUNT(DISTINCT s.session_id), 0) * 100,
+    2
+  ) AS conversion_rate_pct
+FROM campaigns c
+LEFT JOIN sessions s
+  ON s.campaign_id = c.campaign_id
+LEFT JOIN transactions t
+  ON t.session_id = s.session_id
+GROUP BY
+  c.campaign_id,
+  c.campaign_name,
+  c.channel,
+  c.total_spend
+ORDER BY total_revenue DESC</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Evaluate session quality per campaign by computing average pages viewed, average session duration, bounce rate, and average revenue per transaction. This helps distinguish campaigns with high spend but low engagement or poor conversion quality.</p>
+                    <pre><code>SELECT
+    c.campaign_id,
+    c.campaign_name,
+    COUNT(DISTINCT s.session_id) AS total_sessions,
+    ROUND(AVG(s.pages_viewed), 2) AS avg_pages_viewed,
+    ROUND(AVG(s.duration_seconds), 2) AS avg_session_duration_seconds,
+    ROUND(100.0 * SUM(s.bounced) / COUNT(s.session_id), 2) AS bounce_rate_pct,
+    COUNT(DISTINCT t.transaction_id) AS total_transactions,
+    ROUND(SUM(t.revenue) / NULLIF(COUNT(DISTINCT t.transaction_id), 0), 2) AS avg_revenue_per_transaction
+FROM campaigns c
+LEFT JOIN sessions s
+    ON s.campaign_id = c.campaign_id
+LEFT JOIN transactions t
+    ON t.session_id = s.session_id
+GROUP BY
+    c.campaign_id,
+    c.campaign_name
+ORDER BY
+    avg_revenue_per_transaction DESC</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Aggregate ROI, revenue, spend, sessions, and conversions by marketing channel (paid_search, social, etc.) to identify whether performance differences are campaign-specific or channel-structural, informing scaling strategy at the channel level.</p>
+                    <pre><code>WITH channel_spend AS (
+    SELECT
+        channel,
+        SUM(total_spend) AS total_spend
+    FROM campaigns
+    GROUP BY channel
+),
+channel_sessions AS (
+    SELECT
+        s.channel,
+        COUNT(DISTINCT s.session_id) AS total_sessions
+    FROM sessions s
+    GROUP BY s.channel
+),
+channel_revenue AS (
+    SELECT
+        s.channel,
+        SUM(t.revenue) AS total_revenue,
+        COUNT(DISTINCT t.transaction_id) AS total_conversions
+    FROM sessions s
+    INNER JOIN transactions t ON s.session_id = t.session_id
+    GROUP BY s.channel
+)
+SELECT
+    css.channel,
+    COALESCE(cr.total_revenue, 0) AS total_revenue,
+    COALESCE(csp.total_spend, 0) AS total_spend,
+    COALESCE(css.total_sessions, 0) AS total_sessions,
+    COALESCE(cr.total_conversions, 0) AS total_conversions,
+    CASE
+        WHEN COALESCE(csp.total_spend, 0) = 0 THEN NULL
+        ELSE ROUND((COALESCE(cr.total_revenue, 0) - csp.total_spend) / csp.total_spend, 4)
+    END AS roi,
+    CASE
+        WHEN COALESCE(csp.total_spend, 0) = 0 THEN NULL
+        ELSE ROUND(COALESCE(cr.total_revenue, 0) / csp.total_spend, 4)
+    END AS roas,
+    CASE
+        WHEN COALESCE(css.total_sessions, 0) = 0 THEN NULL
+        ELSE ROUND(CAST(COALESCE(cr.total_conversions, 0) AS DOUBLE) / css.total_sessions * 100, 4)
+    END AS conversion_rate_pct
+FROM channel_sessions css
+LEFT JOIN channel_spend csp ON css.channel = csp.channel
+LEFT JOIN channel_revenue cr ON css.channel = cr.channel
+ORDER BY total_revenue DESC</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Track weekly revenue and session volume attributed to each campaign across its active period to identify trends, ramp-up patterns, or decay in performance — useful for deciding whether underperformers are early-stage or genuinely declining.</p>
+                    <pre><code>WITH campaign_weeks AS (
+    SELECT
+        c.campaign_id,
+        c.campaign_name,
+        c.channel,
+        c.start_date,
+        c.end_date,
+        -- Generate weekly buckets within the campaign's active period
+        DATE_TRUNC('week', gs.week_start) AS week_start
+    FROM campaigns c
+    CROSS JOIN (
+        SELECT UNNEST(GENERATE_SERIES(
+            (SELECT MIN(start_date) FROM campaigns),
+            (SELECT MAX(end_date) FROM campaigns),
+            INTERVAL '7 days'
+        )) AS week_start
+    ) gs
+    WHERE gs.week_start <= c.end_date
+      AND gs.week_start + INTERVAL '6 days' >= c.start_date
+),
+session_revenue AS (
+    SELECT
+        s.session_id,
+        s.campaign_id,
+        s.session_date,
+        COALESCE(t.revenue, 0) AS revenue
+    FROM sessions s
+    LEFT JOIN transactions t ON s.session_id = t.session_id
+    WHERE s.campaign_id IS NOT NULL
+),
+weekly_metrics AS (
+    SELECT
+        cw.campaign_id,
+        cw.campaign_name,
+        cw.channel,
+        cw.start_date AS campaign_start,
+        cw.end_date AS campaign_end,
+        cw.week_start,
+        cw.week_start + INTERVAL '6 days' AS week_end,
+        COUNT(DISTINCT sr.session_id) AS session_count,
+        SUM(sr.revenue) AS total_revenue,
+        ROW_NUMBER() OVER (
+            PARTITION BY cw.campaign_id
+            ORDER BY cw.week_start
+        ) AS week_number
+    FROM campaign_weeks cw
+    LEFT JOIN session_revenue sr
+        ON cw.campaign_id = sr.campaign_id
+        AND sr.session_date >= cw.week_start
+        AND sr.session_date <= CAST(cw.week_start + INTERVAL '6 days' AS DATE)
+    GROUP BY
+        cw.campaign_id,
+        cw.campaign_name,
+        cw.channel,
+        cw.start_date,
+        cw.end_date,
+        cw.week_start
+)
+SELECT
+    campaign_id,
+    campaign_name,
+    channel,
+    campaign_start,
+    campaign_end,
+    week_start,
+    CAST(week_end AS DATE) AS week_end,
+    week_number,
+    session_count,
+    COALESCE(total_revenue, 0) AS total_revenue
+FROM weekly_metrics
+ORDER BY campaign_id, week_start</code></pre>
+                </div>
+                
+            </details>
+            
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    <p>Generated by <strong>Autonomous Analytics Agent</strong></p>
+    <p>Pipeline execution time: 1m 49s</p>
+</footer>
+
+</body>
+</html>

@@ -3,7 +3,7 @@ import { StatCards } from "@/components/StatCards";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ProjectImage } from "@/components/ProjectImage";
 import { WorkflowDiagram } from "@/components/WorkflowDiagram";
-import { Quote } from "lucide-react";
+import { Quote, ExternalLink } from "lucide-react";
 
 interface ContentRendererProps {
   blocks: ContentBlock[];
@@ -120,6 +120,39 @@ export function ContentRenderer({ blocks, workflow }: ContentRendererProps) {
                   className="w-full bg-white"
                   style={{ height: block.height ?? 500 }}
                 />
+              </div>
+            );
+
+          case "demoGrid":
+            return (
+              <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {block.cards.map((card) => (
+                  <div
+                    key={card.dataset}
+                    className="bg-card border border-border rounded-xl p-5 flex flex-col"
+                  >
+                    <h4 className="font-display font-bold text-foreground mb-1">
+                      {card.dataset}
+                    </h4>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      {card.description}
+                    </p>
+                    <div className="space-y-1.5">
+                      {card.reports.map((r) => (
+                        <a
+                          key={r.href}
+                          href={r.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                          {r.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             );
 

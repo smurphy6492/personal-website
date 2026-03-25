@@ -4,6 +4,17 @@ export interface StatItem {
   detail?: string;
 }
 
+export interface DemoLink {
+  label: string;
+  href: string;
+}
+
+export interface DemoCard {
+  dataset: string;
+  description: string;
+  reports: DemoLink[];
+}
+
 export type ContentBlock =
   | { type: "text"; value: string }
   | { type: "bullets"; items: string[] }
@@ -13,6 +24,7 @@ export type ContentBlock =
   | { type: "callout"; value: string }
   | { type: "table"; headers: string[]; rows: string[][] }
   | { type: "embed"; src: string; title: string; height?: number }
+  | { type: "demoGrid"; cards: DemoCard[] }
   | { type: "workflow" };
 
 export interface ProjectSection {
@@ -75,8 +87,8 @@ export const projects: Project[] = [
     githubUrl: "https://github.com/smurphy6492/autonomous-analytics-agent",
     metrics: [
       { value: "~60s", label: "Question to Report", detail: "Replaces a ~2hr analyst workflow" },
-      { value: "5", label: "Specialized Agents", detail: "Profiler, Orchestrator, SQL Analyst, Viz, Report Builder" },
-      { value: "8+", label: "LLM Calls per Report", detail: "Planning, SQL generation, synthesis, validation" },
+      { value: "3", label: "Datasets Tested", detail: "Finance, marketing, e-commerce" },
+      { value: "8", label: "Demo Reports", detail: "All generated autonomously" },
       { value: "8", label: "Validation Gates", detail: "Coverage, sanity, zero-row, bdata, and more" }
     ],
     sections: [
@@ -103,6 +115,40 @@ export const projects: Project[] = [
         content: [
           { type: "text", value: "Each report is a self-contained HTML file with interactive Plotly charts and an executive summary that cites actual numbers from the query results. Here's a real report generated from the question: \"What are the revenue trends by product category?\"" },
           { type: "embed", src: "/reports/analytics-agent-demo.html", title: "Auto-generated revenue analysis report", height: 600 }
+        ]
+      },
+      {
+        heading: "Multi-Dataset Demos",
+        content: [
+          { type: "text", value: "The agent runs on any CSV dataset with no configuration. Point it at a directory, ask a question, get a report. Here are demos across three domains:" },
+          { type: "demoGrid", cards: [
+            {
+              dataset: "Financial Markets",
+              description: "Top 50 S&P 500 stocks, 5 years of daily prices from Yahoo Finance.",
+              reports: [
+                { label: "Sector Performance vs S&P 500", href: "/reports/finance_sector_performance.html" },
+                { label: "Sharpe Ratio Rankings", href: "/reports/finance_sharpe_ratio.html" },
+                { label: "Correlation & Diversification", href: "/reports/finance_correlation.html" }
+              ]
+            },
+            {
+              dataset: "Marketing Analytics",
+              description: "240K sessions, 4K transactions, 7 campaigns. Synthetic B2C e-commerce site.",
+              reports: [
+                { label: "Channel Performance & CPA", href: "/reports/marketing_channel_performance.html" },
+                { label: "Device vs Channel Conversion", href: "/reports/marketing_device_conversion.html" },
+                { label: "Campaign ROI Analysis", href: "/reports/marketing_campaign_roi.html" }
+              ]
+            },
+            {
+              dataset: "E-Commerce (Olist)",
+              description: "100K orders from a Brazilian marketplace. Real public dataset from Kaggle.",
+              reports: [
+                { label: "Revenue Analysis", href: "/reports/analytics-agent-demo.html" },
+                { label: "Customer Segmentation", href: "/reports/customer-segmentation.html" }
+              ]
+            }
+          ]}
         ]
       },
       {

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device vs Channel Conversion Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        /* ------------------------------------------------------------------ */
+        /* Reset & base                                                         */
+        /* ------------------------------------------------------------------ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { font-size: 16px; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, sans-serif;
+            background: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+        }
+
+        a { color: #0066cc; }
+
+        /* ------------------------------------------------------------------ */
+        /* Layout                                                               */
+        /* ------------------------------------------------------------------ */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Header                                                               */
+        /* ------------------------------------------------------------------ */
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+            color: #fff;
+            padding: 2.5rem 0 2rem;
+        }
+
+        header .container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header .subtitle {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        header .question-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 1rem;
+        }
+
+        header .question-text {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.9);
+            font-style: italic;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Main content                                                         */
+        /* ------------------------------------------------------------------ */
+        main {
+            padding: 2rem 0 3rem;
+        }
+
+        section {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            padding: 1.75rem 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        section h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0f3460;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #343a40;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        section h3:first-child {
+            margin-top: 0;
+        }
+
+        p { margin-bottom: 0.75rem; }
+
+        /* ------------------------------------------------------------------ */
+        /* Key metrics                                                          */
+        /* ------------------------------------------------------------------ */
+        .key-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        .metric-card {
+            flex: 1 1 160px;
+            background: #f1f3f5;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            text-align: center;
+            border-top: 3px solid #0f3460;
+        }
+
+        .metric-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #0f3460;
+            line-height: 1.2;
+        }
+
+        .metric-label {
+            font-size: 0.78rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+
+        .metric-context {
+            font-size: 0.8rem;
+            color: #495057;
+            margin-top: 0.4rem;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Charts                                                               */
+        /* ------------------------------------------------------------------ */
+        .chart-container {
+            margin-bottom: 2rem;
+        }
+
+        .chart-container:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Data tables                                                          */
+        /* ------------------------------------------------------------------ */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .data-table th {
+            background: #0f3460;
+            color: #fff;
+            padding: 0.6rem 0.85rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 0.5rem 0.85rem;
+            border-bottom: 1px solid #dee2e6;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr:nth-child(even) { background: #f8f9fa; }
+        .data-table tbody tr:hover { background: #e9f0fb; }
+
+        /* ------------------------------------------------------------------ */
+        /* Methodology / collapsible                                           */
+        /* ------------------------------------------------------------------ */
+        details {
+            margin-top: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 0.75rem 1rem;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #343a40;
+            list-style: none;
+        }
+
+        summary::after {
+            content: " ▶";
+            float: right;
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        details[open] summary::after { content: " ▼"; }
+
+        .query-block {
+            padding: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .query-block p {
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            color: #343a40;
+        }
+
+        pre {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        code { font-family: "Fira Code", "Cascadia Code", Consolas, monospace; }
+
+        /* ------------------------------------------------------------------ */
+        /* Errors                                                               */
+        /* ------------------------------------------------------------------ */
+        .error-banner {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+        }
+
+        .error-banner strong { color: #856404; }
+
+        /* ------------------------------------------------------------------ */
+        /* Footer                                                               */
+        /* ------------------------------------------------------------------ */
+        footer {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.8rem;
+            padding: 1.5rem 0 2rem;
+        }
+
+        footer p { margin-bottom: 0.2rem; }
+
+        /* ------------------------------------------------------------------ */
+        /* Print                                                                */
+        /* ------------------------------------------------------------------ */
+        @media print {
+            body { background: #fff; }
+            section { box-shadow: none; border: 1px solid #dee2e6; }
+            details { display: block; }
+            summary::after { display: none; }
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Responsive                                                           */
+        /* ------------------------------------------------------------------ */
+        @media (max-width: 640px) {
+            header h1 { font-size: 1.4rem; }
+            section { padding: 1.25rem 1rem; }
+            .metric-card { flex: 1 1 130px; }
+            .metric-value { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>Device vs Channel Conversion Analysis</h1>
+        <p class="subtitle">Generated on 2026-03-25 19:01 UTC</p>
+        <p class="question-label">Business Question</p>
+        <p class="question-text">How does mobile vs. desktop conversion differ by traffic source?</p>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+
+        
+
+        <!-- Executive Summary -->
+        <section id="executive-summary">
+            <h2>Executive Summary</h2>
+            <p>Desktop consistently outperforms mobile across every traffic channel, with an overall desktop conversion rate approximately 2x higher than mobile. The gap is most pronounced in email (desktop 4.49% vs. mobile 2.22%) and paid search (desktop 3.27% vs. mobile 1.60%), while social is the worst-performing channel for all devices, with mobile social hitting a low of just 0.29%. Despite lower conversion rates, mobile order values are broadly comparable to desktop (~$90–$110 AOV), meaning the revenue gap is driven by conversion volume rather than basket size. The mobile-desktop conversion gap has remained stable throughout 2025, consistently hovering around a 1.2–1.4 percentage point difference, indicating a structural rather than seasonal issue.</p>
+
+            
+            <div class="key-metrics">
+                
+                <div class="metric-card">
+                    <div class="metric-value">4.49%</div>
+                    <div class="metric-label">Desktop Email Conversion Rate</div>
+                    
+                    <div class="metric-context">Highest conversion rate across all device/channel combinations</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">0.29%</div>
+                    <div class="metric-label">Mobile Social Conversion Rate</div>
+                    
+                    <div class="metric-context">Lowest conversion rate — 15x below desktop email</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">1.67 pp</div>
+                    <div class="metric-label">Mobile vs. Desktop Gap (Paid Search)</div>
+                    
+                    <div class="metric-context">Desktop paid search at 3.27% vs. mobile at 1.60%</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">$115.00</div>
+                    <div class="metric-label">Top AOV Segment</div>
+                    
+                    <div class="metric-context">Desktop referral — highest average order value of any segment</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">63.35%</div>
+                    <div class="metric-label">Mobile Social Bounce Rate</div>
+                    
+                    <div class="metric-context">Highest bounce rate, correlated with lowest conversion rate</div>
+                    
+                </div>
+                
+            </div>
+            
+        </section>
+
+        <!-- Analysis: Charts + Data Tables -->
+        
+        <section id="analysis">
+            <h2>Analysis</h2>
+
+            
+            <div class="chart-container">
+                <h3>Conversion Rate by Traffic Channel and Device</h3>
+                <div>                            <div id="conversion_rate_by_device_channel" class="plotly-graph-div" style="height:450px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("conversion_rate_by_device_channel")) {                    Plotly.newPlot(                        "conversion_rate_by_device_channel",                        [{"hovertemplate":"device=desktop\u003cbr\u003echannel=%{x}\u003cbr\u003econversion_rate_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"desktop","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"desktop","orientation":"v","showlegend":true,"textposition":"auto","x":["email","paid_search","direct","organic_search","referral","social"],"xaxis":"x","y":[4.49,3.27,2.99,2.21,1.91,0.57],"yaxis":"y","type":"bar"},{"hovertemplate":"device=tablet\u003cbr\u003echannel=%{x}\u003cbr\u003econversion_rate_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"tablet","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"tablet","orientation":"v","showlegend":true,"textposition":"auto","x":["email","paid_search","direct","organic_search","referral","social"],"xaxis":"x","y":[3.01,2.35,1.83,1.59,1.39,0.47],"yaxis":"y","type":"bar"},{"hovertemplate":"device=mobile\u003cbr\u003echannel=%{x}\u003cbr\u003econversion_rate_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"mobile","marker":{"color":"#00cc96","pattern":{"shape":""}},"name":"mobile","orientation":"v","showlegend":true,"textposition":"auto","x":["email","paid_search","direct","organic_search","referral","social"],"xaxis":"x","y":[2.22,1.6,1.31,0.91,0.88,0.29],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Traffic Channel"},"categoryorder":"total descending"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Conversion Rate (%)"}},"legend":{"title":{"text":"device"},"tracegroupgap":0},"title":{"text":"Conversion Rate by Traffic Channel and Device"},"barmode":"group","height":450,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Monthly Conversion Rate Trend by Device (All Channels)</h3>
+                <div>                            <div id="conversion_trend_over_time" class="plotly-graph-div" style="height:400px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("conversion_trend_over_time")) {                    Plotly.newPlot(                        "conversion_trend_over_time",                        [{"hovertemplate":"device=desktop\u003cbr\u003eMonth=%{x}\u003cbr\u003eConversion Rate (%)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"desktop","line":{"color":"#636efa","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"desktop","orientation":"v","showlegend":true,"x":["2025-01-01T00:00:00.000000","2025-02-01T00:00:00.000000","2025-03-01T00:00:00.000000","2025-04-01T00:00:00.000000","2025-05-01T00:00:00.000000","2025-06-01T00:00:00.000000","2025-07-01T00:00:00.000000","2025-08-01T00:00:00.000000","2025-09-01T00:00:00.000000","2025-10-01T00:00:00.000000","2025-11-01T00:00:00.000000","2025-12-01T00:00:00.000000"],"xaxis":"x","y":[2.29,2.27,2.01,2.31,2.05,2.5,2.27,2.09,2.44,2.26,3.13,3.05],"yaxis":"y","type":"scatter"},{"hovertemplate":"device=mobile\u003cbr\u003eMonth=%{x}\u003cbr\u003eConversion Rate (%)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"mobile","line":{"color":"#EF553B","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"mobile","orientation":"v","showlegend":true,"x":["2025-01-01T00:00:00.000000","2025-02-01T00:00:00.000000","2025-03-01T00:00:00.000000","2025-04-01T00:00:00.000000","2025-05-01T00:00:00.000000","2025-06-01T00:00:00.000000","2025-07-01T00:00:00.000000","2025-08-01T00:00:00.000000","2025-09-01T00:00:00.000000","2025-10-01T00:00:00.000000","2025-11-01T00:00:00.000000","2025-12-01T00:00:00.000000"],"xaxis":"x","y":[0.87,1.09,1.1,1.07,0.94,0.9,1.07,0.91,1.27,1.16,1.46,1.35],"yaxis":"y","type":"scatter"},{"hovertemplate":"device=tablet\u003cbr\u003eMonth=%{x}\u003cbr\u003eConversion Rate (%)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"tablet","line":{"color":"#00cc96","dash":"solid"},"marker":{"symbol":"circle"},"mode":"lines","name":"tablet","orientation":"v","showlegend":true,"x":["2025-01-01T00:00:00.000000","2025-02-01T00:00:00.000000","2025-03-01T00:00:00.000000","2025-04-01T00:00:00.000000","2025-05-01T00:00:00.000000","2025-06-01T00:00:00.000000","2025-07-01T00:00:00.000000","2025-08-01T00:00:00.000000","2025-09-01T00:00:00.000000","2025-10-01T00:00:00.000000","2025-11-01T00:00:00.000000","2025-12-01T00:00:00.000000"],"xaxis":"x","y":[1.97,1.81,1.72,1.83,1.85,1.56,1.92,1.45,1.31,1.41,1.62,2.15],"yaxis":"y","type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Month"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Conversion Rate (%)"}},"legend":{"title":{"text":"device"},"tracegroupgap":0},"title":{"text":"Monthly Conversion Rate Trend by Device (All Channels)"},"height":400,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Bounce Rate by Traffic Channel and Device</h3>
+                <div>                            <div id="bounce_rate_by_device_channel" class="plotly-graph-div" style="height:450px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("bounce_rate_by_device_channel")) {                    Plotly.newPlot(                        "bounce_rate_by_device_channel",                        [{"hovertemplate":"device=mobile\u003cbr\u003echannel=%{x}\u003cbr\u003ebounce_rate_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"mobile","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"mobile","orientation":"v","showlegend":true,"textposition":"auto","x":["social","organic_search","referral","paid_search","direct","email"],"xaxis":"x","y":[63.35,45.54,43.45,40.1,35.1,28.47],"yaxis":"y","type":"bar"},{"hovertemplate":"device=tablet\u003cbr\u003echannel=%{x}\u003cbr\u003ebounce_rate_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"tablet","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"tablet","orientation":"v","showlegend":true,"textposition":"auto","x":["social","organic_search","referral","paid_search","direct","email"],"xaxis":"x","y":[55.67,39.76,38.56,36.06,30.36,24.96],"yaxis":"y","type":"bar"},{"hovertemplate":"device=desktop\u003cbr\u003echannel=%{x}\u003cbr\u003ebounce_rate_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"desktop","marker":{"color":"#00cc96","pattern":{"shape":""}},"name":"desktop","orientation":"v","showlegend":true,"textposition":"auto","x":["social","organic_search","referral","paid_search","direct","email"],"xaxis":"x","y":[55.04,39.34,37.55,35.49,29.8,24.61],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Traffic Channel"},"categoryorder":"total descending"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Bounce Rate (%)"}},"legend":{"title":{"text":"device"},"tracegroupgap":0},"title":{"text":"Bounce Rate by Traffic Channel and Device"},"barmode":"group","height":450,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Average Order Value by Device and Channel</h3>
+                <div>                            <div id="avg_order_value_by_device_channel" class="plotly-graph-div" style="height:450px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("avg_order_value_by_device_channel")) {                    Plotly.newPlot(                        "avg_order_value_by_device_channel",                        [{"hovertemplate":"device=desktop\u003cbr\u003echannel=%{x}\u003cbr\u003eavg_order_value=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"desktop","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"desktop","orientation":"v","showlegend":true,"textposition":"auto","x":["referral","direct","organic_search","social","email","paid_search"],"xaxis":"x","y":[115.00441747572816,106.02469230769232,105.06203342618386,100.52396396396398,99.46999999999998,96.58184041184037],"yaxis":"y","type":"bar"},{"hovertemplate":"device=tablet\u003cbr\u003echannel=%{x}\u003cbr\u003eavg_order_value=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"tablet","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"tablet","orientation":"v","showlegend":true,"textposition":"auto","x":["email","paid_search","organic_search","social","direct","referral"],"xaxis":"x","y":[112.2006976744186,110.23928571428573,106.55689655172412,104.425,102.02028571428572,92.4503125],"yaxis":"y","type":"bar"},{"hovertemplate":"device=mobile\u003cbr\u003echannel=%{x}\u003cbr\u003eavg_order_value=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"mobile","marker":{"color":"#00cc96","pattern":{"shape":""}},"name":"mobile","orientation":"v","showlegend":true,"textposition":"auto","x":["direct","email","paid_search","organic_search","referral","social"],"xaxis":"x","y":[110.41669642857141,106.32535714285713,103.64037135278514,101.54513698630137,90.93677083333334,90.10327272727274],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Traffic Channel"},"categoryorder":"total descending"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Avg Order Value ($)"}},"legend":{"title":{"text":"device"},"tracegroupgap":0},"title":{"text":"Average Order Value by Device and Channel"},"barmode":"group","height":450,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+
+            
+            <div class="table-container">
+                <h3>Conversion Rate & Session Volume by Device and Channel</h3>
+                <table class="data-table"><thead><tr><th>Device</th><th>Channel</th><th>Total Sessions</th><th>Converted Sessions</th><th>Conversion Rate Pct</th></tr></thead><tbody><tr><td>desktop</td><td>email</td><td>12,943</td><td>581</td><td>4.5%</td></tr><tr><td>desktop</td><td>paid_search</td><td>23,728</td><td>777</td><td>3.3%</td></tr><tr><td>tablet</td><td>email</td><td>2,856</td><td>86</td><td>3.0%</td></tr><tr><td>desktop</td><td>direct</td><td>8,694</td><td>260</td><td>3.0%</td></tr><tr><td>tablet</td><td>paid_search</td><td>5,361</td><td>126</td><td>2.4%</td></tr><tr><td>mobile</td><td>email</td><td>12,608</td><td>280</td><td>2.2%</td></tr><tr><td>desktop</td><td>organic_search</td><td>32,448</td><td>718</td><td>2.2%</td></tr><tr><td>desktop</td><td>referral</td><td>10,787</td><td>206</td><td>1.9%</td></tr><tr><td>tablet</td><td>direct</td><td>1,917</td><td>35</td><td>1.8%</td></tr><tr><td>mobile</td><td>paid_search</td><td>23,524</td><td>377</td><td>1.6%</td></tr><tr><td>tablet</td><td>organic_search</td><td>7,277</td><td>116</td><td>1.6%</td></tr><tr><td>tablet</td><td>referral</td><td>2,298</td><td>32</td><td>1.4%</td></tr><tr><td>mobile</td><td>direct</td><td>8,567</td><td>112</td><td>1.3%</td></tr><tr><td>mobile</td><td>organic_search</td><td>32,149</td><td>292</td><td>0.9%</td></tr><tr><td>mobile</td><td>referral</td><td>10,930</td><td>96</td><td>0.9%</td></tr><tr><td>desktop</td><td>social</td><td>19,412</td><td>111</td><td>0.6%</td></tr><tr><td>tablet</td><td>social</td><td>4,275</td><td>20</td><td>0.5%</td></tr><tr><td>mobile</td><td>social</td><td>19,281</td><td>55</td><td>0.3%</td></tr></tbody></table>
+            </div>
+            
+            <div class="table-container">
+                <h3>Engagement Metrics by Device and Channel</h3>
+                <table class="data-table"><thead><tr><th>Device</th><th>Channel</th><th>Total Sessions</th><th>Bounce Rate Pct</th><th>Avg Pages Viewed</th><th>Avg Session Duration Seconds</th></tr></thead><tbody><tr><td>mobile</td><td>social</td><td>19,281</td><td>63.4%</td><td>3.22</td><td>183.4%</td></tr><tr><td>tablet</td><td>social</td><td>4,275</td><td>55.7%</td><td>3.6</td><td>214.2%</td></tr><tr><td>desktop</td><td>social</td><td>19,412</td><td>55.0%</td><td>3.66</td><td>216.9%</td></tr><tr><td>mobile</td><td>organic_search</td><td>32,149</td><td>45.5%</td><td>4.26</td><td>260.4%</td></tr><tr><td>mobile</td><td>referral</td><td>10,930</td><td>43.5%</td><td>4.42</td><td>270.5%</td></tr><tr><td>mobile</td><td>paid_search</td><td>23,524</td><td>40.1%</td><td>4.62</td><td>285.3%</td></tr><tr><td>tablet</td><td>organic_search</td><td>7,277</td><td>39.8%</td><td>4.64</td><td>288.6%</td></tr><tr><td>desktop</td><td>organic_search</td><td>32,448</td><td>39.3%</td><td>4.65</td><td>288.3%</td></tr><tr><td>tablet</td><td>referral</td><td>2,298</td><td>38.6%</td><td>4.59</td><td>295.3%</td></tr><tr><td>desktop</td><td>referral</td><td>10,787</td><td>37.5%</td><td>4.72</td><td>296.0%</td></tr><tr><td>tablet</td><td>paid_search</td><td>5,361</td><td>36.1%</td><td>4.82</td><td>302.7%</td></tr><tr><td>desktop</td><td>paid_search</td><td>23,728</td><td>35.5%</td><td>4.88</td><td>304.5%</td></tr><tr><td>mobile</td><td>direct</td><td>8,567</td><td>35.1%</td><td>4.94</td><td>308.7%</td></tr><tr><td>tablet</td><td>direct</td><td>1,917</td><td>30.4%</td><td>5.13</td><td>330.3%</td></tr><tr><td>desktop</td><td>direct</td><td>8,694</td><td>29.8%</td><td>5.18</td><td>336.5%</td></tr><tr><td>mobile</td><td>email</td><td>12,608</td><td>28.5%</td><td>5.25</td><td>334.7%</td></tr><tr><td>tablet</td><td>email</td><td>2,856</td><td>25.0%</td><td>5.55</td><td>354.5%</td></tr><tr><td>desktop</td><td>email</td><td>12,943</td><td>24.6%</td><td>5.54</td><td>358.5%</td></tr></tbody></table>
+            </div>
+            
+        </section>
+        
+
+        <!-- Methodology -->
+        <section id="methodology">
+            <h2>Methodology</h2>
+            
+            <p><strong>Data Sources:</strong> campaigns, pageviews, sessions, transactions</p>
+            
+            <p><strong>Analysis Approach:</strong> To compare mobile vs. desktop conversion by traffic source, we need to join sessions with transactions to compute conversion rates (sessions that resulted in a purchase) segmented by device type and channel. We will also look at revenue per converting session to understand value differences. A supplementary query will examine session engagement metrics (bounce rate, pages viewed) by device and channel to provide context for conversion differences.</p>
+
+            
+            <details>
+                <summary>SQL Queries Used</summary>
+                
+                <div class="query-block">
+                    <p>Calculate the conversion rate (sessions with at least one transaction / total sessions) broken down by device type (mobile vs. desktop) and traffic channel, to directly answer how conversion differs across these dimensions.</p>
+                    <pre><code>SELECT
+  s.device,
+  s.channel,
+  COUNT(DISTINCT s.session_id) AS total_sessions,
+  COUNT(DISTINCT t.session_id) AS converted_sessions,
+  ROUND(100.0 * COUNT(DISTINCT t.session_id) / COUNT(DISTINCT s.session_id), 2) AS conversion_rate_pct
+FROM sessions s
+LEFT JOIN transactions t
+  ON s.session_id = t.session_id
+GROUP BY s.device, s.channel
+ORDER BY conversion_rate_pct DESC</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Calculate average revenue per converting session and average order value segmented by device type and traffic channel, to understand not just whether users convert but how much value they generate when they do.</p>
+                    <pre><code>SELECT
+    s.device,
+    s.channel,
+    COUNT(DISTINCT t.session_id) AS converting_sessions,
+    COUNT(t.transaction_id) AS total_orders,
+    SUM(t.revenue) AS total_revenue,
+    SUM(t.revenue) / COUNT(DISTINCT t.session_id) AS avg_revenue_per_converting_session,
+    SUM(t.revenue) / COUNT(t.transaction_id) AS avg_order_value
+FROM sessions s
+INNER JOIN transactions t ON s.session_id = t.session_id
+GROUP BY s.device, s.channel
+ORDER BY avg_revenue_per_converting_session DESC</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Examine session engagement indicators (bounce rate, average pages viewed, average session duration) by device and channel to provide context for why conversion rates may differ — e.g. higher bounce on mobile may explain lower conversion.</p>
+                    <pre><code>SELECT
+    device,
+    channel,
+    COUNT(session_id) AS total_sessions,
+    ROUND(100.0 * SUM(bounced) / COUNT(session_id), 2) AS bounce_rate_pct,
+    ROUND(AVG(pages_viewed), 2) AS avg_pages_viewed,
+    ROUND(AVG(duration_seconds), 2) AS avg_session_duration_seconds
+FROM sessions
+GROUP BY device, channel
+ORDER BY bounce_rate_pct DESC</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Show monthly conversion rate trends split by device type across all channels combined, to identify whether the mobile vs. desktop gap is widening, narrowing, or stable over time.</p>
+                    <pre><code>SELECT
+    DATE_TRUNC('month', s.session_date) AS month,
+    s.device,
+    COUNT(DISTINCT s.session_id) AS total_sessions,
+    COUNT(DISTINCT t.transaction_id) AS total_conversions,
+    ROUND(100.0 * COUNT(DISTINCT t.transaction_id) / NULLIF(COUNT(DISTINCT s.session_id), 0), 2) AS conversion_rate_pct
+FROM sessions s
+LEFT JOIN transactions t
+    ON s.session_id = t.session_id
+GROUP BY
+    DATE_TRUNC('month', s.session_date),
+    s.device
+ORDER BY
+    month ASC,
+    s.device ASC</code></pre>
+                </div>
+                
+            </details>
+            
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    <p>Generated by <strong>Autonomous Analytics Agent</strong></p>
+    <p>Pipeline execution time: 2m 0s</p>
+</footer>
+
+</body>
+</html>

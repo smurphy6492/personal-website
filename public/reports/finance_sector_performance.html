@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2024 Sector Performance vs S&P 500</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        /* ------------------------------------------------------------------ */
+        /* Reset & base                                                         */
+        /* ------------------------------------------------------------------ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { font-size: 16px; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, sans-serif;
+            background: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+        }
+
+        a { color: #0066cc; }
+
+        /* ------------------------------------------------------------------ */
+        /* Layout                                                               */
+        /* ------------------------------------------------------------------ */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Header                                                               */
+        /* ------------------------------------------------------------------ */
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+            color: #fff;
+            padding: 2.5rem 0 2rem;
+        }
+
+        header .container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header .subtitle {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        header .question-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 1rem;
+        }
+
+        header .question-text {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.9);
+            font-style: italic;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Main content                                                         */
+        /* ------------------------------------------------------------------ */
+        main {
+            padding: 2rem 0 3rem;
+        }
+
+        section {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            padding: 1.75rem 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        section h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0f3460;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #343a40;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        section h3:first-child {
+            margin-top: 0;
+        }
+
+        p { margin-bottom: 0.75rem; }
+
+        /* ------------------------------------------------------------------ */
+        /* Key metrics                                                          */
+        /* ------------------------------------------------------------------ */
+        .key-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        .metric-card {
+            flex: 1 1 160px;
+            background: #f1f3f5;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            text-align: center;
+            border-top: 3px solid #0f3460;
+        }
+
+        .metric-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #0f3460;
+            line-height: 1.2;
+        }
+
+        .metric-label {
+            font-size: 0.78rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+
+        .metric-context {
+            font-size: 0.8rem;
+            color: #495057;
+            margin-top: 0.4rem;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Charts                                                               */
+        /* ------------------------------------------------------------------ */
+        .chart-container {
+            margin-bottom: 2rem;
+        }
+
+        .chart-container:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Data tables                                                          */
+        /* ------------------------------------------------------------------ */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .data-table th {
+            background: #0f3460;
+            color: #fff;
+            padding: 0.6rem 0.85rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 0.5rem 0.85rem;
+            border-bottom: 1px solid #dee2e6;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr:nth-child(even) { background: #f8f9fa; }
+        .data-table tbody tr:hover { background: #e9f0fb; }
+
+        /* ------------------------------------------------------------------ */
+        /* Methodology / collapsible                                           */
+        /* ------------------------------------------------------------------ */
+        details {
+            margin-top: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 0.75rem 1rem;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #343a40;
+            list-style: none;
+        }
+
+        summary::after {
+            content: " ▶";
+            float: right;
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        details[open] summary::after { content: " ▼"; }
+
+        .query-block {
+            padding: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .query-block p {
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            color: #343a40;
+        }
+
+        pre {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        code { font-family: "Fira Code", "Cascadia Code", Consolas, monospace; }
+
+        /* ------------------------------------------------------------------ */
+        /* Errors                                                               */
+        /* ------------------------------------------------------------------ */
+        .error-banner {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+        }
+
+        .error-banner strong { color: #856404; }
+
+        /* ------------------------------------------------------------------ */
+        /* Footer                                                               */
+        /* ------------------------------------------------------------------ */
+        footer {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.8rem;
+            padding: 1.5rem 0 2rem;
+        }
+
+        footer p { margin-bottom: 0.2rem; }
+
+        /* ------------------------------------------------------------------ */
+        /* Print                                                                */
+        /* ------------------------------------------------------------------ */
+        @media print {
+            body { background: #fff; }
+            section { box-shadow: none; border: 1px solid #dee2e6; }
+            details { display: block; }
+            summary::after { display: none; }
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Responsive                                                           */
+        /* ------------------------------------------------------------------ */
+        @media (max-width: 640px) {
+            header h1 { font-size: 1.4rem; }
+            section { padding: 1.25rem 1rem; }
+            .metric-card { flex: 1 1 130px; }
+            .metric-value { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>2024 Sector Performance vs S&P 500</h1>
+        <p class="subtitle">Generated on 2026-03-25 01:07 UTC</p>
+        <p class="question-label">Business Question</p>
+        <p class="question-text">Which sector outperformed the S&P 500 in 2024, and what drove it? Show the top 10 and bottom 10 individual stocks by annual return.</p>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+
+        
+
+        <!-- Executive Summary -->
+        <section id="executive-summary">
+            <h2>Executive Summary</h2>
+            <p>The S&P 500 returned 25.59% in 2024, and four sectors outperformed this benchmark: Communication Services led all sectors with a 65.64% average return (+40.2pp above benchmark), followed by Technology at 42.66% (+17.2pp), Financials at 33.37% (+7.9pp), and Consumer Discretionary at 27.87% (+2.4pp). Technology outperformance was driven primarily by Semiconductors (avg ~142% annualized return), with NVDA (+178.9%) and AVGO (+116.5%) as the standout individual contributors. On the downside, Real Estate was the worst-performing sector at -16.14%, dragged by REIT holdings PLD (-18.9%) and AMT (-13.3%), while Healthcare averaged just +3.73% amid weakness in Pharmaceuticals (JNJ -6.7%, MRK -9.8%). The best single-stock performer was NVDA at +178.9%, and the worst was ADBE at -23.3%.</p>
+
+            
+            <div class="key-metrics">
+                
+                <div class="metric-card">
+                    <div class="metric-value">25.59%</div>
+                    <div class="metric-label">S&P 500 Return (2024)</div>
+                    
+                    <div class="metric-context">Benchmark return from $459.99 to $577.70</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">+65.64%</div>
+                    <div class="metric-label">Top Sector: Communication Services</div>
+                    
+                    <div class="metric-context">+40.2pp above S&P 500 benchmark</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">NVDA +178.87%</div>
+                    <div class="metric-label">Best Individual Stock</div>
+                    
+                    <div class="metric-context">Technology / Semiconductors</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">ADBE -23.34%</div>
+                    <div class="metric-label">Worst Individual Stock</div>
+                    
+                    <div class="metric-context">Technology / Software</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">4 of 11</div>
+                    <div class="metric-label">Sectors Outperforming S&P 500</div>
+                    
+                    <div class="metric-context">Communication Services, Technology, Financials, Consumer Discretionary</div>
+                    
+                </div>
+                
+            </div>
+            
+        </section>
+
+        <!-- Analysis: Charts + Data Tables -->
+        
+        <section id="analysis">
+            <h2>Analysis</h2>
+
+            
+            <div class="chart-container">
+                <h3>2024 Sector Average Annual Returns vs. S&P 500 Benchmark (25.59%)</h3>
+                <div>                            <div id="sector_returns_vs_benchmark" class="plotly-graph-div" style="height:480px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("sector_returns_vs_benchmark")) {                    Plotly.newPlot(                        "sector_returns_vs_benchmark",                        [{"hovertemplate":"vs_benchmark=Outperforming\u003cbr\u003esector=%{x}\u003cbr\u003eavg_annual_return_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Outperforming","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"Outperforming","orientation":"v","showlegend":true,"textposition":"auto","x":["Communication Services","Technology","Financials","Consumer Discretionary","Benchmark","Consumer Staples"],"xaxis":"x","y":[65.64,42.66,33.37,27.87,25.59,25.48],"yaxis":"y","type":"bar"},{"hovertemplate":"vs_benchmark=Underperforming\u003cbr\u003esector=%{x}\u003cbr\u003eavg_annual_return_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Underperforming","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"Underperforming","orientation":"v","showlegend":true,"textposition":"auto","x":["Industrials","Utilities","Materials","Energy","Healthcare","Real Estate"],"xaxis":"x","y":[20.26,19.82,5.84,4.87,3.73,-16.14],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Sector"},"categoryorder":"total descending"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Avg Annual Return (%)"}},"legend":{"title":{"text":"vs_benchmark"},"tracegroupgap":0},"title":{"text":"2024 Sector Average Annual Returns vs. S&P 500 Benchmark (25.59%)"},"barmode":"relative","height":480,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Top 10 & Bottom 10 Individual Stocks by 2024 Annual Return</h3>
+                <div>                            <div id="top_bottom_stocks" class="plotly-graph-div" style="height:560px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("top_bottom_stocks")) {                    Plotly.newPlot(                        "top_bottom_stocks",                        [{"hovertemplate":"sector=Technology\u003cbr\u003eannual_return_pct=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Technology","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"Technology","orientation":"h","showlegend":true,"textposition":"auto","x":[178.87,116.49,62.1,-12.84,-23.34],"xaxis":"x","y":["NVDA","AVGO","ORCL","AMD","ADBE"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Communication Services\u003cbr\u003eannual_return_pct=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Communication Services","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"Communication Services","orientation":"h","showlegend":true,"textposition":"auto","x":[90.25,69.73],"xaxis":"x","y":["NFLX","META"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Consumer Staples\u003cbr\u003eannual_return_pct=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Consumer Staples","marker":{"color":"#00cc96","pattern":{"shape":""}},"name":"Consumer Staples","orientation":"h","showlegend":true,"textposition":"auto","x":[72.21,-9.24],"xaxis":"x","y":["WMT","PEP"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Industrials\u003cbr\u003eannual_return_pct=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Industrials","marker":{"color":"#ab63fa","pattern":{"shape":""}},"name":"Industrials","orientation":"h","showlegend":true,"textposition":"auto","x":[67.02,-4.25,-16.52],"xaxis":"x","y":["GE","UNP","UPS"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Consumer Discretionary\u003cbr\u003eannual_return_pct=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Consumer Discretionary","marker":{"color":"#FFA15A","pattern":{"shape":""}},"name":"Consumer Discretionary","orientation":"h","showlegend":true,"textposition":"auto","x":[62.56,46.33],"xaxis":"x","y":["TSLA","AMZN"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Financials\u003cbr\u003eannual_return_pct=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Financials","marker":{"color":"#19d3f3","pattern":{"shape":""}},"name":"Financials","orientation":"h","showlegend":true,"textposition":"auto","x":[51.04],"xaxis":"x","y":["GS"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Healthcare\u003cbr\u003eannual_return_pct=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Healthcare","marker":{"color":"#FF6692","pattern":{"shape":""}},"name":"Healthcare","orientation":"h","showlegend":true,"textposition":"auto","x":[-4.74,-6.74,-9.76],"xaxis":"x","y":["UNH","JNJ","MRK"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Real Estate\u003cbr\u003eannual_return_pct=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Real Estate","marker":{"color":"#B6E880","pattern":{"shape":""}},"name":"Real Estate","orientation":"h","showlegend":true,"textposition":"auto","x":[-13.34,-18.93],"xaxis":"x","y":["AMT","PLD"],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Annual Return (%)"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Ticker"},"categoryorder":"total ascending"},"legend":{"title":{"text":"sector"},"tracegroupgap":0},"title":{"text":"Top 10 & Bottom 10 Individual Stocks by 2024 Annual Return"},"barmode":"relative","height":560,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Industry-Level Drivers Within Outperforming Sectors (Avg Annualized Return)</h3>
+                <div>                            <div id="industry_drivers_outperforming" class="plotly-graph-div" style="height:480px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("industry_drivers_outperforming")) {                    Plotly.newPlot(                        "industry_drivers_outperforming",                        [{"hovertemplate":"sector=Technology\u003cbr\u003eavg_annual_return=%{x}\u003cbr\u003eindustry=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Technology","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"Technology","orientation":"h","showlegend":true,"textposition":"auto","x":[1.422033293415536,0.22850574712643676,0.1700686498855835,0.06991750434284416,-0.04570494678518756],"xaxis":"x","y":["Semiconductors","Consumer Electronics","Networking","Software","IT Services"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Industrials\u003cbr\u003eavg_annual_return=%{x}\u003cbr\u003eindustry=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Industrials","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"Industrials","orientation":"h","showlegend":true,"textposition":"auto","x":[0.729124040920716,0.5007920985722667,0.35972302365839587,0.048246931482728246,0.043563812245795315,-0.05062215477996966],"xaxis":"x","y":["Aerospace","Machinery","Aerospace & Defense","Railroads","Conglomerate","Logistics"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Energy\u003cbr\u003eavg_annual_return=%{x}\u003cbr\u003eindustry=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Energy","marker":{"color":"#00cc96","pattern":{"shape":""}},"name":"Energy","orientation":"h","showlegend":true,"textposition":"auto","x":[0.39886914707417],"xaxis":"x","y":["Oil & Gas"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Communication Services\u003cbr\u003eavg_annual_return=%{x}\u003cbr\u003eindustry=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Communication Services","marker":{"color":"#ab63fa","pattern":{"shape":""}},"name":"Communication Services","orientation":"h","showlegend":true,"textposition":"auto","x":[0.37047046059769206,0.22876667751383012,0.1615828196460529],"xaxis":"x","y":["Internet","Social Media","Streaming"],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Avg Annualized Return (ratio)"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Industry"},"categoryorder":"total ascending"},"legend":{"title":{"text":"sector"},"tracegroupgap":0},"title":{"text":"Industry-Level Drivers Within Outperforming Sectors (Avg Annualized Return)"},"barmode":"relative","height":480,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Sector Excess Return vs. S&P 500 Benchmark in 2024</h3>
+                <div>                            <div id="sector_excess_return" class="plotly-graph-div" style="height:420px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("sector_excess_return")) {                    Plotly.newPlot(                        "sector_excess_return",                        [{"hovertemplate":"vs_benchmark=Outperforming\u003cbr\u003esector=%{x}\u003cbr\u003eexcess_return_vs_benchmark=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Outperforming","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"Outperforming","orientation":"v","showlegend":true,"textposition":"auto","x":["Communication Services","Technology","Financials","Consumer Discretionary","Benchmark","Consumer Staples"],"xaxis":"x","y":[40.19,17.21,7.91,2.42,0.13,0.02],"yaxis":"y","type":"bar"},{"hovertemplate":"vs_benchmark=Underperforming\u003cbr\u003esector=%{x}\u003cbr\u003eexcess_return_vs_benchmark=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Underperforming","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"Underperforming","orientation":"v","showlegend":true,"textposition":"auto","x":["Industrials","Utilities","Materials","Energy","Healthcare","Real Estate"],"xaxis":"x","y":[-5.2,-5.64,-19.61,-20.59,-21.72,-41.59],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Sector"},"categoryorder":"total descending"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Excess Return vs. Benchmark (pp)"}},"legend":{"title":{"text":"vs_benchmark"},"tracegroupgap":0},"title":{"text":"Sector Excess Return vs. S&P 500 Benchmark in 2024"},"barmode":"relative","height":420,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+
+            
+            <div class="table-container">
+                <h3>Top 10 & Bottom 10 Stocks by 2024 Annual Return</h3>
+                <table class="data-table"><thead><tr><th>Rank Group</th><th>Rank</th><th>Ticker</th><th>Sector</th><th>Industry</th><th>Year Start Close</th><th>Year End Close</th><th>Annual Return Pct</th></tr></thead><tbody><tr><td>Top 10</td><td>1</td><td>NVDA</td><td>Technology</td><td>Semiconductors</td><td>48.14</td><td>134.25</td><td>178.9%</td></tr><tr><td>Top 10</td><td>2</td><td>AVGO</td><td>Technology</td><td>Semiconductors</td><td>105.91</td><td>229.28</td><td>116.5%</td></tr><tr><td>Top 10</td><td>3</td><td>NFLX</td><td>Communication Services</td><td>Streaming</td><td>46.85</td><td>89.13</td><td>90.2%</td></tr><tr><td>Top 10</td><td>4</td><td>WMT</td><td>Consumer Staples</td><td>Retail</td><td>51.86</td><td>89.31</td><td>72.2%</td></tr><tr><td>Top 10</td><td>5</td><td>META</td><td>Communication Services</td><td>Social Media</td><td>343.59</td><td>583.17</td><td>69.7%</td></tr><tr><td>Top 10</td><td>6</td><td>GE</td><td>Industrials</td><td>Aerospace</td><td>99.15</td><td>165.6</td><td>67.0%</td></tr><tr><td>Top 10</td><td>7</td><td>TSLA</td><td>Consumer Discretionary</td><td>Automotive</td><td>248.42</td><td>403.84</td><td>62.6%</td></tr><tr><td>Top 10</td><td>8</td><td>ORCL</td><td>Technology</td><td>Software</td><td>101.52</td><td>164.56</td><td>62.1%</td></tr><tr><td>Top 10</td><td>9</td><td>GS</td><td>Financials</td><td>Investment Banking</td><td>369.59</td><td>558.23</td><td>51.0%</td></tr><tr><td>Top 10</td><td>10</td><td>AMZN</td><td>Consumer Discretionary</td><td>E-Commerce</td><td>149.93</td><td>219.39</td><td>46.3%</td></tr><tr><td>Bottom 10</td><td>10</td><td>UNP</td><td>Industrials</td><td>Railroads</td><td>231.4</td><td>221.57</td><td>-4.2%</td></tr><tr><td>Bottom 10</td><td>9</td><td>UNH</td><td>Healthcare</td><td>Insurance</td><td>514.26</td><td>489.89</td><td>-4.7%</td></tr><tr><td>Bottom 10</td><td>8</td><td>JNJ</td><td>Healthcare</td><td>Pharmaceuticals</td><td>149.66</td><td>139.58</td><td>-6.7%</td></tr><tr><td>Bottom 10</td><td>7</td><td>PEP</td><td>Consumer Staples</td><td>Beverages</td><td>159.68</td><td>144.92</td><td>-9.2%</td></tr><tr><td>Bottom 10</td><td>6</td><td>MRK</td><td>Healthcare</td><td>Pharmaceuticals</td><td>105.46</td><td>95.17</td><td>-9.8%</td></tr><tr><td>Bottom 10</td><td>5</td><td>AMD</td><td>Technology</td><td>Semiconductors</td><td>138.58</td><td>120.79</td><td>-12.8%</td></tr><tr><td>Bottom 10</td><td>4</td><td>AMT</td><td>Real Estate</td><td>REITs</td><td>204.47</td><td>177.19</td><td>-13.3%</td></tr><tr><td>Bottom 10</td><td>3</td><td>UPS</td><td>Industrials</td><td>Logistics</td><td>139.4</td><td>116.37</td><td>-16.5%</td></tr><tr><td>Bottom 10</td><td>2</td><td>PLD</td><td>Real Estate</td><td>REITs</td><td>124.89</td><td>101.25</td><td>-18.9%</td></tr><tr><td>Bottom 10</td><td>1</td><td>ADBE</td><td>Technology</td><td>Software</td><td>580.07</td><td>444.68</td><td>-23.3%</td></tr></tbody></table>
+            </div>
+            
+            <div class="table-container">
+                <h3>Full Sector Performance vs. S&P 500 in 2024</h3>
+                <table class="data-table"><thead><tr><th>Sector</th><th>Avg Annual Return Pct</th><th>Sp500 Benchmark Return Pct</th><th>Excess Return Vs Benchmark</th><th>Vs Benchmark</th><th>Num Stocks</th></tr></thead><tbody><tr><td>Communication Services</td><td>65.6%</td><td>25.4%</td><td>40.19</td><td>Outperforming</td><td>3</td></tr><tr><td>Technology</td><td>42.7%</td><td>25.4%</td><td>17.21</td><td>Outperforming</td><td>10</td></tr><tr><td>Financials</td><td>33.4%</td><td>25.4%</td><td>7.91</td><td>Outperforming</td><td>6</td></tr><tr><td>Consumer Discretionary</td><td>27.9%</td><td>25.4%</td><td>2.42</td><td>Outperforming</td><td>5</td></tr><tr><td>Benchmark</td><td>25.6%</td><td>25.4%</td><td>0.13</td><td>Outperforming</td><td>1</td></tr><tr><td>Consumer Staples</td><td>25.5%</td><td>25.4%</td><td>0.02</td><td>Outperforming</td><td>5</td></tr><tr><td>Industrials</td><td>20.3%</td><td>25.4%</td><td>-5.2</td><td>Underperforming</td><td>6</td></tr><tr><td>Utilities</td><td>19.8%</td><td>25.4%</td><td>-5.64</td><td>Underperforming</td><td>1</td></tr><tr><td>Materials</td><td>5.8%</td><td>25.4%</td><td>-19.61</td><td>Underperforming</td><td>2</td></tr><tr><td>Energy</td><td>4.9%</td><td>25.4%</td><td>-20.59</td><td>Underperforming</td><td>2</td></tr><tr><td>Healthcare</td><td>3.7%</td><td>25.4%</td><td>-21.72</td><td>Underperforming</td><td>7</td></tr><tr><td>Real Estate</td><td>-16.1%</td><td>25.4%</td><td>-41.59</td><td>Underperforming</td><td>2</td></tr></tbody></table>
+            </div>
+            
+        </section>
+        
+
+        <!-- Methodology -->
+        <section id="methodology">
+            <h2>Methodology</h2>
+            
+            <p><strong>Data Sources:</strong> daily_prices, tickers</p>
+            
+            <p><strong>Analysis Approach:</strong> To answer which sectors outperformed the S&P 500 in 2024 and what drove it, we need to: (1) Calculate the S&P 500 benchmark return for 2024 using the 'Benchmark' ticker, (2) Calculate sector-level annual returns for 2024 by aggregating stock price changes within each sector and comparing to the benchmark, (3) Identify the top 10 and bottom 10 individual stocks by annual return in 2024. We join daily_prices with tickers to get sector information, filter to 2024 date range, and compute returns as (last_close - first_close) / first_close for each ticker and sector.</p>
+
+            
+            <details>
+                <summary>SQL Queries Used</summary>
+                
+                <div class="query-block">
+                    <p>Calculate the S&P 500 benchmark annual return for 2024 to establish the performance threshold for comparison. Uses the 'Benchmark' sector ticker to get start-of-year and end-of-year close prices.</p>
+                    <pre><code>WITH benchmark_prices AS (
+    SELECT
+        dp.date,
+        dp.close
+    FROM daily_prices dp
+    JOIN tickers t ON dp.ticker = t.ticker
+    WHERE t.sector = 'Benchmark'
+      AND YEAR(dp.date) = 2024
+),
+start_price AS (
+    SELECT close AS start_close
+    FROM benchmark_prices
+    ORDER BY date ASC
+    LIMIT 1
+),
+end_price AS (
+    SELECT close AS end_close
+    FROM benchmark_prices
+    ORDER BY date DESC
+    LIMIT 1
+)
+SELECT
+    2024 AS year,
+    s.start_close AS start_of_year_close,
+    e.end_close AS end_of_year_close,
+    ROUND(((e.end_close - s.start_close) / s.start_close) * 100, 2) AS annual_return_pct
+FROM start_price s
+CROSS JOIN end_price e</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Calculate the average annual return for each sector in 2024 by computing each constituent stock's return (first to last close within 2024) and averaging by sector. Compare each sector's return to the S&P 500 benchmark to identify outperforming sectors and rank them.</p>
+                    <pre><code>WITH date_range AS (
+    SELECT
+        MIN(date) AS min_date,
+        MAX(date) AS max_date
+    FROM daily_prices
+    WHERE date >= '2024-01-01' AND date < '2025-01-01'
+),
+first_close AS (
+    SELECT
+        dp.ticker,
+        dp.close AS first_close
+    FROM daily_prices dp
+    INNER JOIN (
+        SELECT ticker, MIN(date) AS first_date
+        FROM daily_prices
+        WHERE date >= '2024-01-01' AND date < '2025-01-01'
+        GROUP BY ticker
+    ) fd ON dp.ticker = fd.ticker AND dp.date = fd.first_date
+),
+last_close AS (
+    SELECT
+        dp.ticker,
+        dp.close AS last_close
+    FROM daily_prices dp
+    INNER JOIN (
+        SELECT ticker, MAX(date) AS last_date
+        FROM daily_prices
+        WHERE date >= '2024-01-01' AND date < '2025-01-01'
+        GROUP BY ticker
+    ) ld ON dp.ticker = ld.ticker AND dp.date = ld.last_date
+),
+stock_returns AS (
+    SELECT
+        f.ticker,
+        (l.last_close - f.first_close) / f.first_close * 100 AS annual_return
+    FROM first_close f
+    JOIN last_close l ON f.ticker = l.ticker
+),
+sp500_return AS (
+    SELECT
+        AVG(annual_return) AS benchmark_return
+    FROM stock_returns
+),
+sector_returns AS (
+    SELECT
+        t.sector,
+        AVG(sr.annual_return) AS avg_sector_return,
+        COUNT(DISTINCT sr.ticker) AS num_stocks
+    FROM stock_returns sr
+    JOIN tickers t ON sr.ticker = t.ticker
+    GROUP BY t.sector
+)
+SELECT
+    s.sector,
+    ROUND(s.avg_sector_return, 2) AS avg_annual_return_pct,
+    ROUND(sp.benchmark_return, 2) AS sp500_benchmark_return_pct,
+    ROUND(s.avg_sector_return - sp.benchmark_return, 2) AS excess_return_vs_benchmark,
+    CASE WHEN s.avg_sector_return > sp.benchmark_return THEN 'Outperforming' ELSE 'Underperforming' END AS vs_benchmark,
+    s.num_stocks
+FROM sector_returns s
+CROSS JOIN sp500_return sp
+ORDER BY avg_annual_return_pct DESC</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Break down returns within outperforming sectors by industry to identify what drove sector outperformance. Computes average annual return at the industry level within each sector, helping pinpoint which sub-industries contributed most.</p>
+                    <pre><code>WITH date_range AS (
+    SELECT MIN(date) AS min_date, MAX(date) AS max_date
+    FROM daily_prices
+),
+ticker_returns AS (
+    SELECT
+        dp_start.ticker,
+        (dp_end.close - dp_start.close) / NULLIF(dp_start.close, 0) AS total_return,
+        DATEDIFF('day', dr.min_date, dr.max_date) / 365.0 AS years
+    FROM daily_prices dp_start
+    JOIN daily_prices dp_end
+        ON dp_start.ticker = dp_end.ticker
+    CROSS JOIN date_range dr
+    WHERE dp_start.date = dr.min_date
+      AND dp_end.date = dr.max_date
+),
+ticker_annual_returns AS (
+    SELECT
+        t.ticker,
+        t.sector,
+        t.industry,
+        tr.total_return / NULLIF(tr.years, 0) AS annual_return
+    FROM ticker_returns tr
+    JOIN tickers t ON tr.ticker = t.ticker
+),
+sector_avg AS (
+    SELECT
+        sector,
+        AVG(annual_return) AS sector_avg_return
+    FROM ticker_annual_returns
+    GROUP BY sector
+),
+overall_avg AS (
+    SELECT AVG(annual_return) AS overall_avg_return
+    FROM ticker_annual_returns
+),
+outperforming_sectors AS (
+    SELECT s.sector, s.sector_avg_return
+    FROM sector_avg s
+    CROSS JOIN overall_avg o
+    WHERE s.sector_avg_return > o.overall_avg_return
+)
+SELECT
+    tar.sector,
+    tar.industry,
+    AVG(tar.annual_return) AS avg_annual_return,
+    os.sector_avg_return,
+    COUNT(tar.ticker) AS ticker_count
+FROM ticker_annual_returns tar
+JOIN outperforming_sectors os ON tar.sector = os.sector
+GROUP BY tar.sector, tar.industry, os.sector_avg_return
+ORDER BY avg_annual_return DESC</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Identify the top 10 and bottom 10 individual stocks by annual return in 2024. Computes each stock's return as (year-end close - year-start close) / year-start close, includes sector and industry for context, and ranks stocks to surface the best and worst performers.</p>
+                    <pre><code>WITH year_prices AS (
+    SELECT
+        ticker,
+        FIRST_VALUE(close) OVER (PARTITION BY ticker ORDER BY date ASC) AS year_start_close,
+        LAST_VALUE(close) OVER (PARTITION BY ticker ORDER BY date ASC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS year_end_close
+    FROM daily_prices
+    WHERE date >= '2024-01-01' AND date < '2025-01-01'
+),
+unique_prices AS (
+    SELECT DISTINCT
+        ticker,
+        year_start_close,
+        year_end_close
+    FROM year_prices
+),
+returns AS (
+    SELECT
+        up.ticker,
+        t.sector,
+        t.industry,
+        up.year_start_close,
+        up.year_end_close,
+        (up.year_end_close - up.year_start_close) / up.year_start_close AS annual_return
+    FROM unique_prices up
+    JOIN tickers t ON up.ticker = t.ticker
+    WHERE up.year_start_close IS NOT NULL AND up.year_start_close != 0
+),
+top_10 AS (
+    SELECT *, 'Top 10' AS rank_group, ROW_NUMBER() OVER (ORDER BY annual_return DESC) AS rank
+    FROM returns
+    ORDER BY annual_return DESC
+    LIMIT 10
+),
+bottom_10 AS (
+    SELECT *, 'Bottom 10' AS rank_group, ROW_NUMBER() OVER (ORDER BY annual_return ASC) AS rank
+    FROM returns
+    ORDER BY annual_return ASC
+    LIMIT 10
+)
+SELECT
+    rank_group,
+    rank,
+    ticker,
+    sector,
+    industry,
+    ROUND(year_start_close, 2) AS year_start_close,
+    ROUND(year_end_close, 2) AS year_end_close,
+    ROUND(annual_return * 100, 2) AS annual_return_pct
+FROM (
+    SELECT * FROM top_10
+    UNION ALL
+    SELECT * FROM bottom_10
+) combined
+ORDER BY rank_group DESC, annual_return DESC</code></pre>
+                </div>
+                
+            </details>
+            
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    <p>Generated by <strong>Autonomous Analytics Agent</strong></p>
+    <p>Pipeline execution time: 1m 19s</p>
+</footer>
+
+</body>
+</html>

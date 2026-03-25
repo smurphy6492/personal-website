@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sharpe Ratio Rankings — Top & Bottom 10</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        /* ------------------------------------------------------------------ */
+        /* Reset & base                                                         */
+        /* ------------------------------------------------------------------ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { font-size: 16px; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, sans-serif;
+            background: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+        }
+
+        a { color: #0066cc; }
+
+        /* ------------------------------------------------------------------ */
+        /* Layout                                                               */
+        /* ------------------------------------------------------------------ */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Header                                                               */
+        /* ------------------------------------------------------------------ */
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+            color: #fff;
+            padding: 2.5rem 0 2rem;
+        }
+
+        header .container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header .subtitle {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        header .question-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 1rem;
+        }
+
+        header .question-text {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.9);
+            font-style: italic;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Main content                                                         */
+        /* ------------------------------------------------------------------ */
+        main {
+            padding: 2rem 0 3rem;
+        }
+
+        section {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            padding: 1.75rem 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        section h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0f3460;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #343a40;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        section h3:first-child {
+            margin-top: 0;
+        }
+
+        p { margin-bottom: 0.75rem; }
+
+        /* ------------------------------------------------------------------ */
+        /* Key metrics                                                          */
+        /* ------------------------------------------------------------------ */
+        .key-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        .metric-card {
+            flex: 1 1 160px;
+            background: #f1f3f5;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            text-align: center;
+            border-top: 3px solid #0f3460;
+        }
+
+        .metric-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #0f3460;
+            line-height: 1.2;
+        }
+
+        .metric-label {
+            font-size: 0.78rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+
+        .metric-context {
+            font-size: 0.8rem;
+            color: #495057;
+            margin-top: 0.4rem;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Charts                                                               */
+        /* ------------------------------------------------------------------ */
+        .chart-container {
+            margin-bottom: 2rem;
+        }
+
+        .chart-container:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Data tables                                                          */
+        /* ------------------------------------------------------------------ */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .data-table th {
+            background: #0f3460;
+            color: #fff;
+            padding: 0.6rem 0.85rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 0.5rem 0.85rem;
+            border-bottom: 1px solid #dee2e6;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr:nth-child(even) { background: #f8f9fa; }
+        .data-table tbody tr:hover { background: #e9f0fb; }
+
+        /* ------------------------------------------------------------------ */
+        /* Methodology / collapsible                                           */
+        /* ------------------------------------------------------------------ */
+        details {
+            margin-top: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 0.75rem 1rem;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #343a40;
+            list-style: none;
+        }
+
+        summary::after {
+            content: " ▶";
+            float: right;
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        details[open] summary::after { content: " ▼"; }
+
+        .query-block {
+            padding: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .query-block p {
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            color: #343a40;
+        }
+
+        pre {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        code { font-family: "Fira Code", "Cascadia Code", Consolas, monospace; }
+
+        /* ------------------------------------------------------------------ */
+        /* Errors                                                               */
+        /* ------------------------------------------------------------------ */
+        .error-banner {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+        }
+
+        .error-banner strong { color: #856404; }
+
+        /* ------------------------------------------------------------------ */
+        /* Footer                                                               */
+        /* ------------------------------------------------------------------ */
+        footer {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.8rem;
+            padding: 1.5rem 0 2rem;
+        }
+
+        footer p { margin-bottom: 0.2rem; }
+
+        /* ------------------------------------------------------------------ */
+        /* Print                                                                */
+        /* ------------------------------------------------------------------ */
+        @media print {
+            body { background: #fff; }
+            section { box-shadow: none; border: 1px solid #dee2e6; }
+            details { display: block; }
+            summary::after { display: none; }
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* Responsive                                                           */
+        /* ------------------------------------------------------------------ */
+        @media (max-width: 640px) {
+            header h1 { font-size: 1.4rem; }
+            section { padding: 1.25rem 1rem; }
+            .metric-card { flex: 1 1 130px; }
+            .metric-value { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>Sharpe Ratio Rankings — Top & Bottom 10</h1>
+        <p class="subtitle">Generated on 2026-03-25 01:08 UTC</p>
+        <p class="question-label">Business Question</p>
+        <p class="question-text">Calculate the Sharpe ratio for each stock over the last 5 years. Show the top 10 and bottom 10 ranked by risk-adjusted return, with their sector.</p>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+
+        
+
+        <!-- Executive Summary -->
+        <section id="executive-summary">
+            <h2>Executive Summary</h2>
+            <p>Over the last 5 years, NVDA leads all stocks with a Sharpe ratio of 1.28, driven by a 66.3% annualized return against 51.7% volatility, followed closely by LLY (1.19) and AVGO (1.17). The top 10 stocks span five sectors — Technology, Healthcare, Industrials, Consumer Staples, and Energy — highlighting that superior risk-adjusted returns are not confined to a single sector. At the other extreme, ADBE posts the worst Sharpe ratio of -0.18 with a negative annualized return of -6.3%, while UPS (-0.07) and ACN (-0.05) also deliver negative returns over the period. The benchmark SPY (0.78 Sharpe) sits in the middle of the universe, with 7 of the top 10 stocks outperforming it on a risk-adjusted basis. Overall, the spread from -0.18 to 1.28 reflects meaningful divergence in risk-adjusted performance across this 50-stock universe.</p>
+
+            
+            <div class="key-metrics">
+                
+                <div class="metric-card">
+                    <div class="metric-value">1.28 (NVDA)</div>
+                    <div class="metric-label">Best Sharpe Ratio</div>
+                    
+                    <div class="metric-context">66.3% annualized return, 51.7% annualized volatility — Technology sector</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">-0.18 (ADBE)</div>
+                    <div class="metric-label">Worst Sharpe Ratio</div>
+                    
+                    <div class="metric-context">-6.3% annualized return, 35.6% annualized volatility — Technology sector</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">0.78</div>
+                    <div class="metric-label">SPY Benchmark Sharpe</div>
+                    
+                    <div class="metric-context">13.2% annualized return, 17.0% volatility — 7 of top 10 stocks beat this</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">3 of 50</div>
+                    <div class="metric-label">Stocks with Negative Sharpe</div>
+                    
+                    <div class="metric-context">ADBE, UPS, ACN all posted negative annualized returns over the 5-year window</div>
+                    
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">Technology</div>
+                    <div class="metric-label">Top Sector Represented</div>
+                    
+                    <div class="metric-context">4 of the top 10 stocks by Sharpe ratio are from Technology (NVDA, AVGO, and others)</div>
+                    
+                </div>
+                
+            </div>
+            
+        </section>
+
+        <!-- Analysis: Charts + Data Tables -->
+        
+        <section id="analysis">
+            <h2>Analysis</h2>
+
+            
+            <div class="chart-container">
+                <h3>Top 10 Stocks by Sharpe Ratio (5-Year)</h3>
+                <div>                            <div id="top_10_sharpe_bar" class="plotly-graph-div" style="height:450px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("top_10_sharpe_bar")) {                    Plotly.newPlot(                        "top_10_sharpe_bar",                        [{"hovertemplate":"sector=Technology\u003cbr\u003esharpe_ratio=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Technology","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"Technology","orientation":"h","showlegend":true,"textposition":"auto","x":[1.2832,1.1736],"xaxis":"x","y":["NVDA","AVGO"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Healthcare\u003cbr\u003esharpe_ratio=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Healthcare","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"Healthcare","orientation":"h","showlegend":true,"textposition":"auto","x":[1.1911],"xaxis":"x","y":["LLY"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Industrials\u003cbr\u003esharpe_ratio=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Industrials","marker":{"color":"#00cc96","pattern":{"shape":""}},"name":"Industrials","orientation":"h","showlegend":true,"textposition":"auto","x":[1.1725,0.9991,0.9983],"xaxis":"x","y":["GE","CAT","RTX"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Consumer Staples\u003cbr\u003esharpe_ratio=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Consumer Staples","marker":{"color":"#ab63fa","pattern":{"shape":""}},"name":"Consumer Staples","orientation":"h","showlegend":true,"textposition":"auto","x":[1.1264,1.084],"xaxis":"x","y":["WMT","COST"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Energy\u003cbr\u003esharpe_ratio=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Energy","marker":{"color":"#FFA15A","pattern":{"shape":""}},"name":"Energy","orientation":"h","showlegend":true,"textposition":"auto","x":[1.0973],"xaxis":"x","y":["XOM"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Financials\u003cbr\u003esharpe_ratio=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Financials","marker":{"color":"#19d3f3","pattern":{"shape":""}},"name":"Financials","orientation":"h","showlegend":true,"textposition":"auto","x":[0.9008],"xaxis":"x","y":["GS"],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Sharpe Ratio"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Ticker"},"categoryorder":"total ascending"},"legend":{"title":{"text":"sector"},"tracegroupgap":0},"title":{"text":"Top 10 Stocks by Sharpe Ratio (5-Year)"},"barmode":"relative","height":450,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Bottom 10 Stocks by Sharpe Ratio (5-Year)</h3>
+                <div>                            <div id="bottom_10_sharpe_bar" class="plotly-graph-div" style="height:450px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("bottom_10_sharpe_bar")) {                    Plotly.newPlot(                        "bottom_10_sharpe_bar",                        [{"hovertemplate":"sector=Technology\u003cbr\u003esharpe_ratio=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Technology","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"Technology","orientation":"h","showlegend":true,"textposition":"auto","x":[-0.1784,-0.0524,0.1235],"xaxis":"x","y":["ADBE","ACN","CRM"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Industrials\u003cbr\u003esharpe_ratio=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Industrials","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"Industrials","orientation":"h","showlegend":true,"textposition":"auto","x":[-0.0656,0.2922],"xaxis":"x","y":["UPS","HON"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Healthcare\u003cbr\u003esharpe_ratio=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Healthcare","marker":{"color":"#00cc96","pattern":{"shape":""}},"name":"Healthcare","orientation":"h","showlegend":true,"textposition":"auto","x":[0.018,0.0712,0.2203],"xaxis":"x","y":["UNH","ABT","TMO"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Real Estate\u003cbr\u003esharpe_ratio=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Real Estate","marker":{"color":"#ab63fa","pattern":{"shape":""}},"name":"Real Estate","orientation":"h","showlegend":true,"textposition":"auto","x":[0.0218],"xaxis":"x","y":["AMT"],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Materials\u003cbr\u003esharpe_ratio=%{x}\u003cbr\u003eticker=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Materials","marker":{"color":"#FFA15A","pattern":{"shape":""}},"name":"Materials","orientation":"h","showlegend":true,"textposition":"auto","x":[0.2517],"xaxis":"x","y":["APD"],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Sharpe Ratio"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Ticker"},"categoryorder":"total ascending"},"legend":{"title":{"text":"sector"},"tracegroupgap":0},"title":{"text":"Bottom 10 Stocks by Sharpe Ratio (5-Year)"},"barmode":"relative","height":450,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Annualized Return vs. Volatility (All Stocks, sized by Sharpe Ratio)</h3>
+                <div>                            <div id="return_vs_volatility_scatter" class="plotly-graph-div" style="height:500px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("return_vs_volatility_scatter")) {                    Plotly.newPlot(                        "return_vs_volatility_scatter",                        [{"hovertemplate":"sector=Technology\u003cbr\u003eannualized_volatility_pct=%{x}\u003cbr\u003eannualized_mean_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Technology","marker":{"color":"#636efa","symbol":"circle"},"mode":"markers","name":"Technology","orientation":"v","showlegend":true,"x":[51.6735,42.3219,27.4487,23.3329,53.2555,39.946,26.1636,35.992,27.4454,35.5568],"xaxis":"x","y":[66.309,49.6688,19.0638,15.1237,33.9681,24.414,13.7513,4.4437,-1.4378,-6.3444],"yaxis":"y","type":"scatter"},{"hovertemplate":"sector=Healthcare\u003cbr\u003eannualized_volatility_pct=%{x}\u003cbr\u003eannualized_mean_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Healthcare","marker":{"color":"#EF553B","symbol":"circle"},"mode":"markers","name":"Healthcare","orientation":"v","showlegend":true,"x":[32.0756,22.5978,16.6783,23.2852,26.6057,22.0072,31.2067],"xaxis":"x","y":[38.2038,20.1097,11.7292,15.3693,5.862,1.5663,0.5613],"yaxis":"y","type":"scatter"},{"hovertemplate":"sector=Industrials\u003cbr\u003eannualized_volatility_pct=%{x}\u003cbr\u003eannualized_mean_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Industrials","marker":{"color":"#00cc96","symbol":"circle"},"mode":"markers","name":"Industrials","orientation":"v","showlegend":true,"x":[30.2516,29.5915,23.497,22.3425,21.393,28.2201],"xaxis":"x","y":[35.4686,29.5651,23.4573,6.8248,6.2501,-1.8502],"yaxis":"y","type":"scatter"},{"hovertemplate":"sector=Consumer Staples\u003cbr\u003eannualized_volatility_pct=%{x}\u003cbr\u003eannualized_mean_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Consumer Staples","marker":{"color":"#ab63fa","symbol":"circle"},"mode":"markers","name":"Consumer Staples","orientation":"v","showlegend":true,"x":[21.0971,22.5448,15.7958,18.1156,17.4807],"xaxis":"x","y":[23.7647,24.4387,11.5077,6.2771,5.4746],"yaxis":"y","type":"scatter"},{"hovertemplate":"sector=Energy\u003cbr\u003eannualized_volatility_pct=%{x}\u003cbr\u003eannualized_mean_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Energy","marker":{"color":"#FFA15A","symbol":"circle"},"mode":"markers","name":"Energy","orientation":"v","showlegend":true,"x":[26.4908,24.9767],"xaxis":"x","y":[29.0692,20.9242],"yaxis":"y","type":"scatter"},{"hovertemplate":"sector=Financials\u003cbr\u003eannualized_volatility_pct=%{x}\u003cbr\u003eannualized_mean_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Financials","marker":{"color":"#19d3f3","symbol":"circle"},"mode":"markers","name":"Financials","orientation":"v","showlegend":true,"x":[27.5956,17.2274,24.2865,22.4579,23.8373,26.839],"xaxis":"x","y":[24.8575,14.5072,18.5785,10.8707,10.0675,10.9793],"yaxis":"y","type":"scatter"},{"hovertemplate":"sector=Communication Services\u003cbr\u003eannualized_volatility_pct=%{x}\u003cbr\u003eannualized_mean_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Communication Services","marker":{"color":"#FF6692","symbol":"circle"},"mode":"markers","name":"Communication Services","orientation":"v","showlegend":true,"x":[30.5968,43.5226,42.9142],"xaxis":"x","y":[25.7456,24.8967,21.4991],"yaxis":"y","type":"scatter"},{"hovertemplate":"sector=Benchmark\u003cbr\u003eannualized_volatility_pct=%{x}\u003cbr\u003eannualized_mean_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Benchmark","marker":{"color":"#B6E880","symbol":"circle"},"mode":"markers","name":"Benchmark","orientation":"v","showlegend":true,"x":[16.9965],"xaxis":"x","y":[13.1945],"yaxis":"y","type":"scatter"},{"hovertemplate":"sector=Materials\u003cbr\u003eannualized_volatility_pct=%{x}\u003cbr\u003eannualized_mean_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Materials","marker":{"color":"#FF97FF","symbol":"circle"},"mode":"markers","name":"Materials","orientation":"v","showlegend":true,"x":[20.6871,26.0311],"xaxis":"x","y":[14.8134,6.5529],"yaxis":"y","type":"scatter"},{"hovertemplate":"sector=Consumer Discretionary\u003cbr\u003eannualized_volatility_pct=%{x}\u003cbr\u003eannualized_mean_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Consumer Discretionary","marker":{"color":"#FECB52","symbol":"circle"},"mode":"markers","name":"Consumer Discretionary","orientation":"v","showlegend":true,"x":[17.0542,59.1068,25.9177,35.2365,23.7436],"xaxis":"x","y":[10.11,29.1206,9.963,12.3891,7.4393],"yaxis":"y","type":"scatter"},{"hovertemplate":"sector=Real Estate\u003cbr\u003eannualized_volatility_pct=%{x}\u003cbr\u003eannualized_mean_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Real Estate","marker":{"color":"#636efa","symbol":"circle"},"mode":"markers","name":"Real Estate","orientation":"v","showlegend":true,"x":[26.8571,26.121],"xaxis":"x","y":[10.9152,0.5682],"yaxis":"y","type":"scatter"},{"hovertemplate":"sector=Utilities\u003cbr\u003eannualized_volatility_pct=%{x}\u003cbr\u003eannualized_mean_pct=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Utilities","marker":{"color":"#EF553B","symbol":"circle"},"mode":"markers","name":"Utilities","orientation":"v","showlegend":true,"x":[26.5538],"xaxis":"x","y":[10.5875],"yaxis":"y","type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Annualized Volatility (%)"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Annualized Return (%)"}},"legend":{"title":{"text":"sector"},"tracegroupgap":0},"title":{"text":"Annualized Return vs. Volatility (All Stocks, sized by Sharpe Ratio)"},"height":500,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Sharpe Ratio for All Stocks — Ranked Best to Worst</h3>
+                <div>                            <div id="sharpe_all_stocks_bar" class="plotly-graph-div" style="height:450px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("sharpe_all_stocks_bar")) {                    Plotly.newPlot(                        "sharpe_all_stocks_bar",                        [{"hovertemplate":"sector=Technology\u003cbr\u003eticker=%{x}\u003cbr\u003esharpe_ratio=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Technology","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"Technology","orientation":"v","showlegend":true,"textposition":"auto","x":["NVDA","AVGO","AAPL","CSCO","AMD","ORCL","MSFT","CRM","ACN","ADBE"],"xaxis":"x","y":[1.2832,1.1736,0.6945,0.6482,0.6378,0.6112,0.5256,0.1235,-0.0524,-0.1784],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Healthcare\u003cbr\u003eticker=%{x}\u003cbr\u003esharpe_ratio=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Healthcare","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"Healthcare","orientation":"v","showlegend":true,"textposition":"auto","x":["LLY","ABBV","JNJ","MRK","TMO","ABT","UNH"],"xaxis":"x","y":[1.1911,0.8899,0.7033,0.66,0.2203,0.0712,0.018],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Industrials\u003cbr\u003eticker=%{x}\u003cbr\u003esharpe_ratio=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Industrials","marker":{"color":"#00cc96","pattern":{"shape":""}},"name":"Industrials","orientation":"v","showlegend":true,"textposition":"auto","x":["GE","CAT","RTX","UNP","HON","UPS"],"xaxis":"x","y":[1.1725,0.9991,0.9983,0.3055,0.2922,-0.0656],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Consumer Staples\u003cbr\u003eticker=%{x}\u003cbr\u003esharpe_ratio=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Consumer Staples","marker":{"color":"#ab63fa","pattern":{"shape":""}},"name":"Consumer Staples","orientation":"v","showlegend":true,"textposition":"auto","x":["WMT","COST","KO","PEP","PG"],"xaxis":"x","y":[1.1264,1.084,0.7285,0.3465,0.3132],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Energy\u003cbr\u003eticker=%{x}\u003cbr\u003esharpe_ratio=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Energy","marker":{"color":"#FFA15A","pattern":{"shape":""}},"name":"Energy","orientation":"v","showlegend":true,"textposition":"auto","x":["XOM","CVX"],"xaxis":"x","y":[1.0973,0.8377],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Financials\u003cbr\u003eticker=%{x}\u003cbr\u003esharpe_ratio=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Financials","marker":{"color":"#19d3f3","pattern":{"shape":""}},"name":"Financials","orientation":"v","showlegend":true,"textposition":"auto","x":["GS","BRK-B","JPM","V","MA","BAC"],"xaxis":"x","y":[0.9008,0.8421,0.765,0.484,0.4223,0.4091],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Communication Services\u003cbr\u003eticker=%{x}\u003cbr\u003esharpe_ratio=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Communication Services","marker":{"color":"#FF6692","pattern":{"shape":""}},"name":"Communication Services","orientation":"v","showlegend":true,"textposition":"auto","x":["GOOG","META","NFLX"],"xaxis":"x","y":[0.8414,0.572,0.501],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Benchmark\u003cbr\u003eticker=%{x}\u003cbr\u003esharpe_ratio=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Benchmark","marker":{"color":"#B6E880","pattern":{"shape":""}},"name":"Benchmark","orientation":"v","showlegend":true,"textposition":"auto","x":["SPY"],"xaxis":"x","y":[0.7763],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Materials\u003cbr\u003eticker=%{x}\u003cbr\u003esharpe_ratio=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Materials","marker":{"color":"#FF97FF","pattern":{"shape":""}},"name":"Materials","orientation":"v","showlegend":true,"textposition":"auto","x":["LIN","APD"],"xaxis":"x","y":[0.7161,0.2517],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Consumer Discretionary\u003cbr\u003eticker=%{x}\u003cbr\u003esharpe_ratio=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Consumer Discretionary","marker":{"color":"#FECB52","pattern":{"shape":""}},"name":"Consumer Discretionary","orientation":"v","showlegend":true,"textposition":"auto","x":["MCD","TSLA","LOW","AMZN","HD"],"xaxis":"x","y":[0.5928,0.4927,0.3844,0.3516,0.3133],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Real Estate\u003cbr\u003eticker=%{x}\u003cbr\u003esharpe_ratio=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Real Estate","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"Real Estate","orientation":"v","showlegend":true,"textposition":"auto","x":["PLD","AMT"],"xaxis":"x","y":[0.4064,0.0218],"yaxis":"y","type":"bar"},{"hovertemplate":"sector=Utilities\u003cbr\u003eticker=%{x}\u003cbr\u003esharpe_ratio=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Utilities","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"Utilities","orientation":"v","showlegend":true,"textposition":"auto","x":["NEE"],"xaxis":"x","y":[0.3987],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Ticker"},"categoryorder":"total descending"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Sharpe Ratio"}},"legend":{"title":{"text":"sector"},"tracegroupgap":0},"title":{"text":"Sharpe Ratio for All Stocks \u2014 Ranked Best to Worst"},"barmode":"relative","height":450,"showlegend":true},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            
+
+            
+            <div class="table-container">
+                <h3>Top 10 Stocks by Sharpe Ratio — Risk-Adjusted Performance</h3>
+                <table class="data-table"><thead><tr><th>Ticker</th><th>Sector</th><th>Annualized Return Pct</th><th>Annualized Volatility Pct</th><th>Sharpe Ratio</th></tr></thead><tbody><tr><td>NVDA</td><td>Technology</td><td>66.3%</td><td>51.7%</td><td>1.3%</td></tr><tr><td>LLY</td><td>Healthcare</td><td>38.2%</td><td>32.1%</td><td>1.2%</td></tr><tr><td>AVGO</td><td>Technology</td><td>49.7%</td><td>42.3%</td><td>1.2%</td></tr><tr><td>GE</td><td>Industrials</td><td>35.5%</td><td>30.2%</td><td>1.2%</td></tr><tr><td>WMT</td><td>Consumer Staples</td><td>23.8%</td><td>21.1%</td><td>1.1%</td></tr><tr><td>XOM</td><td>Energy</td><td>29.1%</td><td>26.5%</td><td>1.1%</td></tr><tr><td>COST</td><td>Consumer Staples</td><td>24.4%</td><td>22.5%</td><td>1.1%</td></tr><tr><td>CAT</td><td>Industrials</td><td>29.6%</td><td>29.6%</td><td>1.0%</td></tr><tr><td>RTX</td><td>Industrials</td><td>23.5%</td><td>23.5%</td><td>1.0%</td></tr><tr><td>GS</td><td>Financials</td><td>24.9%</td><td>27.6%</td><td>0.9%</td></tr></tbody></table>
+            </div>
+            
+            <div class="table-container">
+                <h3>Bottom 10 Stocks by Sharpe Ratio — Worst Risk-Adjusted Performance</h3>
+                <table class="data-table"><thead><tr><th>Ticker</th><th>Sector</th><th>Annualized Return Pct</th><th>Annualized Volatility Pct</th><th>Sharpe Ratio</th></tr></thead><tbody><tr><td>ADBE</td><td>Technology</td><td>-6.3%</td><td>35.6%</td><td>-0.2%</td></tr><tr><td>UPS</td><td>Industrials</td><td>-1.9%</td><td>28.2%</td><td>-0.1%</td></tr><tr><td>ACN</td><td>Technology</td><td>-1.4%</td><td>27.4%</td><td>-0.1%</td></tr><tr><td>UNH</td><td>Healthcare</td><td>0.6%</td><td>31.2%</td><td>0.0%</td></tr><tr><td>AMT</td><td>Real Estate</td><td>0.6%</td><td>26.1%</td><td>0.0%</td></tr><tr><td>ABT</td><td>Healthcare</td><td>1.6%</td><td>22.0%</td><td>0.1%</td></tr><tr><td>CRM</td><td>Technology</td><td>4.4%</td><td>36.0%</td><td>0.1%</td></tr><tr><td>TMO</td><td>Healthcare</td><td>5.9%</td><td>26.6%</td><td>0.2%</td></tr><tr><td>APD</td><td>Materials</td><td>6.6%</td><td>26.0%</td><td>0.3%</td></tr><tr><td>HON</td><td>Industrials</td><td>6.3%</td><td>21.4%</td><td>0.3%</td></tr></tbody></table>
+            </div>
+            
+        </section>
+        
+
+        <!-- Methodology -->
+        <section id="methodology">
+            <h2>Methodology</h2>
+            
+            <p><strong>Data Sources:</strong> daily_prices, tickers</p>
+            
+            <p><strong>Analysis Approach:</strong> To calculate the Sharpe ratio for each stock over the last 5 years, we need to: (1) compute daily log or simple returns from closing prices, (2) calculate annualized mean return and annualized volatility (std dev) per ticker, (3) derive the Sharpe ratio as (annualized_mean_return - risk_free_rate) / annualized_volatility — using 0 or a constant risk-free rate proxy since no rate table is available, (4) join with tickers to get sector, and (5) rank to extract top 10 and bottom 10. We'll split this into a daily returns computation, a per-ticker Sharpe ratio summary with ranking, and a final filtered top/bottom 10 result.</p>
+
+            
+            <details>
+                <summary>SQL Queries Used</summary>
+                
+                <div class="query-block">
+                    <p>Compute daily simple returns for each ticker over the last 5 years by using LAG on close prices, filtering to the relevant date window and excluding the benchmark ticker if present.</p>
+                    <pre><code>WITH max_date AS (
+    SELECT MAX(date) AS max_dt FROM daily_prices
+),
+benchmark_tickers AS (
+    -- Identify tickers not in the tickers table (likely benchmarks like SPY, QQQ, etc.)
+    SELECT DISTINCT dp.ticker
+    FROM daily_prices dp
+    LEFT JOIN tickers t ON dp.ticker = t.ticker
+    WHERE t.ticker IS NULL
+),
+priced AS (
+    SELECT
+        dp.date,
+        dp.ticker,
+        dp.close,
+        t.sector,
+        LAG(dp.close) OVER (PARTITION BY dp.ticker ORDER BY dp.date) AS prev_close
+    FROM daily_prices dp
+    INNER JOIN tickers t ON dp.ticker = t.ticker  -- excludes benchmark tickers not in tickers table
+    CROSS JOIN max_date md
+    WHERE dp.date >= (md.max_dt - INTERVAL '5 years')
+      AND dp.ticker NOT IN (SELECT ticker FROM benchmark_tickers)
+)
+SELECT
+    date,
+    ticker,
+    sector,
+    close,
+    prev_close,
+    CASE
+        WHEN prev_close IS NOT NULL AND prev_close <> 0
+        THEN (close - prev_close) / prev_close
+        ELSE NULL
+    END AS daily_simple_return
+FROM priced
+WHERE prev_close IS NOT NULL
+  AND prev_close <> 0
+ORDER BY ticker, date</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Aggregate daily returns per ticker to compute annualized mean return and annualized volatility, then calculate the Sharpe ratio (annualized_mean / annualized_stddev, assuming a 0% risk-free rate) for each stock, joined with sector from the tickers table.</p>
+                    <pre><code>WITH daily_returns AS (
+    SELECT
+        ticker,
+        date,
+        (close / LAG(close) OVER (PARTITION BY ticker ORDER BY date) - 1) AS daily_return
+    FROM daily_prices
+),
+returns_filtered AS (
+    SELECT
+        ticker,
+        daily_return
+    FROM daily_returns
+    WHERE daily_return IS NOT NULL
+),
+stats AS (
+    SELECT
+        ticker,
+        AVG(daily_return) * 252 AS annualized_mean,
+        STDDEV_SAMP(daily_return) * SQRT(252) AS annualized_volatility,
+        COUNT(*) AS trading_days
+    FROM returns_filtered
+    GROUP BY ticker
+)
+SELECT
+    s.ticker,
+    t.sector,
+    ROUND(s.annualized_mean * 100, 4) AS annualized_mean_pct,
+    ROUND(s.annualized_volatility * 100, 4) AS annualized_volatility_pct,
+    ROUND(
+        CASE
+            WHEN s.annualized_volatility = 0 OR s.annualized_volatility IS NULL THEN NULL
+            ELSE s.annualized_mean / s.annualized_volatility
+        END,
+        4
+    ) AS sharpe_ratio,
+    s.trading_days
+FROM stats s
+JOIN tickers t ON s.ticker = t.ticker
+ORDER BY sharpe_ratio DESC</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Rank all tickers by Sharpe ratio descending and return the top 10 stocks with the highest risk-adjusted returns, showing ticker, sector, annualized return, annualized volatility, and Sharpe ratio.</p>
+                    <pre><code>WITH daily_returns AS (
+    SELECT
+        dp.ticker,
+        t.sector,
+        dp.date,
+        dp.close,
+        (dp.close - LAG(dp.close) OVER (PARTITION BY dp.ticker ORDER BY dp.date)) / LAG(dp.close) OVER (PARTITION BY dp.ticker ORDER BY dp.date) AS daily_return
+    FROM daily_prices dp
+    JOIN tickers t ON dp.ticker = t.ticker
+),
+stats AS (
+    SELECT
+        ticker,
+        sector,
+        AVG(daily_return) * 252 AS annualized_return,
+        STDDEV(daily_return) * SQRT(252) AS annualized_volatility,
+        COUNT(daily_return) AS n_obs
+    FROM daily_returns
+    WHERE daily_return IS NOT NULL
+    GROUP BY ticker, sector
+)
+SELECT
+    ticker,
+    sector,
+    ROUND(annualized_return * 100, 2) AS annualized_return_pct,
+    ROUND(annualized_volatility * 100, 2) AS annualized_volatility_pct,
+    ROUND(annualized_return / NULLIF(annualized_volatility, 0), 4) AS sharpe_ratio
+FROM stats
+WHERE annualized_volatility > 0
+ORDER BY sharpe_ratio DESC
+LIMIT 10</code></pre>
+                </div>
+                
+                <div class="query-block">
+                    <p>Rank all tickers by Sharpe ratio ascending and return the bottom 10 stocks with the lowest (worst) risk-adjusted returns, showing ticker, sector, annualized return, annualized volatility, and Sharpe ratio.</p>
+                    <pre><code>WITH daily_returns AS (
+    SELECT
+        dp.ticker,
+        t.sector,
+        dp.date,
+        dp.close,
+        (dp.close - LAG(dp.close) OVER (PARTITION BY dp.ticker ORDER BY dp.date)) / LAG(dp.close) OVER (PARTITION BY dp.ticker ORDER BY dp.date) AS daily_return
+    FROM daily_prices dp
+    JOIN tickers t ON dp.ticker = t.ticker
+),
+stats AS (
+    SELECT
+        ticker,
+        sector,
+        AVG(daily_return) * 252 AS annualized_return,
+        STDDEV(daily_return) * SQRT(252) AS annualized_volatility,
+        COUNT(daily_return) AS n_days
+    FROM daily_returns
+    WHERE daily_return IS NOT NULL
+    GROUP BY ticker, sector
+),
+sharpe AS (
+    SELECT
+        ticker,
+        sector,
+        annualized_return,
+        annualized_volatility,
+        CASE
+            WHEN annualized_volatility = 0 OR annualized_volatility IS NULL THEN NULL
+            ELSE annualized_return / annualized_volatility
+        END AS sharpe_ratio
+    FROM stats
+)
+SELECT
+    ticker,
+    sector,
+    ROUND(annualized_return * 100, 4) AS annualized_return_pct,
+    ROUND(annualized_volatility * 100, 4) AS annualized_volatility_pct,
+    ROUND(sharpe_ratio, 4) AS sharpe_ratio
+FROM sharpe
+WHERE sharpe_ratio IS NOT NULL
+ORDER BY sharpe_ratio ASC
+LIMIT 10</code></pre>
+                </div>
+                
+            </details>
+            
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    <p>Generated by <strong>Autonomous Analytics Agent</strong></p>
+    <p>Pipeline execution time: 1m 2s</p>
+</footer>
+
+</body>
+</html>
