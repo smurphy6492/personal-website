@@ -20,12 +20,23 @@ export interface ProjectSection {
   content: ContentBlock[];
 }
 
+export type StepType = "llm" | "deterministic" | "validation";
+
+export interface WorkflowStep {
+  label: string;
+  type?: StepType | StepType[];
+  retryLoop?: boolean;
+  conditional?: boolean;
+}
+
+export type WorkflowItem = string | WorkflowStep;
+
 export interface Project {
   id: string;
   name: string;
   tagline: string;
   problem: ContentBlock[];
-  workflow: string[];
+  workflow: WorkflowItem[];
   stack: string[];
   status: "Live" | "In Progress" | "Planned" | "Complete";
   githubUrl?: string;
@@ -51,34 +62,39 @@ export const projects: Project[] = [
       { type: "callout", value: "I wanted to build a system where a question goes in and a complete report comes out, with no human in the loop unless something breaks." }
     ],
     workflow: [
-      "Data Profiler → DuckDB schema + stats",
-      "Orchestrator → SQL query plan",
-      "SQL Analyst → execute + retry on error (×3)",
-      "Orchestrator → executive summary + chart specs",
-      "Viz Agent → Plotly charts (deterministic)",
-      "Report Builder → self-contained HTML"
+      { label: "Data Profiler → DuckDB stats + LLM structuring", type: ["deterministic", "llm"] },
+      { label: "Orchestrator → SQL query plan", type: "llm" },
+      { label: "SQL Analyst → execute with self-correcting retry loop", type: ["llm", "validation"], retryLoop: true },
+      { label: "Orchestrator → summary + chart specs", type: "llm" },
+      { label: "Coverage + Metric Sanity → validate + re-synthesize if needed", type: ["llm", "validation"], conditional: true },
+      { label: "Viz Agent + chart validators", type: ["deterministic", "validation"] },
+      { label: "Report Builder → self-contained HTML", type: "deterministic" },
     ],
     stack: ["Python", "Claude API", "DuckDB", "Plotly", "Pydantic", "Jinja2", "Typer"],
     status: "Live",
     githubUrl: "https://github.com/smurphy6492/autonomous-analytics-agent",
     metrics: [
       { value: "~60s", label: "Question to Report", detail: "Replaces a ~2hr analyst workflow" },
-      { value: "6", label: "Specialized Agents" },
-      { value: "0", label: "Human Steps Required" },
-      { value: "3x", label: "Self-Correcting Retries" }
+      { value: "5", label: "Specialized Agents", detail: "Profiler, Orchestrator, SQL Analyst, Viz, Report Builder" },
+      { value: "8+", label: "LLM Calls per Report", detail: "Planning, SQL generation, synthesis, validation" },
+      { value: "8", label: "Validation Gates", detail: "Coverage, sanity, zero-row, bdata, and more" }
     ],
     sections: [
       {
         heading: "System Architecture",
         content: [
-          { type: "text", value: "Six agents chain in sequence. Each one handles a specific stage, passes structured output to the next, and the pipeline self-corrects when queries fail." },
+          { type: "text", value: "Five specialized agents chain in sequence, making 8+ LLM calls per report. Each stage passes Pydantic-validated output to the next. Validation gates between stages catch data quality issues, coverage gaps, and implausible metrics — triggering automatic re-synthesis when problems are found." },
           { type: "workflow" },
           { type: "bullets", items: [
-            "Data Profiler connects to DuckDB and extracts schema metadata plus summary statistics",
-            "Orchestrator takes the user's question and schema context, then plans which queries are needed",
-            "SQL Analyst generates and executes SQL. If it fails, the DuckDB error feeds back to Claude for self-correction, up to 3 retries",
-            "Viz Agent renders Plotly charts deterministically with no API call",
-            "Report Builder assembles everything into a self-contained HTML file via Jinja2"
+            "Data Profiler connects to DuckDB and extracts schema metadata plus summary statistics. Claude structures this into a typed DataProfile with semantic annotations.",
+            "Orchestrator plans 2-4 SQL queries based on the question and data profile.",
+            "SQL Analyst generates and executes SQL. If DuckDB rejects a query, the error feeds back to Claude for self-correction (up to 3 attempts per query, 2-4 queries per report).",
+            "Deterministic validators run after each query: zero-row detection, sequential-index detection, zero-variance checks.",
+            "Orchestrator synthesizes results into an executive summary, key metrics, and chart specifications.",
+            "Coverage validation reviews the synthesis against the original question. Multi-part questions get checked for dedicated coverage of each facet. Gaps trigger automatic re-synthesis with specific feedback.",
+            "Metric sanity check cross-references reported metrics against the data profile to catch implausible figures.",
+            "Viz Agent renders Plotly charts deterministically (no LLM call). Chart validators catch bdata encoding bugs and column mapping errors.",
+            "Report Builder assembles everything into a self-contained HTML file via Jinja2."
           ]}
         ]
       },
@@ -106,10 +122,12 @@ export const projects: Project[] = [
           { type: "text", value: "The first demo required hours of manual debugging. Charts showed row indices instead of revenue figures. Queries returned zero rows because of date filter edge cases. Reports answered half the question and ignored the rest. So I built the debugging into the pipeline itself." },
           { type: "bullets", items: [
             "Coverage validation: After the orchestrator proposes a report layout, a separate LLM call reviews it against the original question. Multi-part questions like \"Which states have the highest CLV AND what payment methods do they prefer?\" get checked for dedicated coverage of each facet. Gaps trigger automatic re-synthesis with specific feedback.",
+            "Metric sanity check: A dedicated LLM call reviews key metrics against the data profile. Catches implausible figures — like cost-per-acquisition exceeding total campaign budget, or revenue numbers that imply impossible average order values.",
             "Zero-row detection: Catches date filter bugs on historical data before they produce empty charts.",
             "Sequential-index detection: Flags when chart axes show 0, 1, 2, 3 instead of actual values, which signals column encoding bugs.",
             "Binary encoding guard: Catches Plotly's bdata regression, where chart data silently corrupts during serialization.",
-            "Zero-variance detection: Catches wrong column mappings where every bar is the same height."
+            "Zero-variance detection: Catches wrong column mappings where every bar is the same height.",
+            "Auto-formatting: The report builder infers column types from names — revenue columns get dollar signs and commas, percentages get proper formatting, counts get separators. Adaptive decimal precision prevents data loss when rounding would collapse distinct values into the same number."
           ]},
           { type: "callout", value: "The first demo failed repeatedly and needed manual fixes. Every subsequent demo ran clean on the first try. The system learns from its failures structurally. Not through better prompts, but through validators that make the same mistake impossible twice." }
         ]

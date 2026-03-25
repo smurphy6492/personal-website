@@ -1,4 +1,4 @@
-import type { ContentBlock } from "@/data/projects";
+import type { ContentBlock, WorkflowItem } from "@/data/projects";
 import { StatCards } from "@/components/StatCards";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ProjectImage } from "@/components/ProjectImage";
@@ -7,7 +7,7 @@ import { Quote } from "lucide-react";
 
 interface ContentRendererProps {
   blocks: ContentBlock[];
-  workflow?: string[];
+  workflow?: WorkflowItem[];
 }
 
 export function ContentRenderer({ blocks, workflow }: ContentRendererProps) {
