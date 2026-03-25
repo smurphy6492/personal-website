@@ -10,7 +10,7 @@ import { useEffect } from "react";
 
 export function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
-  const project = projects.find(p => p.id === id);
+  const project = projects.find(p => p.id === id && !p.hidden);
 
   useEffect(() => {
     window.scrollTo(0, 0);

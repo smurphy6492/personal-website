@@ -32,6 +32,7 @@ export interface Project {
   liveUrl?: string;
   metrics?: StatItem[];
   sections: ProjectSection[];
+  hidden?: boolean;
 }
 
 export const projects: Project[] = [
@@ -116,6 +117,7 @@ export const projects: Project[] = [
     ]
   },
   {
+    hidden: true,
     id: "customer-segmentation",
     name: "Customer Segmentation & Churn Prediction",
     tagline: "Unsupervised clustering reveals 3 behavioral segments from 800K+ transactions. Supervised models then predict which customers will churn — and what it costs to ignore them.",
