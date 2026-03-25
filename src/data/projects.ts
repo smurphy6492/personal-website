@@ -116,6 +116,95 @@ export const projects: Project[] = [
     ]
   },
   {
+    id: "customer-segmentation",
+    name: "Customer Segmentation & Churn Prediction",
+    tagline: "Unsupervised clustering reveals 3 behavioral segments from 800K+ transactions. Supervised models then predict which customers will churn — and what it costs to ignore them.",
+    problem: [
+      { type: "text", value: "Every e-commerce company has the same question: which customers are we about to lose, and which ones are worth fighting to keep? The data exists in transaction logs, but most teams rely on gut feel or static reports." },
+      { type: "callout", value: "I wanted to build an end-to-end data science pipeline — from raw transactions to actionable segments to churn predictions — using statistics and ML, not AI tooling. Pure Python and scikit-learn." }
+    ],
+    workflow: [
+      "Raw transactions → data cleaning (805K rows)",
+      "RFM feature engineering → Recency, Frequency, Monetary",
+      "K-Means clustering → 3 behavioral segments",
+      "Temporal split → no data leakage",
+      "Logistic Regression + Random Forest → churn classification",
+      "Segment × Churn → business recommendations"
+    ],
+    stack: ["Python", "scikit-learn", "Pandas", "Plotly", "scipy"],
+    status: "Live",
+    githubUrl: "https://github.com/smurphy6492/customer-segmentation",
+    liveUrl: "/reports/customer-segmentation.html",
+    metrics: [
+      { value: "5,878", label: "Customers Segmented" },
+      { value: "83%", label: "Revenue from Champions", detail: "Top segment drives the business" },
+      { value: "0.793", label: "Churn AUC-ROC", detail: "Logistic Regression" },
+      { value: "86%", label: "At-Risk Churn Rate", detail: "Highest-churn segment identified" }
+    ],
+    sections: [
+      {
+        heading: "Key Findings",
+        content: [
+          { type: "text", value: "RFM-based clustering separated customers into three distinct behavioral groups. The revenue concentration is stark: Champions are 29% of customers but generate 83% of revenue." },
+          { type: "table", headers: ["Segment", "Customers", "Avg Recency", "Avg Frequency", "Avg Spend", "Revenue Share"],
+            rows: [
+              ["Champions", "1,689", "57 days", "15.9 orders", "$8,691", "82.7%"],
+              ["Loyal Customers", "2,351", "92 days", "2.9 orders", "$861", "11.4%"],
+              ["Potential Loyalists", "1,838", "473 days", "1.8 orders", "$566", "5.9%"]
+            ]
+          },
+          { type: "callout", value: "The Potential Loyalists segment — 31% of all customers — has an 86% churn rate. These are the customers a retention team should focus on before it's too late." }
+        ]
+      },
+      {
+        heading: "Segmentation Deep Dive",
+        content: [
+          { type: "text", value: "K-Means clustering on standardized, log-transformed RFM features with K=3 (selected via silhouette analysis in the K=3-6 range for business interpretability). PCA captures 95% of variance in just 2 components, confirming the segments are well-separated." },
+          { type: "embed", src: "/reports/customer-segmentation.html", title: "Full Interactive Report", height: 600 }
+        ]
+      },
+      {
+        heading: "Predicting Churn",
+        content: [
+          { type: "text", value: "Churn was defined using a strict temporal split: features from the first 22 months, churn labels from the final 2 months (no purchase = churned). This prevents data leakage and mimics real deployment." },
+          { type: "bullets", items: [
+            "Logistic Regression (AUC=0.793) outperformed Random Forest (AUC=0.780) — simpler model, better generalization",
+            "Balanced class weights handled the 63% churn rate without oversampling",
+            "Top predictors: Recency, Frequency, and Tenure — recent, frequent buyers are least likely to churn",
+            "Segment membership is predictive: adding it as a feature improved classification performance"
+          ]},
+          { type: "callout", value: "The business case: at a $5 retention offer per customer, targeting the top 500 highest-probability churners costs $2,500 but protects an estimated $400K+ in lifetime revenue." }
+        ]
+      },
+      {
+        heading: "Connecting Segments to Churn",
+        content: [
+          { type: "text", value: "The payoff of combining unsupervised and supervised approaches: churn rates differ dramatically by segment. This tells the retention team not just who will churn, but which type of customer they're losing." },
+          { type: "table", headers: ["Segment", "Churn Rate", "Business Implication"],
+            rows: [
+              ["Champions", "33%", "Low churn, high value — protect with loyalty programs"],
+              ["Loyal Customers", "64%", "Mid-tier at risk — targeted re-engagement campaigns"],
+              ["Potential Loyalists", "86%", "Nearly gone — last-chance win-back offers or accept the loss"]
+            ]
+          }
+        ]
+      },
+      {
+        heading: "Methodology",
+        content: [
+          { type: "text", value: "Built with pure Python and scikit-learn — no LLMs, no AI orchestration. This project demonstrates core data science skills: feature engineering, unsupervised clustering, supervised classification, and model evaluation." },
+          { type: "bullets", items: [
+            "Data: UCI Online Retail II (1M+ transactions, 2009-2011). ~23% of rows dropped due to missing Customer ID.",
+            "Features: RFM + AvgOrderValue, AvgDaysBetween, UniqueProducts, Tenure, Segment membership",
+            "Clustering: K-Means and Hierarchical (Ward) compared. K selected via silhouette score within business-interpretable range (3-6).",
+            "Classification: Logistic Regression (interpretable baseline) vs Random Forest. Evaluated on AUC-ROC, F1, precision/recall.",
+            "Temporal split prevents data leakage: features from months 1-22, churn defined by months 23-24."
+          ]}
+        ]
+      }
+    ]
+  },
+  {
     id: "ecommerce-data-story",
     name: "E-Commerce Disruption Analysis",
     tagline: "25 years of US retail data reveal which categories e-commerce has gutted, and which it hasn't touched.",
@@ -181,7 +270,7 @@ export const projects: Project[] = [
   {
     id: "tableau-migration-toolkit",
     name: "Tableau Migration Toolkit",
-    tagline: "98 dashboards migrated from Redshift to Databricks. Then the process got packaged into portable AI tooling.",
+    tagline: "AI tooling that compressed a 98-dashboard platform migration from 8 weeks to 1.",
     problem: [
       { type: "text", value: "BI migrations are one of the most tedious jobs in analytics. Nothing intellectually hard, just repetitive work where the real risk is human error on dashboard #73. I ran this migration in production with Claude Code as my copilot throughout, translating SQL dialects, catching edge cases, and validating patterns across 98 real Tableau workbooks on live clusters." },
       { type: "bullets", items: [
