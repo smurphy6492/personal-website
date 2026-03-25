@@ -43,10 +43,13 @@ export interface WorkflowStep {
 
 export type WorkflowItem = string | WorkflowStep;
 
+export type ProjectCategory = "AI Tooling" | "Data Science" | "Data Analytics" | "Data Engineering";
+
 export interface Project {
   id: string;
   name: string;
   tagline: string;
+  category: ProjectCategory;
   problem: ContentBlock[];
   workflow: WorkflowItem[];
   stack: string[];
@@ -63,6 +66,7 @@ export const projects: Project[] = [
     id: "autonomous-analytics-agent",
     name: "Autonomous Analytics Agent",
     tagline: "Ask a business question. Get SQL, charts, and an executive summary. Automatically.",
+    category: "AI Tooling",
     problem: [
       { type: "text", value: "Every analytics team knows this cycle: a stakeholder asks a question, an analyst writes SQL, builds a chart, drafts a summary, and two hours later delivers something that prompts three follow-up questions." },
       { type: "bullets", items: [
@@ -184,6 +188,7 @@ export const projects: Project[] = [
     id: "customer-segmentation",
     name: "Customer Segmentation & Churn Prediction",
     tagline: "Which customers are about to leave — and which ones are worth saving? End-to-end segmentation and churn prediction from 800K+ retail transactions.",
+    category: "Data Science",
     problem: [
       { type: "text", value: "Every e-commerce company has the same question: which customers are we about to lose, and which ones are worth fighting to keep? The data exists in transaction logs, but most teams rely on gut feel or static reports." },
       { type: "callout", value: "I built an end-to-end data science pipeline, from raw transactions to actionable segments to churn predictions, using statistics and ML. Pure Python and scikit-learn. No AI tooling." }
@@ -289,6 +294,7 @@ export const projects: Project[] = [
     id: "ecommerce-data-story",
     name: "E-Commerce Disruption Analysis",
     tagline: "25 years of US retail data reveal which categories e-commerce has gutted, and which it hasn't touched.",
+    category: "Data Analytics",
     problem: [
       { type: "text", value: "Everyone knows e-commerce transformed retail, but the disruption hasn't been uniform. Electronics stores have been hollowed out while grocery barely flinched." },
       { type: "callout", value: "Which retail categories have been most disrupted by e-commerce? I wanted to answer that with 25 years of Census Bureau data, not opinions." }
@@ -352,6 +358,7 @@ export const projects: Project[] = [
     id: "tableau-migration-toolkit",
     name: "Tableau Migration Toolkit",
     tagline: "AI tooling that compressed a 98-dashboard platform migration from 8 weeks to 1.",
+    category: "Data Engineering",
     problem: [
       { type: "text", value: "BI migrations are one of the most tedious jobs in analytics. Nothing intellectually hard, just repetitive work where the real risk is human error on dashboard #73. I ran this migration in production with Claude Code as my copilot throughout, translating SQL dialects, catching edge cases, and validating patterns across 98 real Tableau workbooks on live clusters." },
       { type: "bullets", items: [

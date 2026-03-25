@@ -84,7 +84,7 @@ export function Home() {
                 key={project.id}
                 className={index === visible.length - 1 && visible.length % 2 !== 0 ? "md:col-span-2 md:w-1/2 md:mx-auto" : ""}
               >
-                <ProjectCard project={project} />
+                <ProjectCard project={project} className="h-full" />
               </div>
             ))}
           </div>

@@ -1,26 +1,42 @@
 import { Link } from "wouter";
 import { ArrowRight, Clock, CheckCircle2, Radio } from "lucide-react";
-import type { Project } from "@/data/projects";
+import type { Project, ProjectCategory } from "@/data/projects";
 import { cn } from "@/lib/utils";
+
+const categoryStyles: Record<ProjectCategory, string> = {
+  "AI Tooling": "bg-violet-500/10 text-violet-400 border-violet-500/20",
+  "Data Science": "bg-teal-500/10 text-teal-400 border-teal-500/20",
+  "Data Analytics": "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  "Data Engineering": "bg-amber-500/10 text-amber-400 border-amber-500/20",
+};
 
 interface ProjectCardProps {
   project: Project;
+  className?: string;
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, className }: ProjectCardProps) {
   const isLive = project.status === "Live" || project.status === "Complete";
   const isInProgress = project.status === "In Progress";
 
   return (
-    <div className="group relative flex flex-col justify-between bg-card border border-border rounded-2xl p-6 md:p-8 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1">
+    <div className={cn("group relative flex flex-col justify-between bg-card border border-border rounded-2xl p-6 md:p-8 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1", className)}>
       {/* Decorative gradient blob on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-500 pointer-events-none" />
 
       <div>
         <div className="flex justify-between items-start mb-4 gap-4">
-          <h3 className="font-display font-bold text-xl md:text-2xl text-foreground">
-            {project.name}
-          </h3>
+          <div>
+            <span className={cn(
+              "inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider border mb-2",
+              categoryStyles[project.category]
+            )}>
+              {project.category}
+            </span>
+            <h3 className="font-display font-bold text-xl md:text-2xl text-foreground">
+              {project.name}
+            </h3>
+          </div>
           <span className={cn(
             "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap border shrink-0",
             isLive
