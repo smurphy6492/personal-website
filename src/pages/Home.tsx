@@ -79,10 +79,10 @@ export function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-            {projects.map((project, index) => (
-              <div 
-                key={project.id} 
-                className={index === projects.length - 1 && projects.length % 2 !== 0 ? "md:col-span-2 md:w-1/2 md:mx-auto" : ""}
+            {projects.filter(p => !p.hidden).map((project, index, visible) => (
+              <div
+                key={project.id}
+                className={index === visible.length - 1 && visible.length % 2 !== 0 ? "md:col-span-2 md:w-1/2 md:mx-auto" : ""}
               >
                 <ProjectCard project={project} />
               </div>
