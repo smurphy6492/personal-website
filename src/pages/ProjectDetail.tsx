@@ -3,7 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ContentRenderer } from "@/components/ContentRenderer";
 import { StatCards } from "@/components/StatCards";
-import { projects } from "@/data/projects";
+import { projects, type ProjectCategory } from "@/data/projects";
 import { ArrowLeft, Github, ExternalLink, Clock, CheckCircle2, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
@@ -57,10 +57,21 @@ export function ProjectDetail() {
           <header className="mb-12">
             <div className="flex flex-wrap items-center gap-4 mb-6">
               <span className={cn(
+                "inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider border",
+                {
+                  "AI Tooling": "bg-violet-500/10 text-violet-400 border-violet-500/20",
+                  "Data Science": "bg-teal-500/10 text-teal-400 border-teal-500/20",
+                  "Data Analytics": "bg-blue-500/10 text-blue-400 border-blue-500/20",
+                  "Data Engineering": "bg-amber-500/10 text-amber-400 border-amber-500/20",
+                }[project.category as ProjectCategory]
+              )}>
+                {project.category}
+              </span>
+              <span className={cn(
                 "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border",
                 isInProgress
                   ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
-                  : "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                  : "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
               )}>
                 {isInProgress ? <Clock className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                 {isComplete ? "Complete" : project.status}
