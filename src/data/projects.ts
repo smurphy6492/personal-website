@@ -137,7 +137,7 @@ export const projects: Project[] = [
   {
     id: "customer-segmentation",
     name: "Customer Segmentation & Churn Prediction",
-    tagline: "RFMT clustering reveals 5 lifecycle segments from 800K+ transactions. A data-driven churn threshold and supervised models predict which customers will leave, and what it costs to ignore them.",
+    tagline: "Which customers are about to leave — and which ones are worth saving? End-to-end segmentation and churn prediction from 800K+ retail transactions.",
     problem: [
       { type: "text", value: "Every e-commerce company has the same question: which customers are we about to lose, and which ones are worth fighting to keep? The data exists in transaction logs, but most teams rely on gut feel or static reports." },
       { type: "callout", value: "I built an end-to-end data science pipeline, from raw transactions to actionable segments to churn predictions, using statistics and ML. Pure Python and scikit-learn. No AI tooling." }
@@ -218,7 +218,7 @@ export const projects: Project[] = [
               ["Loyal Customers", "35%", "Monitor, light-touch engagement"],
               ["Potential Loyalists", "46%", "New customers still deciding. Nurture."],
               ["Win-Back Targets", "67%", "Were valuable, now lapsing. Reactivation campaigns."],
-              ["Lost", "84%", "Low value, long gone. Accept the loss."]
+              ["Lost", "84%", "Deprioritize — reactivation ROI is negative"]
             ]
           }
         ]

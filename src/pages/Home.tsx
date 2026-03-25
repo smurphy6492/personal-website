@@ -74,7 +74,7 @@ export function Home() {
             </h2>
             <div className="w-20 h-1.5 bg-primary rounded-full" />
             <p className="text-muted-foreground mt-6 max-w-2xl text-lg">
-              Architecting multi-agent systems that autonomously answer complex questions, monitor data health, and scale analytics output.
+              AI systems, data pipelines, and applied analytics — from multi-agent orchestration to classical ML.
             </p>
           </div>
 
