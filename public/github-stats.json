@@ -1,20 +1,20 @@
 {
-  "updated_at": "2026-03-25T05:49:05.425448+00:00",
+  "updated_at": "2026-03-26T06:17:04.138697+00:00",
   "public_repos": 4,
   "total_stars": 0,
-  "commits_this_year": 17,
+  "commits_this_year": 21,
   "top_languages": [
     {
+      "name": "HTML",
+      "percentage": 67
+    },
+    {
       "name": "Python",
-      "percentage": 42
+      "percentage": 18
     },
     {
       "name": "TypeScript",
-      "percentage": 28
-    },
-    {
-      "name": "HTML",
-      "percentage": 26
+      "percentage": 13
     }
   ]
 }
