@@ -125,7 +125,6 @@ export const projects: Project[] = [
         ]
       },
       {
-      {
         heading: "Model Iteration: Diagnosing the Extrapolation Problem",
         content: [
           { type: "text", value: "The hybrid model wasn't the first approach. The project went through a deliberate iteration cycle: build, evaluate, diagnose, fix." },
