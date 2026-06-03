@@ -141,6 +141,7 @@ export const projects: Project[] = [
           { type: "callout", value: "The fix wasn't more complexity — it was the right decomposition. Separate the trend (which needs extrapolation) from the residual (which doesn't). Let each component be handled by the method best suited to it." }
         ]
       },
+      {
         heading: "Honest Limitations",
         content: [
           { type: "bullets", items: [
