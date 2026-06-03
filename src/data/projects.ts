@@ -122,7 +122,8 @@ export const projects: Project[] = [
             "LightGBM trained on log(residual_ratio) with quantile regression for P10/P50/P90",
             "Per-type proportional conformal calibration for honest prediction intervals",
             "Walk-forward backtesting (3 folds) confirms consistent improvement"
-          ]}
+          ]},
+          { type: "image", src: "/images/compute-forecasting/feature_importance.png", alt: "Feature importance chart showing lag and rolling features dominate", caption: "SHAP-derived feature importance on the residual target. Lag and rolling features dominate — calendar features matter less once the trend is removed." }
         ]
       },
       {
@@ -160,7 +161,7 @@ export const projects: Project[] = [
         heading: "Scenario Planning & Capacity Threshold",
         content: [
           { type: "text", value: "The executive deliverable: a 6-month recursive forecast under three scenarios, plotted against the capacity ceiling. This answers the procurement question directly: when does each scenario hit the ceiling?" },
-          { type: "image", src: "/images/compute-forecasting/capacity_threshold_scenarios.png", alt: "Capacity threshold analysis with three scenarios", caption: "Three scenarios vs. current capacity ceiling. High scenario P90 crosses first (Sep 2), triggering a 3-month procurement window." },
+          { type: "image", src: "/images/compute-forecasting/capacity_threshold_scenarios.png", alt: "Capacity threshold analysis with three scenarios", caption: "Three scenarios vs. current capacity ceiling. All scenarios breach capacity by late September — the question isn't if, but how severe the shortfall." },
           { type: "table", headers: ["Scenario", "Description", "P90 Crosses Ceiling"],
             rows: [
               ["Base", "Current trends continue", "Sep 9"],
@@ -168,6 +169,7 @@ export const projects: Project[] = [
               ["Low", "15% GPU Inference efficiency gain", "Sep 23"]
             ]
           },
+          { type: "text", value: "The tight 21-day spread between scenarios tells its own story: capacity procurement is urgent regardless of assumptions. The scenarios diverge more meaningfully in shortfall magnitude — how many GPU-hours/day of unmet demand we face in Q4 — which is where the sensitivity analysis below adds value." },
           { type: "image", src: "/images/compute-forecasting/60day_forecast_fan_chart.png", alt: "60-day forecast with P10-P90 confidence bands", caption: "Near-term 60-day forecast with confidence bands. The trend model ensures the forecast continues growing rather than plateauing." }
         ]
       },
