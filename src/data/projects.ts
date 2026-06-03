@@ -125,6 +125,23 @@ export const projects: Project[] = [
         ]
       },
       {
+      {
+        heading: "Model Iteration: Diagnosing the Extrapolation Problem",
+        content: [
+          { type: "text", value: "The hybrid model wasn't the first approach. The project went through a deliberate iteration cycle: build, evaluate, diagnose, fix." },
+          { type: "table", headers: ["Stage", "Approach", "Overall MAPE", "Enterprise GPU Training"],
+            rows: [
+              ["Baselines", "Seasonal naive, growth-adjusted", "10.5%", "~15%"],
+              ["First model", "LightGBM on log(compute_hours)", "8.57%", "14.1%"],
+              ["Diagnosis", "Coverage analysis + residual inspection", "—", "21% of actuals above P90"],
+              ["Hybrid model", "Trend decomposition + LightGBM on residuals", "7.94%", "4.9%"]
+            ]
+          },
+          { type: "text", value: "The first LightGBM model beat every baseline convincingly. But the per-series MAPE table revealed a problem: Enterprise GPU Training at 14.1% while CPU series sat at 4-7%. Coverage analysis showed 21% of GPU Training actuals exceeded P90 — the model was systematically under-predicting." },
+          { type: "text", value: "The root cause was structural, not tunable. Tree models partition the feature space into regions and assign constant leaf values. When Enterprise GPU Training grew 15% beyond its training maximum, the model literally could not predict those values. More trees, different hyperparameters, and the log transform all helped but couldn't solve a fundamental architectural limitation." },
+          { type: "callout", value: "The fix wasn't more complexity — it was the right decomposition. Separate the trend (which needs extrapolation) from the residual (which doesn't). Let each component be handled by the method best suited to it." }
+        ]
+      },
         heading: "Honest Limitations",
         content: [
           { type: "bullets", items: [
