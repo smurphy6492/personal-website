@@ -63,6 +63,111 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    id: "compute-capacity-forecasting",
+    name: "Compute Capacity Forecasting",
+    tagline: "ML-driven capacity planning for an AI compute provider. Hybrid trend + residual model with quantile regression and scenario planning.",
+    category: "Data Science",
+    problem: [
+      { type: "text", value: "AI compute companies face a critical planning challenge: GPU capacity takes 3-6 months to procure, but demand grows 40-80% annually with strong weekly seasonality and unpredictable spikes. Under-provision and customers churn. Over-provision and you burn capital." },
+      { type: "callout", value: "I built a forecasting system that produces daily P10/P50/P90 predictions with scenario planning, giving leadership a capacity threshold chart that answers: when do we run out under each scenario?" }
+    ],
+    workflow: [
+      "Synthetic data generation (16 series, 3 years)",
+      "EDA: trend decomposition, seasonality, events",
+      "Feature engineering (25 features)",
+      "LightGBM quantile regression (P10/P50/P90)",
+      "Hybrid trend + residual decomposition",
+      "Conformal calibration for coverage",
+      "Recursive 6-month forecast",
+      "Three-scenario capacity threshold analysis"
+    ],
+    stack: ["Python", "LightGBM", "Pandas", "NumPy", "Matplotlib", "scikit-learn", "SHAP"],
+    status: "Complete",
+    githubUrl: "https://github.com/smurphy6492/compute-forecasting",
+    metrics: [
+      { value: "7.9%", label: "Test MAPE", detail: "Hybrid model, 6-month holdout" },
+      { value: "4.9%", label: "Enterprise GPU MAPE", detail: "Down from 14.1% (original model)" },
+      { value: "83.8%", label: "P10-P90 Coverage", detail: "Target: 80%" },
+      { value: "16", label: "Series Forecasted", detail: "4 compute types x 4 segments" }
+    ],
+    sections: [
+      {
+        heading: "The Data",
+        content: [
+          { type: "text", value: "Realistic synthetic data: 4 compute types (GPU Training, GPU Inference, CPU Batch, CPU Interactive) across 4 customer segments, totaling 16 time series over 3 years. Each series has compound growth, weekly seasonality, holiday effects, step-changes from customer onboardings, conference spikes, and a GPU outage." },
+          { type: "image", src: "/images/compute-forecasting/overview_with_events.png", alt: "3-year compute usage overview with business events annotated", caption: "Total daily compute hours with documented business events. Growth is ~47% annualized with strong weekly seasonality." },
+          { type: "bullets", items: [
+            "17,536 rows: deterministic generation (seed=42) with layered multiplicative signals",
+            "Every anomaly has a documented business reason in event_log.csv",
+            "Variable growth rates: GPU Inference ~60%/yr, CPU Batch ~13%/yr, Research near-flat"
+          ]}
+        ]
+      },
+      {
+        heading: "The Model: Hybrid Trend + Residual",
+        content: [
+          { type: "text", value: "Tree-based models (LightGBM, XGBoost) can't extrapolate beyond their training range. For fast-growing Enterprise GPU Training, test-period values exceed the training maximum and the model plateaus. The hybrid approach solves this by separating the problem:" },
+          { type: "table", headers: ["Component", "Method", "Handles"],
+            rows: [
+              ["Trend", "Per-series exponential regression", "Growth extrapolation beyond training range"],
+              ["Residual", "Global LightGBM (25 features)", "Seasonality, holidays, day-of-week, noise"]
+            ]
+          },
+          { type: "text", value: "The residual target (actual / trend) is stationary and bounded, so LightGBM never needs to predict outside its training range. The trend handles extrapolation; LightGBM handles pattern recognition." },
+          { type: "image", src: "/images/compute-forecasting/hybrid_improvement.png", alt: "Original vs hybrid model comparison for Enterprise GPU Training", caption: "Enterprise GPU Training: the original model plateaus at training-range max (14.1% MAPE). The hybrid model tracks the growth trajectory (4.9% MAPE)." },
+          { type: "bullets", items: [
+            "Per-series exponential trend via log-linear regression, capped at 5%/month",
+            "LightGBM trained on log(residual_ratio) with quantile regression for P10/P50/P90",
+            "Per-type proportional conformal calibration for honest prediction intervals",
+            "Walk-forward backtesting (3 folds) confirms consistent improvement"
+          ]}
+        ]
+      },
+      {
+        heading: "Honest Limitations",
+        content: [
+          { type: "bullets", items: [
+            "Research/Academic GPU series slightly worse (+4pp MAPE) — the exponential trend is noisier for low-growth series",
+            "Recursive multi-step forecasts degrade at 30+ days as errors compound through lag features",
+            "Unpredictable events (outages, conference spikes) can't be forecast — the model reacts via lags but can't anticipate",
+            "Trend extrapolation assumes growth rates continue — actual acceleration or deceleration would shift timelines"
+          ]},
+          { type: "callout", value: "Showing limitations isn't a weakness. It's what separates a portfolio piece from a production system and demonstrates the judgment to know the difference." }
+        ]
+      },
+      {
+        heading: "Scenario Planning & Capacity Threshold",
+        content: [
+          { type: "text", value: "The executive deliverable: a 6-month recursive forecast under three scenarios, plotted against the capacity ceiling. This answers the procurement question directly: when does each scenario hit the ceiling?" },
+          { type: "image", src: "/images/compute-forecasting/capacity_threshold_scenarios.png", alt: "Capacity threshold analysis with three scenarios", caption: "Three scenarios vs. current capacity ceiling. High scenario P90 crosses first (Sep 2), triggering a 3-month procurement window." },
+          { type: "table", headers: ["Scenario", "Description", "P90 Crosses Ceiling"],
+            rows: [
+              ["Base", "Current trends continue", "Sep 9"],
+              ["High", "Sales pipeline converts (probability-weighted)", "Sep 2"],
+              ["Low", "15% GPU Inference efficiency gain", "Sep 23"]
+            ]
+          },
+          { type: "image", src: "/images/compute-forecasting/60day_forecast_fan_chart.png", alt: "60-day forecast with P10-P90 confidence bands", caption: "Near-term 60-day forecast with confidence bands. The trend model ensures the forecast continues growing rather than plateauing." }
+        ]
+      },
+      {
+        heading: "How It Was Built",
+        content: [
+          { type: "text", value: "Built entirely with Claude Code across 6 sessions. The commit history is the build log — every decision, iteration, and bug fix is visible in the repo." },
+          { type: "bullets", items: [
+            "Session 1: Project scaffolding + synthetic data generation with layered multiplicative signals",
+            "Session 2: EDA notebook (51 cells) — trend decomposition, ACF/PACF, stationarity testing",
+            "Session 3: Forecasting notebook — LightGBM, baselines, SHAP, backtesting, residual analysis",
+            "Session 4: Scenario planning — recursive forecast, 3 scenarios, capacity threshold chart",
+            "Session 5: Case study page for portfolio website",
+            "Session 6: Hybrid trend + residual model — solved the extrapolation problem (14.1% → 4.9%)"
+          ]},
+          { type: "callout", value: "The hybrid model iteration demonstrates something important: identifying a systematic failure mode (extrapolation), diagnosing the root cause (tree models can't extrapolate), and implementing a targeted fix (trend decomposition) — rather than throwing more complexity at the problem." }
+        ]
+      }
+    ]
+  },
+  {
     id: "autonomous-analytics-agent",
     name: "Autonomous Analytics Agent",
     tagline: "Ask a business question. Get SQL, charts, and an executive summary. Automatically.",
@@ -407,34 +512,8 @@ export const projects: Project[] = [
         heading: "SQL Migration Examples",
         content: [
           { type: "text", value: "Five sanitized examples show the real patterns at each complexity level. Here are the dialect notes from two of them:" },
-          { type: "code", language: "sql", value: `-- DIALECT NOTES (Redshift → Databricks Spark SQL)
---
--- Date arithmetic:
---   Redshift:   DATEADD(MONTH, -49, GETDATE())
---   Databricks: ADD_MONTHS(CURRENT_DATE(), -49)
---
--- Null coalescing:
---   Redshift:   NVL(col, default)
---   Databricks: COALESCE(col, default)
---
--- IMPORTANT: All column aliases are lowercase.
--- Redshift returns lowercase regardless of alias case.
--- Databricks preserves case. Tableau field references
--- break if case changes — enforce lowercase explicitly.`, caption: "From simple_select.sql — basic dialect translation for a weekly KPI dashboard" },
-          { type: "code", language: "sql", value: `-- DIALECT NOTES (Redshift → Databricks Spark SQL)
---
--- Integer division:
---   Redshift:   DIV(expr, n)  — function
---   Databricks: expr DIV n    — infix operator
---
--- Sequence generation (replacing recursive CTE):
---   Redshift:   Recursive CTE or GENERATE_SERIES
---   Databricks: EXPLODE(SEQUENCE(0, 60))
---   Generates integers 0-60 as quarter offsets.
---
--- Date diff (argument order flipped):
---   Redshift:   DATEDIFF(day, start_date, end_date)
---   Databricks: DATEDIFF(end_date, start_date)`, caption: "From window_functions.sql — customer cohort dashboard with running totals and period offsets" }
+          { type: "code", language: "sql", value: `-- DIALECT NOTES (Redshift → Databricks Spark SQL)\n--\n-- Date arithmetic:\n--   Redshift:   DATEADD(MONTH, -49, GETDATE())\n--   Databricks: ADD_MONTHS(CURRENT_DATE(), -49)\n--\n-- Null coalescing:\n--   Redshift:   NVL(col, default)\n--   Databricks: COALESCE(col, default)\n--\n-- IMPORTANT: All column aliases are lowercase.\n-- Redshift returns lowercase regardless of alias case.\n-- Databricks preserves case. Tableau field references\n-- break if case changes — enforce lowercase explicitly.`, caption: "From simple_select.sql — basic dialect translation for a weekly KPI dashboard" },
+          { type: "code", language: "sql", value: `-- DIALECT NOTES (Redshift → Databricks Spark SQL)\n--\n-- Integer division:\n--   Redshift:   DIV(expr, n)  — function\n--   Databricks: expr DIV n    — infix operator\n--\n-- Sequence generation (replacing recursive CTE):\n--   Redshift:   Recursive CTE or GENERATE_SERIES\n--   Databricks: EXPLODE(SEQUENCE(0, 60))\n--   Generates integers 0-60 as quarter offsets.\n--\n-- Date diff (argument order flipped):\n--   Redshift:   DATEDIFF(day, start_date, end_date)\n--   Databricks: DATEDIFF(end_date, start_date)`, caption: "From window_functions.sql — customer cohort dashboard with running totals and period offsets" }
         ]
       },
       {
