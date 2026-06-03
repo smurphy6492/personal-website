@@ -69,7 +69,8 @@ export const projects: Project[] = [
     category: "Data Science",
     problem: [
       { type: "text", value: "AI compute companies face a critical planning challenge: GPU capacity takes 3-6 months to procure, but demand grows 40-80% annually with strong weekly seasonality and unpredictable spikes. Under-provision and customers churn. Over-provision and you burn capital." },
-      { type: "callout", value: "I built a forecasting system that produces daily P10/P50/P90 predictions with scenario planning, giving leadership a capacity threshold chart that answers: when do we run out under each scenario?" }
+      { type: "callout", value: "I built a forecasting system that produces daily P10/P50/P90 predictions with scenario planning, giving leadership a capacity threshold chart that answers: when do we run out under each scenario?" },
+      { type: "text", value: "This project uses realistic synthetic data to demonstrate methodology — not production telemetry. The data simulates 16 compute series with real-world patterns (step-changes, seasonality, outages, variable growth), and all metrics are evaluated on held-out test periods. See the Data section below for details on the generation approach." }
     ],
     workflow: [
       "Synthetic data generation (16 series, 3 years)",
@@ -86,9 +87,9 @@ export const projects: Project[] = [
     githubUrl: "https://github.com/smurphy6492/compute-forecasting",
     hidden: true,
     metrics: [
-      { value: "7.9%", label: "Test MAPE", detail: "Hybrid model, 6-month holdout" },
+      { value: "7.9%", label: "Test MAPE", detail: "Hybrid model, 6-month holdout (synthetic data)" },
       { value: "4.9%", label: "Enterprise GPU MAPE", detail: "Down from 14.1% (original model)" },
-      { value: "83.8%", label: "P10-P90 Coverage", detail: "Target: 80%" },
+      { value: "83.8%", label: "P10-P90 Coverage", detail: "Target: 80% (conformal calibration)" },
       { value: "16", label: "Series Forecasted", detail: "4 compute types x 4 segments" }
     ],
     sections: [
@@ -145,12 +146,14 @@ export const projects: Project[] = [
         heading: "Honest Limitations",
         content: [
           { type: "bullets", items: [
+            "Synthetic data — the model is validated on data I designed, not production telemetry. Real compute usage has messier patterns, missing data, and distribution drift that would likely degrade performance",
             "Research/Academic GPU series slightly worse (+4pp MAPE) — the exponential trend is noisier for low-growth series",
-            "Recursive forecast validated: 7.95% MAPE over 6 months vs 7.94% single-step \u2014 the hybrid decomposition prevents error compounding",
             "Unpredictable events (outages, conference spikes) can't be forecast — the model reacts via lags but can't anticipate",
-            "Trend extrapolation assumes growth rates continue — actual acceleration or deceleration would shift timelines"
+            "Trend extrapolation assumes growth rates continue — actual acceleration or deceleration would shift timelines",
+            "Hyperparameters are sensible defaults, not optimized — tuning would likely improve results but wasn't the focus"
           ]},
-          { type: "callout", value: "Showing limitations isn't a weakness. It's what separates a portfolio piece from a production system and demonstrates the judgment to know the difference." }
+          { type: "text", value: "On the positive side: recursive forecast validation shows 7.95% MAPE over 6 months vs 7.94% single-step — the hybrid decomposition prevents the error compounding that plagues most recursive forecasts." },
+          { type: "callout", value: "Showing limitations isn't a weakness. It's what separates a methodology demonstration from production claims." }
         ]
       },
       {
@@ -171,16 +174,17 @@ export const projects: Project[] = [
       {
         heading: "How It Was Built",
         content: [
-          { type: "text", value: "Built entirely with Claude Code across 6 sessions. The commit history is the build log — every decision, iteration, and bug fix is visible in the repo." },
+          { type: "text", value: "The project followed a deliberate build-evaluate-diagnose-fix cycle. Each phase informed the next — the final model emerged from understanding why earlier approaches failed, not from throwing more complexity at the problem." },
           { type: "bullets", items: [
-            "Session 1: Project scaffolding + synthetic data generation with layered multiplicative signals",
-            "Session 2: EDA notebook (51 cells) — trend decomposition, ACF/PACF, stationarity testing",
-            "Session 3: Forecasting notebook — LightGBM, baselines, SHAP, backtesting, residual analysis",
-            "Session 4: Scenario planning — recursive forecast, 3 scenarios, capacity threshold chart",
-            "Session 5: Case study page for portfolio website",
-            "Session 6: Hybrid trend + residual model — solved the extrapolation problem (14.1% → 4.9%)"
+            "Designed synthetic data with layered multiplicative signals (trend × seasonality × events × noise) to create realistic forecasting challenges including step-changes, outages, and variable growth rates across segments",
+            "EDA (51 cells) confirmed multiplicative seasonality and guided feature selection — ACF/PACF analysis justified specific lag choices, volatility heatmaps revealed segment-level risk differences",
+            "First LightGBM model beat all baselines (8.57% vs 10.5% MAPE), but per-series diagnostics revealed Enterprise GPU Training at 14.1% — a systematic extrapolation failure, not a tuning problem",
+            "Hybrid decomposition was the key insight: separate the trend (needs extrapolation) from the residual (doesn't). This cut Enterprise GPU MAPE from 14.1% to 4.9% without adding model complexity",
+            "Recursive backtest validated 6-month forecasts before trusting the scenario planning outputs",
+            "Reframed sensitivity analysis from 'days earlier/later' to 'GPU-hours of shortfall × dollar cost' — making pipeline deals visible to procurement decisions"
           ]},
-          { type: "callout", value: "The hybrid model iteration demonstrates something important: identifying a systematic failure mode (extrapolation), diagnosing the root cause (tree models can't extrapolate), and implementing a targeted fix (trend decomposition) — rather than throwing more complexity at the problem." }
+          { type: "text", value: "Built with Claude Code as an AI-assisted development workflow. The full commit history is visible in the repo." },
+          { type: "callout", value: "The core analytical insight: the fix for the extrapolation problem wasn't more complexity — it was the right decomposition. Identifying structural failure modes and implementing targeted fixes is more valuable than hyperparameter tuning." }
         ]
       }
     ]
