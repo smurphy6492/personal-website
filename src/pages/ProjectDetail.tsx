@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { ContentRenderer } from "@/components/ContentRenderer";
 import { StatCards } from "@/components/StatCards";
 import { projects, type ProjectCategory } from "@/data/projects";
-import { ArrowLeft, Github, ExternalLink, Clock, CheckCircle2, FileText } from "lucide-react";
+import { ArrowLeft, Github, ExternalLink, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 
@@ -31,9 +31,6 @@ export function ProjectDetail() {
       </div>
     );
   }
-
-  const isInProgress = project.status === "In Progress";
-  const isComplete = project.status === "Complete";
 
   return (
     <div className="min-h-screen flex flex-col relative bg-background">
@@ -66,15 +63,6 @@ export function ProjectDetail() {
                 }[project.category as ProjectCategory]
               )}>
                 {project.category}
-              </span>
-              <span className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border",
-                isInProgress
-                  ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
-                  : "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-              )}>
-                {isInProgress ? <Clock className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
-                {isComplete ? "Complete" : project.status}
               </span>
 
               <div className="flex flex-wrap gap-2">

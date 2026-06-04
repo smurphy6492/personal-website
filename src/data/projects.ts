@@ -53,7 +53,6 @@ export interface Project {
   problem: ContentBlock[];
   workflow: WorkflowItem[];
   stack: string[];
-  status: "Live" | "In Progress" | "Planned" | "Complete";
   githubUrl?: string;
   liveUrl?: string;
   metrics?: StatItem[];
@@ -83,7 +82,6 @@ export const projects: Project[] = [
       "Three-scenario capacity threshold analysis"
     ],
     stack: ["Python", "LightGBM", "Pandas", "NumPy", "Matplotlib", "scikit-learn", "SHAP"],
-    status: "Complete",
     githubUrl: "https://github.com/smurphy6492/compute-forecasting",
     hidden: false,
     metrics: [
@@ -216,7 +214,6 @@ export const projects: Project[] = [
       { label: "Report Builder → self-contained HTML", type: "deterministic" },
     ],
     stack: ["Python", "Claude API", "DuckDB", "Plotly", "Pydantic", "Jinja2", "Typer"],
-    status: "Live",
     githubUrl: "https://github.com/smurphy6492/autonomous-analytics-agent",
     metrics: [
       { value: "~60s", label: "Question to Report", detail: "Replaces a ~2hr analyst workflow" },
@@ -331,7 +328,6 @@ export const projects: Project[] = [
       "Logistic Regression + Random Forest → churn classification"
     ],
     stack: ["Python", "scikit-learn", "Pandas", "Plotly", "scipy"],
-    status: "Live",
     githubUrl: "https://github.com/smurphy6492/customer-segmentation",
     liveUrl: "/reports/customer-segmentation.html",
     metrics: [
@@ -437,7 +433,6 @@ export const projects: Project[] = [
       "Plotly + Jinja2 → self-contained HTML report"
     ],
     stack: ["Python", "Claude API", "DuckDB", "Plotly", "Pandas", "Jinja2"],
-    status: "Live",
     githubUrl: "https://github.com/smurphy6492/ecommerce-data-story",
     liveUrl: "/reports/ecommerce-disruption.html",
     metrics: [
@@ -511,7 +506,6 @@ export const projects: Project[] = [
       "Set refresh schedule"
     ],
     stack: ["Claude Code", "SQL", "Databricks", "Tableau", "Python", "Redshift"],
-    status: "Complete",
     githubUrl: "https://github.com/smurphy6492/tableau-migration-toolkit",
     metrics: [
       { value: "8→1 wk", label: "Timeline with Claude", detail: "8-week estimate cut to 1 week" },
