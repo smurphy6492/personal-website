@@ -85,7 +85,7 @@ export const projects: Project[] = [
     stack: ["Python", "LightGBM", "Pandas", "NumPy", "Matplotlib", "scikit-learn", "SHAP"],
     status: "Complete",
     githubUrl: "https://github.com/smurphy6492/compute-forecasting",
-    hidden: true,
+    hidden: false,
     metrics: [
       { value: "7.9%", label: "Test MAPE", detail: "Hybrid model, 6-month holdout (synthetic data)" },
       { value: "4.9%", label: "Enterprise GPU MAPE", detail: "Down from 14.1% (original model)" },
