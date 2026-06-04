@@ -1,20 +1,20 @@
 {
-  "updated_at": "2026-06-03T06:55:03.791072+00:00",
-  "public_repos": 4,
+  "updated_at": "2026-06-04T06:44:57.643481+00:00",
+  "public_repos": 5,
   "total_stars": 1,
-  "commits_this_year": 22,
+  "commits_this_year": 51,
   "top_languages": [
     {
+      "name": "Jupyter Notebook",
+      "percentage": 73
+    },
+    {
       "name": "HTML",
-      "percentage": 66
+      "percentage": 17
     },
     {
       "name": "Python",
-      "percentage": 19
-    },
-    {
-      "name": "TypeScript",
-      "percentage": 12
+      "percentage": 7
     }
   ]
 }
