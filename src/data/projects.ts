@@ -69,7 +69,7 @@ export const projects: Project[] = [
     problem: [
       { type: "text", value: "AI compute companies face a critical planning challenge: GPU capacity takes 3-6 months to procure, but demand grows 40-80% annually with strong weekly seasonality and unpredictable spikes. Under-provision and customers churn. Over-provision and you burn capital." },
       { type: "callout", value: "I built a forecasting system that produces daily P10/P50/P90 predictions with scenario planning, giving leadership a capacity threshold chart that answers: when do we run out under each scenario?" },
-      { type: "text", value: "This project uses realistic synthetic data to demonstrate methodology — not production telemetry. The data simulates 16 compute series with real-world patterns (step-changes, seasonality, outages, variable growth), and all metrics are evaluated on held-out test periods. See the Data section below for details on the generation approach." }
+      { type: "text", value: "This project uses realistic synthetic data to demonstrate methodology, not production telemetry. The data simulates 16 compute series with real-world patterns (step-changes, seasonality, outages, variable growth), and all metrics are evaluated on held-out test periods. See the Data section below for details on the generation approach." }
     ],
     workflow: [
       "Synthetic data generation (16 series, 3 years)",
@@ -121,7 +121,7 @@ export const projects: Project[] = [
             "Per-type proportional conformal calibration for honest prediction intervals",
             "Walk-forward backtesting (3 folds) confirms consistent improvement"
           ]},
-          { type: "image", src: "/images/compute-forecasting/feature_importance.png", alt: "Feature importance chart showing lag and rolling features dominate", caption: "SHAP-derived feature importance on the residual target. Lag and rolling features dominate — calendar features matter less once the trend is removed." }
+          { type: "image", src: "/images/compute-forecasting/feature_importance.png", alt: "Feature importance chart showing lag and rolling features dominate", caption: "SHAP-derived feature importance on the residual target. Lag and rolling features dominate; calendar features matter less once the trend is removed." }
         ]
       },
       {
@@ -136,22 +136,22 @@ export const projects: Project[] = [
               ["Hybrid model", "Trend decomposition + LightGBM on residuals", "7.94%", "4.9%"]
             ]
           },
-          { type: "text", value: "The first LightGBM model beat every baseline convincingly. But the per-series MAPE table revealed a problem: Enterprise GPU Training at 14.1% while CPU series sat at 4-7%. Coverage analysis showed 21% of GPU Training actuals exceeded P90 — the model was systematically under-predicting." },
+          { type: "text", value: "The first LightGBM model beat every baseline convincingly. But the per-series MAPE table revealed a problem: Enterprise GPU Training at 14.1% while CPU series sat at 4-7%. Coverage analysis showed 21% of GPU Training actuals exceeded P90. The model was systematically under-predicting." },
           { type: "text", value: "The root cause was structural, not tunable. Tree models partition the feature space into regions and assign constant leaf values. When Enterprise GPU Training grew 15% beyond its training maximum, the model literally could not predict those values. More trees, different hyperparameters, and the log transform all helped but couldn't solve a fundamental architectural limitation." },
-          { type: "callout", value: "The fix wasn't more complexity — it was the right decomposition. Separate the trend (which needs extrapolation) from the residual (which doesn't). Let each component be handled by the method best suited to it." }
+          { type: "callout", value: "The fix was the right decomposition, not more complexity. Separate the trend (which needs extrapolation) from the residual (which doesn't). Let each component be handled by the method best suited to it." }
         ]
       },
       {
         heading: "Honest Limitations",
         content: [
           { type: "bullets", items: [
-            "Synthetic data — the model is validated on data I designed, not production telemetry. Real compute usage has messier patterns, missing data, and distribution drift that would likely degrade performance",
-            "Research/Academic GPU series slightly worse (+4pp MAPE) — the exponential trend is noisier for low-growth series",
-            "Unpredictable events (outages, conference spikes) can't be forecast — the model reacts via lags but can't anticipate",
-            "Trend extrapolation assumes growth rates continue — actual acceleration or deceleration would shift timelines",
-            "Hyperparameters are sensible defaults, not optimized — tuning would likely improve results but wasn't the focus"
+            "Synthetic data: the model is validated on data I designed, not production telemetry. Real compute usage has messier patterns, missing data, and distribution drift that would likely degrade performance",
+            "Research/Academic GPU series slightly worse (+4pp MAPE) because the exponential trend is noisier for low-growth series",
+            "Unpredictable events (outages, conference spikes) can't be forecast. The model reacts via lags but can't anticipate",
+            "Trend extrapolation assumes growth rates continue. Actual acceleration or deceleration would shift timelines",
+            "Hyperparameters are sensible defaults, not optimized. Tuning would likely improve results but wasn't the focus"
           ]},
-          { type: "text", value: "On the positive side: recursive forecast validation shows 7.96% MAPE over 6 months vs 7.94% single-step — the hybrid decomposition prevents the error compounding that plagues most recursive forecasts." },
+          { type: "text", value: "On the positive side: recursive forecast validation shows 7.96% MAPE over 6 months vs 7.94% single-step. The hybrid decomposition prevents the error compounding that plagues most recursive forecasts." },
           { type: "callout", value: "Stating limitations honestly is what separates a methodology demonstration from production claims." }
         ]
       },
@@ -167,24 +167,24 @@ export const projects: Project[] = [
               ["Low", "15% GPU Inference efficiency gain", "Sep 23"]
             ]
           },
-          { type: "text", value: "The tight 21-day spread between scenarios tells its own story: capacity procurement is urgent regardless of assumptions. The scenarios diverge more meaningfully in shortfall magnitude — how many GPU-hours/day of unmet demand we face in Q4 — which is where the sensitivity analysis below adds value." },
+          { type: "text", value: "The tight 21-day spread between scenarios tells its own story: capacity procurement is urgent regardless of assumptions. The scenarios diverge more meaningfully in shortfall magnitude (how many GPU-hours/day of unmet demand we face in Q4), which is where the sensitivity analysis below adds value." },
           { type: "image", src: "/images/compute-forecasting/60day_forecast_fan_chart.png", alt: "60-day forecast with P10-P90 confidence bands", caption: "Near-term 60-day forecast with confidence bands. The trend model ensures the forecast continues growing rather than plateauing." }
         ]
       },
       {
         heading: "How It Was Built",
         content: [
-          { type: "text", value: "The project followed a deliberate build-evaluate-diagnose-fix cycle. Each phase informed the next — the final model emerged from understanding why earlier approaches failed, not from throwing more complexity at the problem." },
+          { type: "text", value: "The project followed a deliberate build-evaluate-diagnose-fix cycle. Each phase informed the next. The final model emerged from understanding why earlier approaches failed, not from throwing more complexity at the problem." },
           { type: "bullets", items: [
             "Designed synthetic data with layered multiplicative signals (trend × seasonality × events × noise) to create realistic forecasting challenges including step-changes, outages, and variable growth rates across segments",
-            "EDA (51 cells) confirmed multiplicative seasonality and guided feature selection — ACF/PACF analysis justified specific lag choices, volatility heatmaps revealed segment-level risk differences",
-            "First LightGBM model beat all baselines (8.57% vs 10.5% MAPE), but per-series diagnostics revealed Enterprise GPU Training at 14.1% — a systematic extrapolation failure, not a tuning problem",
+            "EDA (51 cells) confirmed multiplicative seasonality and guided feature selection. ACF/PACF analysis justified specific lag choices; volatility heatmaps revealed segment-level risk differences",
+            "First LightGBM model beat all baselines (8.57% vs 10.5% MAPE), but per-series diagnostics revealed Enterprise GPU Training at 14.1%. A systematic extrapolation failure, not a tuning problem",
             "Hybrid decomposition was the key insight: separate the trend (needs extrapolation) from the residual (doesn't). This cut Enterprise GPU MAPE from 14.1% to 4.9% without adding model complexity",
             "Recursive backtest validated 6-month forecasts before trusting the scenario planning outputs",
-            "Reframed sensitivity analysis from 'days earlier/later' to 'GPU-hours of shortfall × dollar cost' — making pipeline deals visible to procurement decisions"
+            "Reframed sensitivity analysis from 'days earlier/later' to 'GPU-hours of shortfall × dollar cost', making pipeline deals visible to procurement decisions"
           ]},
           { type: "text", value: "Built with Claude Code as an AI-assisted development workflow. The full commit history is visible in the repo." },
-          { type: "callout", value: "The core analytical insight: the fix for the extrapolation problem wasn't more complexity — it was the right decomposition. Identifying structural failure modes and implementing targeted fixes is more valuable than hyperparameter tuning." }
+          { type: "callout", value: "The core analytical insight: the fix for the extrapolation problem was the right decomposition, not more complexity. Identifying structural failure modes and implementing targeted fixes is more valuable than hyperparameter tuning." }
         ]
       }
     ]
@@ -225,7 +225,7 @@ export const projects: Project[] = [
       {
         heading: "System Architecture",
         content: [
-          { type: "text", value: "Five specialized agents chain in sequence, making 8+ LLM calls per report. Each stage passes Pydantic-validated output to the next. Validation gates between stages catch data quality issues, coverage gaps, and implausible metrics — triggering automatic re-synthesis when problems are found." },
+          { type: "text", value: "Five specialized agents chain in sequence, making 8+ LLM calls per report. Each stage passes Pydantic-validated output to the next. Validation gates between stages catch data quality issues, coverage gaps, and implausible metrics. When problems are found, re-synthesis triggers automatically." },
           { type: "workflow" },
           { type: "bullets", items: [
             "Data Profiler connects to DuckDB and extracts schema metadata plus summary statistics. Claude structures this into a typed DataProfile with semantic annotations.",
@@ -298,12 +298,12 @@ export const projects: Project[] = [
           { type: "text", value: "The first demo required hours of manual debugging. Charts showed row indices instead of revenue figures. Queries returned zero rows because of date filter edge cases. Reports answered half the question and ignored the rest. So I built the debugging into the pipeline itself." },
           { type: "bullets", items: [
             "Coverage validation: After the orchestrator proposes a report layout, a separate LLM call reviews it against the original question. Multi-part questions like \"Which states have the highest CLV AND what payment methods do they prefer?\" get checked for dedicated coverage of each facet. Gaps trigger automatic re-synthesis with specific feedback.",
-            "Metric sanity check: A dedicated LLM call reviews key metrics against the data profile. Catches implausible figures — like cost-per-acquisition exceeding total campaign budget, or revenue numbers that imply impossible average order values.",
+            "Metric sanity check: A dedicated LLM call reviews key metrics against the data profile. Catches implausible figures like cost-per-acquisition exceeding total campaign budget, or revenue numbers that imply impossible average order values.",
             "Zero-row detection: Catches date filter bugs on historical data before they produce empty charts.",
             "Sequential-index detection: Flags when chart axes show 0, 1, 2, 3 instead of actual values, which signals column encoding bugs.",
             "Binary encoding guard: Catches Plotly's bdata regression, where chart data silently corrupts during serialization.",
             "Zero-variance detection: Catches wrong column mappings where every bar is the same height.",
-            "Auto-formatting: The report builder infers column types from names — revenue columns get dollar signs and commas, percentages get proper formatting, counts get separators. Adaptive decimal precision prevents data loss when rounding would collapse distinct values into the same number."
+            "Auto-formatting: The report builder infers column types from names. Revenue columns get dollar signs and commas, percentages get proper formatting, counts get separators. Adaptive decimal precision prevents data loss when rounding would collapse distinct values into the same number."
           ]},
           { type: "callout", value: "The first demo failed repeatedly and needed manual fixes. Every subsequent demo ran clean on the first try. The system learns from its failures structurally. Not through better prompts, but through validators that make the same mistake impossible twice." }
         ]
@@ -554,7 +554,7 @@ export const projects: Project[] = [
     tagline: "The multi-agent workspace configuration behind every project on this site. Specialized agents, reusable skills, and coding standards — published as a public template.",
     category: "AI Tooling",
     problem: [
-      { type: "text", value: "Claude Code is powerful out of the box, but using it effectively for complex projects requires structure. Without it, every session starts from scratch — no consistent coding standards, no specialized agents, no reusable workflows. The result is ad-hoc prompting instead of systematic development." },
+      { type: "text", value: "Claude Code is powerful out of the box, but using it effectively for complex projects requires structure. Without it, every session starts from scratch: no consistent coding standards, no specialized agents, no reusable workflows. The result is ad-hoc prompting instead of systematic development." },
       { type: "callout", value: "I built a workspace configuration that turns Claude Code into a coordinated team of specialized agents, each with defined roles, tools, and instructions. Skills codify repeatable workflows into single commands. Rules enforce standards automatically." }
     ],
     workflow: [
@@ -580,7 +580,7 @@ export const projects: Project[] = [
           { type: "text", value: "CLAUDE.md is the control plane. It tells Claude Code which agents exist, which skills are available, which rules are active, and how to route work. Think of it as the operating manual for a software team — except the team is a set of AI agents." },
           { type: "workflow" },
           { type: "bullets", items: [
-            "Skills are invoked explicitly (/verification-loop, /systematic-debugging). They define phases, gates, and output formats — turning repeatable processes into one-command operations.",
+            "Skills are invoked explicitly (/verification-loop, /systematic-debugging). They define phases, gates, and output formats, turning repeatable processes into one-command operations.",
             "Agents are spawned for complex tasks. Each has a defined role, model, tools, and detailed instructions. The planner agent produces implementation plans. The web-developer builds UI. The python-reviewer checks code quality.",
             "Rules fire automatically on matching file patterns. Python files get type hint enforcement. SQL files get CTE conventions. All files get commit message standards."
           ]}
@@ -589,12 +589,12 @@ export const projects: Project[] = [
       {
         heading: "The Agents",
         content: [
-          { type: "text", value: "Each agent is purpose-built with its own system prompt, tool access, and model selection. They don't share a generic prompt — specialization keeps instructions focused and prevents competing objectives." },
+          { type: "text", value: "Each agent is purpose-built with its own system prompt, tool access, and model selection. They don't share a generic prompt. Specialization keeps instructions focused and prevents competing objectives." },
           { type: "table", headers: ["Agent", "Role", "Why It Exists"],
             rows: [
               ["planner", "Architecture + implementation planning", "Forces structured thinking before code. The most expensive bugs are design bugs."],
               ["web-developer", "HTML/CSS/JS/React frontend work", "Knows the site stack, accessibility requirements, and performance patterns."],
-              ["content-writer", "Case studies, READMEs, portfolio copy", "Writes in a specific voice — direct, technical, not corporate."],
+              ["content-writer", "Case studies, READMEs, portfolio copy", "Writes in a specific voice: direct, technical, not corporate."],
               ["data-pipeline", "ETL, API integrations, data pipelines", "Handles fetch/transform/store with proper error handling and scheduling."],
               ["python-reviewer", "Python code review", "Checks types, patterns, security, testing. Structured severity output."],
               ["code-reviewer", "General code review (any language)", "Same rigor as the Python reviewer, adapted per file type."]
@@ -650,7 +650,7 @@ export const projects: Project[] = [
       {
         heading: "How It Was Built",
         content: [
-          { type: "text", value: "The workspace started as a CLAUDE.md file and a single planner agent. Each project I built revealed gaps — a missing reviewer, an undocumented workflow, a quality check I kept forgetting. The /create skill was built to formalize that feedback loop: use the workspace, find a gap, scaffold the fix." },
+          { type: "text", value: "The workspace started as a CLAUDE.md file and a single planner agent. Each project revealed gaps: a missing reviewer, an undocumented workflow, a quality check I kept forgetting. The /create skill was built to formalize that feedback loop: use the workspace, find a gap, scaffold the fix." },
           { type: "bullets", items: [
             "Started with planner + CLAUDE.md routing table during the first portfolio project",
             "Added python-reviewer and code-reviewer after catching the same issues repeatedly in manual review",
@@ -659,7 +659,7 @@ export const projects: Project[] = [
             "Built /create so the workspace could grow from use without manual file scaffolding",
             "Published as a public repo after 5 projects proved the system works"
           ]},
-          { type: "callout", value: "The workspace wasn't designed upfront — it evolved from use. Every agent, skill, and rule exists because a real project needed it." }
+          { type: "callout", value: "The workspace evolved from use, not upfront design. Every agent, skill, and rule exists because a real project needed it." }
         ]
       }
     ]
