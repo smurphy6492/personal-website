@@ -548,6 +548,121 @@ export const projects: Project[] = [
       }
     ]
   },
+  {
+    id: "claude-workspace-config",
+    name: "Claude Code Workspace Config",
+    tagline: "The multi-agent workspace configuration behind every project on this site. Specialized agents, reusable skills, and coding standards — published as a public template.",
+    category: "AI Tooling",
+    problem: [
+      { type: "text", value: "Claude Code is powerful out of the box, but using it effectively for complex projects requires structure. Without it, every session starts from scratch — no consistent coding standards, no specialized agents, no reusable workflows. The result is ad-hoc prompting instead of systematic development." },
+      { type: "callout", value: "I built a workspace configuration that turns Claude Code into a coordinated team of specialized agents, each with defined roles, tools, and instructions. Skills codify repeatable workflows into single commands. Rules enforce standards automatically." }
+    ],
+    workflow: [
+      "User request enters via CLAUDE.md routing layer",
+      "Route to /skill (guided workflow) or agent (autonomous persona)",
+      "Agent executes with domain-specific instructions and tools",
+      "Rules enforce coding standards automatically on matching files",
+      "/verification-loop validates before commit",
+      "Workspace self-improves via /create when gaps are found"
+    ],
+    stack: ["Claude Code", "Markdown", "Python", "TypeScript", "SQL"],
+    githubUrl: "https://github.com/smurphy6492/claude-workspace-config",
+    metrics: [
+      { value: "6", label: "Specialized Agents", detail: "Planner, web-dev, content, data, 2 reviewers" },
+      { value: "12", label: "Skills", detail: "Slash commands for repeatable workflows" },
+      { value: "4", label: "Rules", detail: "Always-on coding standards" },
+      { value: "5", label: "Projects Built", detail: "Every project on this site used this config" }
+    ],
+    sections: [
+      {
+        heading: "How It Works",
+        content: [
+          { type: "text", value: "CLAUDE.md is the control plane. It tells Claude Code which agents exist, which skills are available, which rules are active, and how to route work. Think of it as the operating manual for a software team — except the team is a set of AI agents." },
+          { type: "workflow" },
+          { type: "bullets", items: [
+            "Skills are invoked explicitly (/verification-loop, /systematic-debugging). They define phases, gates, and output formats — turning repeatable processes into one-command operations.",
+            "Agents are spawned for complex tasks. Each has a defined role, model, tools, and detailed instructions. The planner agent produces implementation plans. The web-developer builds UI. The python-reviewer checks code quality.",
+            "Rules fire automatically on matching file patterns. Python files get type hint enforcement. SQL files get CTE conventions. All files get commit message standards."
+          ]}
+        ]
+      },
+      {
+        heading: "The Agents",
+        content: [
+          { type: "text", value: "Each agent is purpose-built with its own system prompt, tool access, and model selection. They don't share a generic prompt — specialization keeps instructions focused and prevents competing objectives." },
+          { type: "table", headers: ["Agent", "Role", "Why It Exists"],
+            rows: [
+              ["planner", "Architecture + implementation planning", "Forces structured thinking before code. The most expensive bugs are design bugs."],
+              ["web-developer", "HTML/CSS/JS/React frontend work", "Knows the site stack, accessibility requirements, and performance patterns."],
+              ["content-writer", "Case studies, READMEs, portfolio copy", "Writes in a specific voice — direct, technical, not corporate."],
+              ["data-pipeline", "ETL, API integrations, data pipelines", "Handles fetch/transform/store with proper error handling and scheduling."],
+              ["python-reviewer", "Python code review", "Checks types, patterns, security, testing. Structured severity output."],
+              ["code-reviewer", "General code review (any language)", "Same rigor as the Python reviewer, adapted per file type."]
+            ]
+          },
+          { type: "callout", value: "Agents can be chained: planner designs the approach, web-developer builds it, code-reviewer validates it, content-writer documents it. Each step uses the right specialist." }
+        ]
+      },
+      {
+        heading: "The Skills",
+        content: [
+          { type: "text", value: "Skills are guided workflows invoked with /skill-name. They codify processes that would otherwise require remembering a checklist every time." },
+          { type: "table", headers: ["Skill", "What It Does", "Key Design Choice"],
+            rows: [
+              ["/systematic-debugging", "4-phase: Reproduce, Isolate, Root-Cause, Fix", "No jumping to fixes before understanding the bug"],
+              ["/verification-loop", "Pre-commit: lint, type-check, test, security", "Multiple modes (full, quick, security) for different contexts"],
+              ["/weekly-review", "Strategic brief across all projects", "Produces strategy, not a commit log replay"],
+              ["/bootstrap-python-project", "Scaffold project with full tooling", "One command for pyproject.toml, ruff, mypy, pytest, pre-commit"],
+              ["/qa-validate", "End-to-end functional QA", "Checks features work, not just that code lints"],
+              ["/create", "Scaffold new agents, skills, or rules", "The workspace builds its own tooling"]
+            ]
+          }
+        ]
+      },
+      {
+        heading: "The Rules",
+        content: [
+          { type: "text", value: "Rules apply automatically to files matching their glob pattern. No invocation needed — they're the coding standards every agent and skill follows." },
+          { type: "table", headers: ["Rule", "Scope", "What It Enforces"],
+            rows: [
+              ["workflow-orchestration", "All files", "Plan before building, verify before committing, capture lessons"],
+              ["git-workflow", "All files", "Conventional commits, branch naming, PR templates"],
+              ["python-style", "**/*.py", "Type hints, ruff, pathlib, dataclasses over bare dicts"],
+              ["sql-style", "**/*.sql", "CTEs over subqueries, explicit JOINs, named conventions"]
+            ]
+          }
+        ]
+      },
+      {
+        heading: "Design Philosophy",
+        content: [
+          { type: "text", value: "Five principles shaped this setup:" },
+          { type: "bullets", items: [
+            "Plan before building. The planner agent exists because thinking is cheaper than refactoring.",
+            "Separate concerns. The web-developer doesn't review Python. The python-reviewer doesn't write copy. Specialization keeps instructions focused.",
+            "Verify before shipping. /verification-loop runs before every significant commit. Quality is a workflow, not a manual checklist.",
+            "The workspace improves itself. When a task reveals a missing capability, /create scaffolds a new agent, skill, or rule. The system grows from use.",
+            "Elegance over cleverness. Simple solutions with fewer moving parts. If code needs a comment to explain why it works, simplify the code."
+          ]}
+        ]
+      },
+      {
+        heading: "How It Was Built",
+        content: [
+          { type: "text", value: "The workspace started as a CLAUDE.md file and a single planner agent. Each project I built revealed gaps — a missing reviewer, an undocumented workflow, a quality check I kept forgetting. The /create skill was built to formalize that feedback loop: use the workspace, find a gap, scaffold the fix." },
+          { type: "bullets", items: [
+            "Started with planner + CLAUDE.md routing table during the first portfolio project",
+            "Added python-reviewer and code-reviewer after catching the same issues repeatedly in manual review",
+            "Built /verification-loop after a commit introduced a type error that lint would have caught",
+            "Added content-writer when case study writing became a recurring task with consistent voice requirements",
+            "Built /create so the workspace could grow from use without manual file scaffolding",
+            "Published as a public repo after 5 projects proved the system works"
+          ]},
+          { type: "callout", value: "The workspace wasn't designed upfront — it evolved from use. Every agent, skill, and rule exists because a real project needed it." }
+        ]
+      }
+    ]
+  },
 ];
 
 export const personalInfo = {
