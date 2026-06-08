@@ -570,7 +570,7 @@ export const projects: Project[] = [
     metrics: [
       { value: "6", label: "Specialized Agents", detail: "Planner, web-dev, content, data, 2 reviewers" },
       { value: "12", label: "Skills", detail: "Slash commands for repeatable workflows" },
-      { value: "4", label: "Rules", detail: "Always-on coding standards" },
+      { value: "5", label: "Rules", detail: "Always-on coding and writing standards" },
       { value: "5", label: "Projects Built", detail: "Every project on this site used this config" }
     ],
     sections: [
@@ -628,7 +628,8 @@ export const projects: Project[] = [
               ["workflow-orchestration", "All files", "Plan before building, verify before committing, capture lessons"],
               ["git-workflow", "All files", "Conventional commits, branch naming, PR templates"],
               ["python-style", "**/*.py", "Type hints, ruff, pathlib, dataclasses over bare dicts"],
-              ["sql-style", "**/*.sql", "CTEs over subqueries, explicit JOINs, named conventions"]
+              ["sql-style", "**/*.sql", "CTEs over subqueries, explicit JOINs, named conventions"],
+              ["writing-style", "**/*.md, **/*.txt", "Voice, tone, AI trope avoidance, content patterns"]
             ]
           }
         ]
