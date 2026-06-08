@@ -313,7 +313,7 @@ export const projects: Project[] = [
   {
     id: "customer-segmentation",
     name: "Customer Segmentation & Churn Prediction",
-    tagline: "Which customers are about to leave — and which ones are worth saving? End-to-end segmentation and churn prediction from 800K+ retail transactions.",
+    tagline: "Which customers are about to leave, and which ones are worth saving? End-to-end segmentation and churn prediction from 800K+ retail transactions.",
     category: "Data Science",
     problem: [
       { type: "text", value: "Every e-commerce company has the same question: which customers are we about to lose, and which ones are worth fighting to keep? The data exists in transaction logs, but most teams rely on gut feel or static reports." },
