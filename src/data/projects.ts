@@ -152,7 +152,7 @@ export const projects: Project[] = [
             "Hyperparameters are sensible defaults, not optimized — tuning would likely improve results but wasn't the focus"
           ]},
           { type: "text", value: "On the positive side: recursive forecast validation shows 7.96% MAPE over 6 months vs 7.94% single-step — the hybrid decomposition prevents the error compounding that plagues most recursive forecasts." },
-          { type: "callout", value: "Showing limitations isn't a weakness. It's what separates a methodology demonstration from production claims." }
+          { type: "callout", value: "Stating limitations honestly is what separates a methodology demonstration from production claims." }
         ]
       },
       {
@@ -387,7 +387,7 @@ export const projects: Project[] = [
       {
         heading: "Connecting Segments to Churn",
         content: [
-          { type: "text", value: "Churn rates map directly to lifecycle segments. This tells a retention team not just who will churn, but what kind of customer they are losing." },
+          { type: "text", value: "Churn rates map directly to lifecycle segments, so a retention team knows both who will churn and what kind of customer they're losing." },
           { type: "table", headers: ["Segment", "Churn Rate", "Action"],
             rows: [
               ["Champions", "8%", "Protect with loyalty programs"],
@@ -674,7 +674,7 @@ export const personalInfo = {
   about: [
     "I spent years directing analytics teams, and the pattern was always the same: talented people burning hours on tasks a machine should handle. Writing routine SQL. Debugging pipeline failures at 2am. Manually formatting the same executive summary every Monday. The strategic work got whatever time was left over.",
     "Now I build systems that change that ratio. Using the Claude API and Python, I design multi-agent architectures with custom orchestration. Specialized agents collaborate on analytics workflows, from data profiling and SQL generation to visualization and executive summary writing.",
-    "My goal isn't to replace data professionals. It's to multiply them. A single analytics engineer paired with the right agent infrastructure should be able to operate at the scale of a full team. That's what I'm building toward, and proving out, with every project on this site."
+    "My goal is to multiply data professionals. One analytics engineer paired with the right agent infrastructure should operate at the scale of a full team. That's what I'm building toward, and proving out, with every project on this site."
   ],
   links: {
     linkedin: "https://www.linkedin.com/in/seanmurphy2014/",
