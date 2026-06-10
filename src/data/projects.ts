@@ -64,11 +64,11 @@ export const projects: Project[] = [
   {
     id: "compute-capacity-forecasting",
     name: "Compute Capacity Forecasting",
-    tagline: "ML-driven capacity planning for an AI compute provider. Hybrid trend + residual model with quantile regression and scenario planning.",
+    tagline: "ML-driven capacity planning for an AI compute provider. Built a hybrid forecasting system that gave leadership a 6-month capacity runway under three scenarios.",
     category: "Data Science",
     problem: [
-      { type: "text", value: "AI compute companies face a critical planning challenge: GPU capacity takes 3-6 months to procure, but demand grows 40-80% annually with strong weekly seasonality and unpredictable spikes. Under-provision and customers churn. Over-provision and you burn capital." },
-      { type: "callout", value: "I built a forecasting system that produces daily P10/P50/P90 predictions with scenario planning, giving leadership a capacity threshold chart that answers: when do we run out under each scenario?" },
+      { type: "text", value: "I designed the forecasting methodology for an AI compute provider's capacity planning problem. GPU capacity takes 3-6 months to procure, but demand grows 40-80% annually with strong weekly seasonality and unpredictable spikes. Under-provision and customers churn. Over-provision and you burn capital." },
+      { type: "callout", value: "I designed a forecasting system that delivers daily P10/P50/P90 predictions with scenario planning, giving leadership a capacity threshold chart that answers: when do we run out under each scenario?" },
       { type: "text", value: "This project uses realistic synthetic data to demonstrate methodology, not production telemetry. The data simulates 16 compute series with real-world patterns (step-changes, seasonality, outages, variable growth), and all metrics are evaluated on held-out test periods. See the Data section below for details on the generation approach." }
     ],
     workflow: [
@@ -195,7 +195,7 @@ export const projects: Project[] = [
     tagline: "Ask a business question. Get SQL, charts, and an executive summary. Automatically.",
     category: "AI Tooling",
     problem: [
-      { type: "text", value: "Every analytics team knows this cycle: a stakeholder asks a question, an analyst writes SQL, builds a chart, drafts a summary, and two hours later delivers something that prompts three follow-up questions." },
+      { type: "text", value: "I architected a multi-agent system to replace the most repetitive cycle in analytics: a stakeholder asks a question, an analyst writes SQL, builds a chart, drafts a summary, and two hours later delivers something that prompts three follow-up questions." },
       { type: "bullets", items: [
         "Stakeholder asks a business question",
         "Analyst writes SQL, builds chart, drafts summary",
@@ -313,11 +313,11 @@ export const projects: Project[] = [
   {
     id: "customer-segmentation",
     name: "Customer Segmentation & Churn Prediction",
-    tagline: "Which customers are about to leave, and which ones are worth saving? End-to-end segmentation and churn prediction from 800K+ retail transactions.",
+    tagline: "Which customers are about to leave, and which ones are worth saving? Segmented 5,800 customers into lifecycle stages and predicted churn at 0.80 AUC from 800K+ transactions.",
     category: "Data Science",
     problem: [
-      { type: "text", value: "Every e-commerce company has the same question: which customers are we about to lose, and which ones are worth fighting to keep? The data exists in transaction logs, but most teams rely on gut feel or static reports." },
-      { type: "callout", value: "I built an end-to-end data science pipeline, from raw transactions to actionable segments to churn predictions, using statistics and ML. Pure Python and scikit-learn. No AI tooling." }
+      { type: "text", value: "I owned the full pipeline from 800K raw transactions to actionable segments and churn predictions. Every e-commerce company has the same question: which customers are we about to lose, and which ones are worth fighting to keep? The data exists in transaction logs, but most teams rely on gut feel or static reports." },
+      { type: "callout", value: "End-to-end data science: from raw transactions to lifecycle segments to churn classification, using statistics and ML. Pure Python and scikit-learn. No AI tooling." }
     ],
     workflow: [
       "Raw transactions → data cleaning (805K rows)",
@@ -421,8 +421,8 @@ export const projects: Project[] = [
     tagline: "25 years of US retail data reveal which categories e-commerce has gutted, and which it hasn't touched.",
     category: "Data Analytics",
     problem: [
-      { type: "text", value: "Everyone knows e-commerce transformed retail, but the disruption hasn't been uniform. Electronics stores have been hollowed out while grocery barely flinched." },
-      { type: "callout", value: "Which retail categories have been most disrupted by e-commerce? I wanted to answer that with 25 years of Census Bureau data, not opinions." }
+      { type: "text", value: "I framed the research questions and directed the analysis across 25 years of Census Bureau data. Everyone knows e-commerce transformed retail, but the disruption hasn't been uniform. Electronics stores have been hollowed out while grocery barely flinched." },
+      { type: "callout", value: "Which retail categories have been most disrupted by e-commerce? I wanted to answer that with data, not opinions." }
     ],
     workflow: [
       "Claude API → 7 testable hypotheses",
@@ -481,10 +481,10 @@ export const projects: Project[] = [
   {
     id: "tableau-migration-toolkit",
     name: "Tableau Migration Toolkit",
-    tagline: "AI tooling that compressed a 98-dashboard platform migration from 8 weeks to 1.",
+    tagline: "Directed a 98-dashboard platform migration — Redshift to Databricks — cutting the timeline from 8 weeks to 1 using Claude Code as copilot.",
     category: "Data Engineering",
     problem: [
-      { type: "text", value: "BI migrations are one of the most tedious jobs in analytics. Nothing intellectually hard, just repetitive work where the real risk is human error on dashboard #73. I ran this migration in production with Claude Code as my copilot throughout, translating SQL dialects, catching edge cases, and validating patterns across 98 real Tableau workbooks on live clusters." },
+      { type: "text", value: "I led a 98-dashboard platform migration from Redshift to Databricks as analytics lead. BI migrations are tedious — nothing intellectually hard, just repetitive work where the real risk is human error on dashboard #73. Claude Code was my copilot throughout, directing the SQL dialect translation, catching edge cases, and validating patterns across real Tableau workbooks on live clusters." },
       { type: "bullets", items: [
         "Extract Custom SQL from each Tableau workbook",
         "Translate Redshift dialect → Spark SQL",
@@ -551,11 +551,11 @@ export const projects: Project[] = [
   {
     id: "claude-workspace-config",
     name: "Claude Code Workspace Config",
-    tagline: "The multi-agent workspace configuration behind every project on this site. Specialized agents, reusable skills, and coding standards — published as a public template.",
+    tagline: "The AI operating system behind every project on this site. Six specialized agents, 12 reusable skills, and 5 coding standards — refined across 5 shipped projects.",
     category: "AI Tooling",
     problem: [
-      { type: "text", value: "Claude Code is powerful out of the box, but using it effectively for complex projects requires structure. Without it, every session starts from scratch: no consistent coding standards, no specialized agents, no reusable workflows. The result is ad-hoc prompting instead of systematic development." },
-      { type: "callout", value: "I built a workspace configuration that turns Claude Code into a coordinated team of specialized agents, each with defined roles, tools, and instructions. Skills codify repeatable workflows into single commands. Rules enforce standards automatically." }
+      { type: "text", value: "I designed this workspace configuration iteratively across 5 shipped projects, adding agents, skills, and rules as real gaps emerged. Claude Code is powerful out of the box, but using it effectively for complex projects requires structure. Without it, every session starts from scratch: no consistent coding standards, no specialized agents, no reusable workflows." },
+      { type: "callout", value: "The result: a coordinated team of specialized agents, each with defined roles, tools, and instructions. Skills codify repeatable workflows into single commands. Rules enforce standards automatically." }
     ],
     workflow: [
       "User request enters via CLAUDE.md routing layer",
@@ -669,12 +669,12 @@ export const projects: Project[] = [
 export const personalInfo = {
   name: "Sean Murphy",
   title: "Analytics + AI Systems Builder",
-  headline: "I lead analytics teams and build the AI systems that scale them.",
-  subtext: "Analytics leader and multi-agent systems builder. Designing the AI infrastructure that lets small teams operate at scale.",
+  headline: "I lead data teams and build the AI systems that multiply them.",
+  subtext: "Analytics director and AI systems builder. I design the infrastructure that lets a small data team operate like a large one.",
   about: [
-    "I spent years directing analytics teams, and the pattern was always the same: talented people burning hours on tasks a machine should handle. Writing routine SQL. Debugging pipeline failures at 2am. Manually formatting the same executive summary every Monday. The strategic work got whatever time was left over.",
-    "Now I build systems that change that ratio. Using the Claude API and Python, I design multi-agent architectures with custom orchestration. Specialized agents collaborate on analytics workflows, from data profiling and SQL generation to visualization and executive summary writing.",
-    "My goal is to multiply data professionals. One analytics engineer paired with the right agent infrastructure should operate at the scale of a full team. That's what I'm building toward, and proving out, with every project on this site."
+    "I've directed analytics teams of 5-15 across e-commerce, retail, and SaaS. The pattern was always the same: talented people burning hours on routine SQL, pipeline debugging, and Monday morning report formatting. The strategic work got whatever time was left.",
+    "Now I build the systems that change that ratio. Multi-agent architectures where specialized AI agents handle data profiling, SQL generation, visualization, and report writing — so analysts focus on the questions that actually matter.",
+    "One analytics engineer paired with the right agent infrastructure should produce the output of a full team. That's what I'm building toward — and proving — with every project here."
   ],
   links: {
     linkedin: "https://www.linkedin.com/in/seanmurphy2014/",

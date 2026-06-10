@@ -122,7 +122,7 @@ export function Home() {
             </h2>
             <div className="w-20 h-1.5 bg-accent rounded-full" />
             <p className="text-muted-foreground mt-6 max-w-2xl text-lg">
-              This site was built by an AI agent. Not with AI assistance, but <em>by</em> an AI agent. Here's how.
+              Every project on this site was built using the same AI-agent workflow. Here's how it works.
             </p>
           </div>
 
@@ -158,7 +158,7 @@ export function Home() {
 
           <div className="bg-card/50 border border-border rounded-2xl p-6 md:p-8">
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Most portfolios claim AI skills and then show a static list of technologies. This site is the proof. If you're evaluating whether I can build with AI agents, you're looking at the output right now.
+              Five projects, each built through the same agentic workflow. The commit history is the proof — every feature, every deployment, routed through specialized agents and validated before shipping.
             </p>
             <div className="flex flex-wrap gap-2">
               {["React", "Vite", "Tailwind", "shadcn/ui", "Claude Code", "GitHub", "Netlify"].map((tech) => (
@@ -180,7 +180,7 @@ export function Home() {
           <div className="w-20 h-1.5 bg-primary rounded-full mx-auto mb-12" />
 
           <p className="text-xl text-muted-foreground mb-12">
-            Looking to lead data teams where AI agents aren't a buzzword. They're how the work gets done.
+            Looking to lead a data team where AI agents aren't a roadmap item — they're how the work ships today.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
