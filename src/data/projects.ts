@@ -138,7 +138,7 @@ export const projects: Project[] = [
           },
           { type: "text", value: "The first LightGBM model beat every baseline convincingly. But the per-series MAPE table revealed a problem: Enterprise GPU Training at 14.1% while CPU series sat at 4-7%. Coverage analysis showed 21% of GPU Training actuals exceeded P90. The model was systematically under-predicting." },
           { type: "text", value: "The root cause was structural, not tunable. Tree models partition the feature space into regions and assign constant leaf values. When Enterprise GPU Training grew 15% beyond its training maximum, the model literally could not predict those values. More trees, different hyperparameters, and the log transform all helped but couldn't solve a fundamental architectural limitation." },
-          { type: "callout", value: "The fix was the right decomposition, not more complexity. Separate the trend (which needs extrapolation) from the residual (which doesn't). Let each component be handled by the method best suited to it." }
+          { type: "callout", value: "The fix was the right decomposition: separate the trend (which needs extrapolation) from the residual (which doesn't), and handle each with the method suited to it." }
         ]
       },
       {
@@ -174,17 +174,14 @@ export const projects: Project[] = [
       {
         heading: "How It Was Built",
         content: [
-          { type: "text", value: "The project followed a deliberate build-evaluate-diagnose-fix cycle. Each phase informed the next. The final model emerged from understanding why earlier approaches failed, not from throwing more complexity at the problem." },
+          { type: "text", value: "The modeling iteration is covered above. The rest of the build:" },
           { type: "bullets", items: [
             "Designed synthetic data with layered multiplicative signals (trend × seasonality × events × noise) to create realistic forecasting challenges including step-changes, outages, and variable growth rates across segments",
             "EDA (51 cells) confirmed multiplicative seasonality and guided feature selection. ACF/PACF analysis justified specific lag choices; volatility heatmaps revealed segment-level risk differences",
-            "First LightGBM model beat all baselines (8.57% vs 10.5% MAPE), but per-series diagnostics revealed Enterprise GPU Training at 14.1%. A systematic extrapolation failure, not a tuning problem",
-            "Hybrid decomposition was the key insight: separate the trend (needs extrapolation) from the residual (doesn't). This cut Enterprise GPU MAPE from 14.1% to 4.9% without adding model complexity",
             "Recursive backtest validated 6-month forecasts before trusting the scenario planning outputs",
             "Reframed sensitivity analysis from 'days earlier/later' to 'GPU-hours of shortfall × dollar cost', making pipeline deals visible to procurement decisions"
           ]},
-          { type: "text", value: "Built with Claude Code as an AI-assisted development workflow. The full commit history is visible in the repo." },
-          { type: "callout", value: "The core analytical insight: the fix for the extrapolation problem was the right decomposition, not more complexity. Identifying structural failure modes and implementing targeted fixes is more valuable than hyperparameter tuning." }
+          { type: "text", value: "Built with Claude Code as an AI-assisted development workflow. The full commit history is visible in the repo." }
         ]
       }
     ]
@@ -289,7 +286,7 @@ export const projects: Project[] = [
             "Pydantic JSON contracts between agents. Claude outputs structured JSON that gets validated before the next agent touches it. Eliminates hallucinated field names that silently break pipelines.",
             "Self-correcting SQL: when a query fails, the actual DuckDB error message goes back to Claude with original context. The model fixes its own mistakes without hardcoded fallbacks."
           ]},
-          { type: "callout", value: "Typed contracts between agents and self-correcting loops that consume real error messages are what make agentic systems work with messy data, not just clean demos." }
+          { type: "callout", value: "Typed contracts between agents and self-correcting loops that consume real error messages are what make agentic systems survive messy real-world data." }
         ]
       },
       {
@@ -305,7 +302,7 @@ export const projects: Project[] = [
             "Zero-variance detection: Catches wrong column mappings where every bar is the same height.",
             "Auto-formatting: The report builder infers column types from names. Revenue columns get dollar signs and commas, percentages get proper formatting, counts get separators. Adaptive decimal precision prevents data loss when rounding would collapse distinct values into the same number."
           ]},
-          { type: "callout", value: "The first demo failed repeatedly and needed manual fixes. Every subsequent demo ran clean on the first try. The system learns from its failures structurally. Not through better prompts, but through validators that make the same mistake impossible twice." }
+          { type: "callout", value: "The first demo failed repeatedly and needed manual fixes. Every subsequent demo ran clean on the first try. The system learns from its failures structurally: each validator makes the same mistake impossible twice." }
         ]
       }
     ]
@@ -407,7 +404,7 @@ export const projects: Project[] = [
             "Data: UCI Online Retail II (1M+ transactions, 2009-2011). ~23% of rows dropped due to missing Customer ID.",
             "Clustering features: RFMT (Recency, Frequency, Monetary, Tenure). Log-transformed and standardized.",
             "Churn features: RFMT + AvgOrderValue, AvgDaysBetween, UniqueProducts, Segment membership",
-            "Churn threshold: 180 days, derived from retention curve analysis (not arbitrary).",
+            "Churn threshold: 180 days, derived from retention curve analysis.",
             "Classification: Logistic Regression vs Random Forest, evaluated on AUC-ROC, F1, precision/recall.",
             "Temporal split prevents data leakage: features before cutoff, churn defined by behavior after."
           ]}
@@ -422,7 +419,7 @@ export const projects: Project[] = [
     category: "Data Analytics",
     problem: [
       { type: "text", value: "I framed the research questions and directed the analysis across 25 years of Census Bureau data. Everyone knows e-commerce transformed retail, but the disruption hasn't been uniform. Electronics stores have been hollowed out while grocery barely flinched." },
-      { type: "callout", value: "Which retail categories have been most disrupted by e-commerce? I wanted to answer that with data, not opinions." }
+      { type: "callout", value: "Which retail categories have been most disrupted by e-commerce? I wanted an answer backed by 25 years of data." }
     ],
     workflow: [
       "Claude API → 7 testable hypotheses",
@@ -493,7 +490,7 @@ export const projects: Project[] = [
         "Validate row counts against the source",
         "Reconnect Tableau and set refresh schedules"
       ]},
-      { type: "callout", value: "98 dashboards. Same 8-step process. Each one with its own edge cases: date spines, LOD expressions, Initial SQL temp tables, blended data sources. Claude handled the dialect translation and pattern matching; I handled the judgment calls." }
+      { type: "callout", value: "98 dashboards. Same 8-step process. Each one with its own edge cases: date spines, LOD expressions, Initial SQL temp tables, blended data sources. Claude took the dialect translation and pattern matching. The judgment calls — which workbooks to batch, when a translation needed a human eye — were mine." }
     ],
     workflow: [
       "Download Tableau workbook (.twb/.twbx)",
@@ -641,8 +638,8 @@ export const projects: Project[] = [
           { type: "bullets", items: [
             "Plan before building. The planner agent exists because thinking is cheaper than refactoring.",
             "Separate concerns. The web-developer doesn't review Python. The python-reviewer doesn't write copy. Specialization keeps instructions focused.",
-            "Verify before shipping. /verification-loop runs before every significant commit. Quality is a workflow, not a manual checklist.",
-            "The workspace improves itself. When a task reveals a missing capability, /create scaffolds a new agent, skill, or rule. The system grows from use.",
+            "Verify before shipping. /verification-loop runs before every significant commit, so quality doesn't depend on remembering a checklist.",
+            "The workspace improves itself. When a task reveals a missing capability, /create scaffolds a new agent, skill, or rule.",
             "Elegance over cleverness. Simple solutions with fewer moving parts. If code needs a comment to explain why it works, simplify the code."
           ]}
         ]
@@ -659,7 +656,7 @@ export const projects: Project[] = [
             "Built /create so the workspace could grow from use without manual file scaffolding",
             "Published as a public repo after 5 projects proved the system works"
           ]},
-          { type: "callout", value: "The workspace evolved from use, not upfront design. Every agent, skill, and rule exists because a real project needed it." }
+          { type: "callout", value: "Every agent, skill, and rule exists because a real project needed it." }
         ]
       }
     ]

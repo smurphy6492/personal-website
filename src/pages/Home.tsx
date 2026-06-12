@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ProjectCard } from "@/components/ProjectCard";
@@ -133,7 +134,7 @@ export function Home() {
               </div>
               <h3 className="font-display font-semibold text-lg text-foreground mb-2">Agentic Development</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Claude Code reads the codebase, plans changes, writes the implementation, and commits to GitHub. I provide direction and review. The agent handles the execution.
+                Claude Code reads the codebase, plans changes, writes the implementation, and commits to GitHub. My job is direction and review: deciding what to build and whether it's right.
               </p>
             </div>
             <div className="bg-card border border-border rounded-2xl p-6">
@@ -158,7 +159,10 @@ export function Home() {
 
           <div className="bg-card/50 border border-border rounded-2xl p-6 md:p-8">
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Five projects, each built through the same agentic workflow. The commit history is the proof — every feature, every deployment, routed through specialized agents and validated before shipping.
+              Five projects, each built through the same agentic workflow. The workflow is itself a project: the agents, skills, and rules behind it are documented in{" "}
+              <Link href="/projects/claude-workspace-config" className="text-primary hover:underline">
+                Claude Code Workspace Config
+              </Link>.
             </p>
             <div className="flex flex-wrap gap-2">
               {["React", "Vite", "Tailwind", "shadcn/ui", "Claude Code", "GitHub", "Netlify"].map((tech) => (
