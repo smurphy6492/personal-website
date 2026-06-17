@@ -645,7 +645,6 @@ export const projects: Project[] = [
               ["geo-lift-agents CI", "The same gate on a private repo, with pip caching for the heavy Bayesian stack and the slow MCMC tests skipped to keep CI minutes low."]
             ]
           },
-          { type: "text", value: "The gate proved itself the first time it ran. On both repos the first CI run came back red. Neither repo had ever actually passed its own checks: the analytics agent had 59 lint violations, a type error, and two tests that had drifted from the code; the geo-lift repo had 33 type errors. Each fix was the same — clean the repo to green, then let the gate keep it there." },
           { type: "callout", value: "The workspace holds itself to the standard it sets. Whether a repo passes no longer depends on anyone remembering to check." }
         ]
       },
