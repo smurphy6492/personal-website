@@ -548,7 +548,7 @@ export const projects: Project[] = [
   {
     id: "claude-workspace-config",
     name: "Claude Code Workspace Config",
-    tagline: "The AI operating system behind every project on this site. Six specialized agents, 12 reusable skills, and 5 coding standards — refined across 5 shipped projects.",
+    tagline: "The AI operating system behind every project on this site. Six specialized agents, 14 reusable skills, and 6 coding standards — refined across 5 shipped projects.",
     category: "AI Tooling",
     problem: [
       { type: "text", value: "I designed this workspace configuration iteratively across 5 shipped projects, adding agents, skills, and rules as real gaps emerged. Claude Code is powerful out of the box, but using it effectively for complex projects requires structure. Without it, every session starts from scratch: no consistent coding standards, no specialized agents, no reusable workflows." },
@@ -566,8 +566,8 @@ export const projects: Project[] = [
     githubUrl: "https://github.com/smurphy6492/claude-workspace-config",
     metrics: [
       { value: "6", label: "Specialized Agents", detail: "Planner, web-dev, content, data, 2 reviewers" },
-      { value: "12", label: "Skills", detail: "Slash commands for repeatable workflows" },
-      { value: "5", label: "Rules", detail: "Always-on coding and writing standards" },
+      { value: "14", label: "Skills", detail: "Slash commands for repeatable workflows" },
+      { value: "6", label: "Rules", detail: "Always-on coding and writing standards" },
       { value: "5", label: "Projects Built", detail: "Every project on this site used this config" }
     ],
     sections: [
@@ -626,9 +626,27 @@ export const projects: Project[] = [
               ["git-workflow", "All files", "Conventional commits, branch naming, PR templates"],
               ["python-style", "**/*.py", "Type hints, ruff, pathlib, dataclasses over bare dicts"],
               ["sql-style", "**/*.sql", "CTEs over subqueries, explicit JOINs, named conventions"],
-              ["writing-style", "**/*.md, **/*.txt", "Voice, tone, AI trope avoidance, content patterns"]
+              ["writing-style", "**/*.md, **/*.txt", "Voice, tone, AI trope avoidance, content patterns"],
+              ["mechanical-gates", "All files", "Every repo enforces lint, type-check, and tests as CI and hooks, not optional skills"]
             ]
           }
+        ]
+      },
+      {
+        heading: "Enforced Quality Gates",
+        content: [
+          { type: "text", value: "A skill like /verification-loop only helps if you remember to run it. A check you have to invoke is a check you will skip the moment you are in a hurry, and the repo quietly accumulates lint warnings, type errors, and broken tests. So the standards the rules define are also enforced mechanically: every project repo gets lint, type-check, and tests that run on their own and block the change when they fail." },
+          { type: "text", value: "Two layers do the enforcing. Pre-commit hooks run on each commit locally. GitHub Actions runs the same checks on every push and pull request. Both call the repo's make check, so there is one definition of passing and no way to route around it." },
+          { type: "table", headers: ["Artifact", "What it does"],
+            rows: [
+              ["mechanical-gates rule", "States the standard: every repo enforces lint, type-check, and tests on every change, with the checks living in CI and hooks rather than skills you remember to run."],
+              ["/add-gates skill", "Installs the enforcement into a target repo. It reads the existing tooling and writes the GitHub Actions workflow plus the pre-commit wiring, invoking the repo's own make check instead of duplicating the logic."],
+              ["analytics-agent CI", "Runs the full test pyramid on every push and pull request. A green run is required before a change can merge."],
+              ["geo-lift-agents CI", "The same gate on a private repo, with pip caching for the heavy Bayesian stack and the slow MCMC tests skipped to keep CI minutes low."]
+            ]
+          },
+          { type: "text", value: "The gate proved itself the first time it ran. On both repos the first CI run came back red. Neither repo had ever actually passed its own checks: the analytics agent had 59 lint violations, a type error, and two tests that had drifted from the code; the geo-lift repo had 33 type errors. Each fix was the same — clean the repo to green, then let the gate keep it there." },
+          { type: "callout", value: "The workspace holds itself to the standard it sets. Whether a repo passes no longer depends on anyone remembering to check." }
         ]
       },
       {
