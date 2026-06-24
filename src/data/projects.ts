@@ -559,7 +559,7 @@ export const projects: Project[] = [
       "Route to /skill (guided workflow) or agent (autonomous persona)",
       "Agent executes with domain-specific instructions and tools",
       "Rules enforce coding standards automatically on matching files",
-      "/verification-loop validates before commit",
+      "/verification-loop and enforced CI gates validate before merge",
       "Workspace self-improves via /create when gaps are found"
     ],
     stack: ["Claude Code", "Markdown", "Python", "TypeScript", "SQL"],
@@ -604,12 +604,11 @@ export const projects: Project[] = [
       {
         heading: "The Skills",
         content: [
-          { type: "text", value: "Skills are guided workflows invoked with /skill-name. They codify processes that would otherwise require remembering a checklist every time." },
+          { type: "text", value: "Skills are guided workflows invoked with /skill-name. They codify processes that would otherwise require remembering a checklist every time. These are six of the fourteen, the ones I reach for most." },
           { type: "table", headers: ["Skill", "What It Does", "Key Design Choice"],
             rows: [
               ["/systematic-debugging", "4-phase: Reproduce, Isolate, Root-Cause, Fix", "No jumping to fixes before understanding the bug"],
               ["/verification-loop", "Pre-commit: lint, type-check, test, security", "Multiple modes (full, quick, security) for different contexts"],
-              ["/weekly-review", "Strategic brief across all projects", "Produces strategy, not a commit log replay"],
               ["/bootstrap-python-project", "Scaffold project with full tooling", "One command for pyproject.toml, ruff, mypy, pytest, pre-commit"],
               ["/qa-validate", "End-to-end functional QA", "Checks features work, not just that code lints"],
               ["/create", "Scaffold new agents, skills, or rules", "The workspace builds its own tooling"],
@@ -650,9 +649,9 @@ export const projects: Project[] = [
         ]
       },
       {
-        heading: "Plans That Critique Themselves",
+        heading: "Pressure-Tested Plans",
         content: [
-          { type: "text", value: "Planning catches design bugs, but only the ones the author can see. On real analysis projects I have shipped a plan that read as solid, then hit a methodology problem mid-build: a backtest that leaked future data, or a metric that didn't fit the decision, and ended up fixing it after the fact. The /improve-plan skill moves that fix earlier, to before any code runs." },
+          { type: "text", value: "Planning catches design bugs, but only the ones the author can see. A plan can read as solid and still hide a methodology problem that surfaces mid-build: a backtest that leaks future data, or a metric that doesn't fit the decision. The /improve-plan skill moves that catch earlier, to before any code runs." },
           { type: "text", value: "It works by separating the author from the critic. After the planner drafts a plan, a separate plan-judge agent scores it against a fixed rubric. The judge never saw the plan get written, so it reads the plan the way the engineer who has to execute it will: cold. It is told to become the right expert for the plan's domain and reason from first principles rather than run down a checklist, because the most expensive footgun is usually the one no checklist anticipated. The plan is then revised from the judge's specific critiques rather than its score, so the fix addresses substance instead of gaming a number." },
           { type: "callout", value: "Tested on a forecasting plan with planted methodology holes, the judge caught all of them cold: full-dataset leakage, shuffled cross-validation on time series, and MAPE on intermittent demand. It also flagged deeper problems no one planted, like training on stockout-censored demand. The revise pass took the plan from 28 to 74 out of 100." }
         ]
