@@ -548,7 +548,7 @@ export const projects: Project[] = [
   {
     id: "claude-workspace-config",
     name: "Claude Code Workspace Config",
-    tagline: "The AI operating system behind every project on this site. Six specialized agents, 14 reusable skills, and 6 coding standards — refined across 5 shipped projects.",
+    tagline: "The AI operating system behind every project on this site. Seven specialized agents, 14 reusable skills, and 6 coding standards — refined across 5 shipped projects.",
     category: "AI Tooling",
     problem: [
       { type: "text", value: "I designed this workspace configuration iteratively across 5 shipped projects, adding agents, skills, and rules as real gaps emerged. Claude Code is powerful out of the box, but using it effectively for complex projects requires structure. Without it, every session starts from scratch: no consistent coding standards, no specialized agents, no reusable workflows." },
@@ -565,7 +565,7 @@ export const projects: Project[] = [
     stack: ["Claude Code", "Markdown", "Python", "TypeScript", "SQL"],
     githubUrl: "https://github.com/smurphy6492/claude-workspace-config",
     metrics: [
-      { value: "6", label: "Specialized Agents", detail: "Planner, web-dev, content, data, 2 reviewers" },
+      { value: "7", label: "Specialized Agents", detail: "Planner, plan-judge, web-dev, content, data, 2 reviewers" },
       { value: "14", label: "Skills", detail: "Slash commands for repeatable workflows" },
       { value: "6", label: "Rules", detail: "Always-on coding and writing standards" },
       { value: "5", label: "Projects Built", detail: "Every project on this site used this config" }
@@ -594,7 +594,8 @@ export const projects: Project[] = [
               ["content-writer", "Case studies, READMEs, portfolio copy", "Writes in a specific voice: direct, technical, not corporate."],
               ["data-pipeline", "ETL, API integrations, data pipelines", "Handles fetch/transform/store with proper error handling and scheduling."],
               ["python-reviewer", "Python code review", "Checks types, patterns, security, testing. Structured severity output."],
-              ["code-reviewer", "General code review (any language)", "Same rigor as the Python reviewer, adapted per file type."]
+              ["code-reviewer", "General code review (any language)", "Same rigor as the Python reviewer, adapted per file type."],
+              ["plan-judge", "Independent plan review", "Scores a draft plan against a fixed rubric and finds the methodology gaps the author can't see, because it never wrote the plan."]
             ]
           },
           { type: "callout", value: "Agents can be chained: planner designs the approach, web-developer builds it, code-reviewer validates it, content-writer documents it. Each step uses the right specialist." }
@@ -611,7 +612,8 @@ export const projects: Project[] = [
               ["/weekly-review", "Strategic brief across all projects", "Produces strategy, not a commit log replay"],
               ["/bootstrap-python-project", "Scaffold project with full tooling", "One command for pyproject.toml, ruff, mypy, pytest, pre-commit"],
               ["/qa-validate", "End-to-end functional QA", "Checks features work, not just that code lints"],
-              ["/create", "Scaffold new agents, skills, or rules", "The workspace builds its own tooling"]
+              ["/create", "Scaffold new agents, skills, or rules", "The workspace builds its own tooling"],
+              ["/improve-plan", "Independent judge scores a plan, then revises it", "Catches methodology footguns — leaked backtests, wrong metrics — that pass a structural read"]
             ]
           }
         ]
@@ -646,6 +648,15 @@ export const projects: Project[] = [
             ]
           },
           { type: "callout", value: "The workspace holds itself to the standard it sets. Whether a repo passes no longer depends on anyone remembering to check." }
+        ]
+      },
+      {
+        heading: "Plans That Critique Themselves",
+        content: [
+          { type: "text", value: "Planning catches design bugs, but only the ones the author can see. On real analysis projects I have shipped a plan that read as solid, then hit a methodology problem mid-build: a backtest that leaked future data, or a metric that didn't fit the decision, and ended up fixing it after the fact. The /improve-plan skill moves that fix earlier, to before any code runs." },
+          { type: "text", value: "It works by separating the author from the critic. After the planner drafts a plan, a separate plan-judge agent scores it against a fixed rubric. The judge never saw the plan get written, so it reads the plan the way the engineer who has to execute it will: cold. It is told to become the right expert for the plan's domain and reason from first principles rather than run down a checklist, because the most expensive footgun is usually the one no checklist anticipated. The plan is then revised from the judge's specific critiques rather than its score, so the fix addresses substance instead of gaming a number." },
+          { type: "callout", value: "Tested on a forecasting plan with planted methodology holes, the judge caught all of them cold: full-dataset leakage, shuffled cross-validation on time series, and MAPE on intermittent demand. It also flagged deeper problems no one planted, like training on stockout-censored demand. The revise pass took the plan from 28 to 74 out of 100." },
+          { type: "text", value: "The rubric's methodology checks came from real corrections on earlier projects on this site: the leaked recursive backtest in the compute forecasting work, and the favorable two-stage setup in the media-mix model. Each footgun that escapes to execution becomes an example the judge looks for next time." }
         ]
       },
       {
