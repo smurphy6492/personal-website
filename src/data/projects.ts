@@ -643,8 +643,7 @@ export const projects: Project[] = [
             rows: [
               ["mechanical-gates rule", "States the standard: every repo enforces lint, type-check, and tests on every change, with the checks living in CI and hooks rather than skills you remember to run."],
               ["/add-gates skill", "Installs the enforcement into a target repo. It reads the existing tooling and writes the GitHub Actions workflow plus the pre-commit wiring, invoking the repo's own make check instead of duplicating the logic."],
-              ["analytics-agent CI", "Runs the full test pyramid on every push and pull request. A green run is required before a change can merge."],
-              ["geo-lift-agents CI", "The same gate on a private repo, with pip caching for the heavy Bayesian stack and the slow MCMC tests skipped to keep CI minutes low."]
+              ["analytics-agent CI", "Runs the full test pyramid on every push and pull request. A green run is required before a change can merge."]
             ]
           },
           { type: "callout", value: "The workspace holds itself to the standard it sets. Whether a repo passes no longer depends on anyone remembering to check." }
@@ -655,8 +654,7 @@ export const projects: Project[] = [
         content: [
           { type: "text", value: "Planning catches design bugs, but only the ones the author can see. On real analysis projects I have shipped a plan that read as solid, then hit a methodology problem mid-build: a backtest that leaked future data, or a metric that didn't fit the decision, and ended up fixing it after the fact. The /improve-plan skill moves that fix earlier, to before any code runs." },
           { type: "text", value: "It works by separating the author from the critic. After the planner drafts a plan, a separate plan-judge agent scores it against a fixed rubric. The judge never saw the plan get written, so it reads the plan the way the engineer who has to execute it will: cold. It is told to become the right expert for the plan's domain and reason from first principles rather than run down a checklist, because the most expensive footgun is usually the one no checklist anticipated. The plan is then revised from the judge's specific critiques rather than its score, so the fix addresses substance instead of gaming a number." },
-          { type: "callout", value: "Tested on a forecasting plan with planted methodology holes, the judge caught all of them cold: full-dataset leakage, shuffled cross-validation on time series, and MAPE on intermittent demand. It also flagged deeper problems no one planted, like training on stockout-censored demand. The revise pass took the plan from 28 to 74 out of 100." },
-          { type: "text", value: "The rubric's methodology checks came from real corrections on earlier projects on this site: the leaked recursive backtest in the compute forecasting work, and the favorable two-stage setup in the media-mix model. Each footgun that escapes to execution becomes an example the judge looks for next time." }
+          { type: "callout", value: "Tested on a forecasting plan with planted methodology holes, the judge caught all of them cold: full-dataset leakage, shuffled cross-validation on time series, and MAPE on intermittent demand. It also flagged deeper problems no one planted, like training on stockout-censored demand. The revise pass took the plan from 28 to 74 out of 100." }
         ]
       },
       {
