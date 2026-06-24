@@ -548,7 +548,7 @@ export const projects: Project[] = [
   {
     id: "claude-workspace-config",
     name: "Claude Code Workspace Config",
-    tagline: "The AI operating system behind every project on this site. Seven specialized agents, 14 reusable skills, and 6 coding standards — refined across 5 shipped projects.",
+    tagline: "The AI operating system behind every project on this site. Seven specialized agents, 15 reusable skills, and 6 coding standards — refined across 5 shipped projects.",
     category: "AI Tooling",
     problem: [
       { type: "text", value: "I designed this workspace configuration iteratively across 5 shipped projects, adding agents, skills, and rules as real gaps emerged. Claude Code is powerful out of the box, but using it effectively for complex projects requires structure. Without it, every session starts from scratch: no consistent coding standards, no specialized agents, no reusable workflows." },
@@ -566,7 +566,7 @@ export const projects: Project[] = [
     githubUrl: "https://github.com/smurphy6492/claude-workspace-config",
     metrics: [
       { value: "7", label: "Specialized Agents", detail: "Planner, plan-judge, web-dev, content, data, 2 reviewers" },
-      { value: "14", label: "Skills", detail: "Slash commands for repeatable workflows" },
+      { value: "15", label: "Skills", detail: "Slash commands for repeatable workflows" },
       { value: "6", label: "Rules", detail: "Always-on coding and writing standards" },
       { value: "5", label: "Projects Built", detail: "Every project on this site used this config" }
     ],
@@ -604,7 +604,7 @@ export const projects: Project[] = [
       {
         heading: "The Skills",
         content: [
-          { type: "text", value: "Skills are guided workflows invoked with /skill-name. They codify processes that would otherwise require remembering a checklist every time. These are six of the fourteen, the ones I reach for most." },
+          { type: "text", value: "Skills are guided workflows invoked with /skill-name. They codify processes that would otherwise require remembering a checklist every time. These are six of the fifteen, the ones I reach for most." },
           { type: "table", headers: ["Skill", "What It Does", "Key Design Choice"],
             rows: [
               ["/systematic-debugging", "4-phase: Reproduce, Isolate, Root-Cause, Fix", "No jumping to fixes before understanding the bug"],
