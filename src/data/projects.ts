@@ -151,7 +151,7 @@ export const projects: Project[] = [
             "Trend extrapolation assumes growth rates continue. Actual acceleration or deceleration would shift timelines",
             "Hyperparameters are sensible defaults, not optimized. Tuning would likely improve results but wasn't the focus"
           ]},
-          { type: "text", value: "On the positive side: recursive forecast validation shows 7.96% MAPE over 6 months vs 7.94% single-step. The hybrid decomposition prevents the error compounding that plagues most recursive forecasts." },
+          { type: "text", value: "On the positive side: recursive forecast validation shows 7.93% MAPE over 6 months vs 7.94% single-step. The hybrid decomposition prevents the error compounding that plagues most recursive forecasts." },
           { type: "callout", value: "Stating limitations honestly is what separates a methodology demonstration from production claims." }
         ]
       },
