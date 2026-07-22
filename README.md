@@ -5,7 +5,7 @@
 
 Portfolio site showcasing Analytics + AI Systems work. Built with React + Vite + Tailwind. Deployed to Netlify automatically on every push to `master`.
 
-**Live site:** [smurphy.netlify.app](https://smurphy.netlify.app)
+**Live site:** [seanmurphy.app](https://seanmurphy.app)
 
 ---
 
