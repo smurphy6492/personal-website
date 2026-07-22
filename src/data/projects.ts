@@ -216,7 +216,7 @@ export const projects: Project[] = [
       { value: "~60s", label: "Question to Report", detail: "Replaces a ~2hr analyst workflow" },
       { value: "3", label: "Datasets Tested", detail: "Finance, marketing, e-commerce" },
       { value: "8", label: "Demo Reports", detail: "All generated autonomously" },
-      { value: "8", label: "Validation Gates", detail: "Coverage, sanity, zero-row, bdata, and more" }
+      { value: "8/8", label: "Eval Score", detail: "Agent output matched every verified reference figure" }
     ],
     sections: [
       {
@@ -228,7 +228,7 @@ export const projects: Project[] = [
             "Data Profiler connects to DuckDB and extracts schema metadata plus summary statistics. Claude structures this into a typed DataProfile with semantic annotations.",
             "Orchestrator plans 2-4 SQL queries based on the question and data profile.",
             "SQL Analyst generates and executes SQL. If DuckDB rejects a query, the error feeds back to Claude for self-correction (up to 3 attempts per query, 2-4 queries per report).",
-            "Deterministic validators run after each query: zero-row detection, sequential-index detection, zero-variance checks.",
+            "Deterministic validators run after each query: zero-row, sequential-index, zero-variance, and join fan-out detection. A separate check confirms every figure in the summary traces back to a query result.",
             "Orchestrator synthesizes results into an executive summary, key metrics, and chart specifications.",
             "Coverage validation reviews the synthesis against the original question. Multi-part questions get checked for dedicated coverage of each facet. Gaps trigger automatic re-synthesis with specific feedback.",
             "Metric sanity check cross-references reported metrics against the data profile to catch implausible figures.",
@@ -300,8 +300,11 @@ export const projects: Project[] = [
             "Sequential-index detection: Flags when chart axes show 0, 1, 2, 3 instead of actual values, which signals column encoding bugs.",
             "Binary encoding guard: Catches Plotly's bdata regression, where chart data silently corrupts during serialization.",
             "Zero-variance detection: Catches wrong column mappings where every bar is the same height.",
+            "Join fan-out detection: Flags when a grouped query returns more rows than its largest source table, the signature of a join that multiplied rows and inflated its totals. The retry loop only catches SQL that errors; this catches SQL that runs clean and is wrong.",
+            "Summary figure check: Confirms every number quoted in the executive summary appears in an actual query result, so a mis-transcribed or invented figure is caught before it ships.",
             "Auto-formatting: The report builder infers column types from names. Revenue columns get dollar signs and commas, percentages get proper formatting, counts get separators. Adaptive decimal precision prevents data loss when rounding would collapse distinct values into the same number."
           ]},
+          { type: "text", value: "These checks split into two kinds, and the difference matters. The deterministic guards verify facts about the data and the output. Coverage and metric sanity are LLM calls that catch gross errors but cannot certify that a specific number is correct. For that I built an eval set: each question has a reference answer computed independently of the agent and verified against the source data, plus a scorer that grades the agent on how many it reproduces. On the current set it matched all 8 reference figures across 3 questions. A companion script recomputes the published demo numbers straight from the raw Kaggle data, so anyone can check them in one command. The eval is the authoritative correctness check; the runtime guards are fast smoke alarms." },
           { type: "callout", value: "The first demo failed repeatedly and needed manual fixes. Every subsequent demo ran clean on the first try. The system learns from its failures structurally: each validator makes the same mistake impossible twice." }
         ]
       }
