@@ -85,9 +85,9 @@ export const projects: Project[] = [
     githubUrl: "https://github.com/smurphy6492/compute-forecasting",
     hidden: false,
     metrics: [
-      { value: "7.9%", label: "Test MAPE", detail: "Hybrid model, 6-month holdout (synthetic data)" },
-      { value: "4.9%", label: "Enterprise GPU MAPE", detail: "Down from 14.1% (original model)" },
-      { value: "83.8%", label: "P10-P90 Coverage", detail: "Target: 80% (conformal calibration)" },
+      { value: "7.7%", label: "Test MAPE", detail: "Hybrid model, 6-month holdout (synthetic data)" },
+      { value: "5.2%", label: "Enterprise GPU MAPE", detail: "Down from 14.1% (original model)" },
+      { value: "83.3%", label: "P10-P90 Coverage", detail: "Target: 80% (conformal calibration)" },
       { value: "16", label: "Series Forecasted", detail: "4 compute types x 4 segments" }
     ],
     sections: [
@@ -114,9 +114,9 @@ export const projects: Project[] = [
             ]
           },
           { type: "text", value: "The residual target (actual / trend) is stationary and bounded, so LightGBM never needs to predict outside its training range. The trend handles extrapolation; LightGBM handles pattern recognition." },
-          { type: "image", src: "/images/compute-forecasting/hybrid_improvement.png", alt: "Original vs hybrid model comparison for Enterprise GPU Training", caption: "Enterprise GPU Training: the original model plateaus at training-range max (14.1% MAPE). The hybrid model tracks the growth trajectory (4.9% MAPE)." },
+          { type: "image", src: "/images/compute-forecasting/hybrid_improvement.png", alt: "Original vs hybrid model comparison for Enterprise GPU Training", caption: "Enterprise GPU Training: the original model plateaus at training-range max (14.1% MAPE). The hybrid model tracks the growth trajectory (5.2% MAPE)." },
           { type: "bullets", items: [
-            "Per-series exponential trend via log-linear regression, capped at 5%/month",
+            "Per-series exponential trend via log-linear regression, capped at 6%/month (tuned via validation sweep)",
             "LightGBM trained on log(residual_ratio) with quantile regression for P10/P50/P90",
             "Per-type proportional conformal calibration for honest prediction intervals",
             "Walk-forward backtesting (3 folds) confirms consistent improvement"
@@ -133,7 +133,7 @@ export const projects: Project[] = [
               ["Baselines", "Seasonal naive, growth-adjusted", "10.5%", "~15%"],
               ["First model", "LightGBM on log(compute_hours)", "8.57%", "14.1%"],
               ["Diagnosis", "Coverage analysis + residual inspection", "—", "21% of actuals above P90"],
-              ["Hybrid model", "Trend decomposition + LightGBM on residuals", "7.94%", "4.9%"]
+              ["Hybrid model", "Trend decomposition + LightGBM on residuals", "7.65%", "5.2%"]
             ]
           },
           { type: "text", value: "The first LightGBM model beat every baseline convincingly. But the per-series MAPE table revealed a problem: Enterprise GPU Training at 14.1% while CPU series sat at 4-7%. Coverage analysis showed 21% of GPU Training actuals exceeded P90. The model was systematically under-predicting." },
@@ -146,12 +146,12 @@ export const projects: Project[] = [
         content: [
           { type: "bullets", items: [
             "Synthetic data: the model is validated on data I designed, not production telemetry. Real compute usage has messier patterns, missing data, and distribution drift that would likely degrade performance",
-            "Research/Academic GPU series slightly worse (+4pp MAPE) because the exponential trend is noisier for low-growth series",
+            "Research/Academic GPU series slightly worse (+5pp MAPE) because the exponential trend is noisier for low-growth series",
             "Unpredictable events (outages, conference spikes) can't be forecast. The model reacts via lags but can't anticipate",
             "Trend extrapolation assumes growth rates continue. Actual acceleration or deceleration would shift timelines",
             "Hyperparameters are sensible defaults, not optimized. Tuning would likely improve results but wasn't the focus"
           ]},
-          { type: "text", value: "On the positive side: recursive forecast validation shows 7.93% MAPE over 6 months vs 7.94% single-step. The hybrid decomposition prevents the error compounding that plagues most recursive forecasts." },
+          { type: "text", value: "On the positive side: recursive forecast validation shows 7.65% MAPE over 6 months vs 7.63% single-step. The hybrid decomposition prevents the error compounding that plagues most recursive forecasts." },
           { type: "callout", value: "Stating limitations honestly is what separates a methodology demonstration from production claims." }
         ]
       },
