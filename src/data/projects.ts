@@ -328,7 +328,6 @@ export const projects: Project[] = [
       "Logistic Regression + Random Forest → churn classification"
     ],
     stack: ["Python", "scikit-learn", "Pandas", "Plotly", "scipy"],
-    githubUrl: "https://github.com/smurphy6492/customer-segmentation",
     liveUrl: "/reports/customer-segmentation.html",
     metrics: [
       { value: "5,878", label: "Customers Segmented" },
