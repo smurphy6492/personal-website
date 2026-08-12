@@ -122,20 +122,24 @@ export function ProjectDetail() {
             </section>
           ))}
 
-          {/* GitHub CTA */}
-          <section className="text-center py-12 border-t border-border mt-12">
-            <h3 className="text-2xl font-display font-bold text-foreground mb-6">Explore the Code</h3>
-            <a
-              href={project.githubUrl ?? "https://github.com/smurphy6492"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-semibold bg-foreground text-background hover:scale-105 transition-transform duration-300 shadow-xl shadow-white/5"
-            >
-              <Github className="w-5 h-5" />
-              View on GitHub
-              <ExternalLink className="w-4 h-4 ml-1 opacity-70" />
-            </a>
-          </section>
+          {/* GitHub CTA — only when the project actually has a repo. Never fall back
+              to the profile: a "View on GitHub" button that lands somewhere other than
+              the code reads as a broken promise. */}
+          {project.githubUrl && (
+            <section className="text-center py-12 border-t border-border mt-12">
+              <h3 className="text-2xl font-display font-bold text-foreground mb-6">Explore the Code</h3>
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-semibold bg-foreground text-background hover:scale-105 transition-transform duration-300 shadow-xl shadow-white/5"
+              >
+                <Github className="w-5 h-5" />
+                View on GitHub
+                <ExternalLink className="w-4 h-4 ml-1 opacity-70" />
+              </a>
+            </section>
+          )}
 
         </div>
       </main>
