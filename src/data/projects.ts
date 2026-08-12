@@ -328,6 +328,7 @@ export const projects: Project[] = [
       "Logistic Regression + Random Forest → churn classification"
     ],
     stack: ["Python", "scikit-learn", "Pandas", "Plotly", "scipy"],
+    githubUrl: "https://github.com/smurphy6492/customer-segmentation",
     liveUrl: "/reports/customer-segmentation.html",
     metrics: [
       { value: "5,878", label: "Customers Segmented" },
@@ -550,7 +551,7 @@ export const projects: Project[] = [
   {
     id: "claude-workspace-config",
     name: "Claude Code Workspace Config",
-    tagline: "The AI operating system behind every project on this site. Seven specialized agents, 15 reusable skills, and 6 coding standards — refined across 5 shipped projects.",
+    tagline: "The AI operating system behind every project on this site. Eight specialized agents, 19 reusable skills, and 6 coding standards — refined across 5 shipped projects.",
     category: "AI Tooling",
     problem: [
       { type: "text", value: "I designed this workspace configuration iteratively across 5 shipped projects, adding agents, skills, and rules as real gaps emerged. Claude Code is powerful out of the box, but using it effectively for complex projects requires structure. Without it, every session starts from scratch: no consistent coding standards, no specialized agents, no reusable workflows." },
@@ -567,10 +568,10 @@ export const projects: Project[] = [
     stack: ["Claude Code", "Markdown", "Python", "TypeScript", "SQL"],
     githubUrl: "https://github.com/smurphy6492/claude-workspace-config",
     metrics: [
-      { value: "7", label: "Specialized Agents", detail: "Planner, plan-judge, web-dev, content, data, 2 reviewers" },
-      { value: "15", label: "Skills", detail: "Slash commands for repeatable workflows" },
+      { value: "8", label: "Specialized Agents", detail: "Planner, plan-judge, web-dev, content, data, 3 reviewers" },
+      { value: "19", label: "Skills", detail: "Slash commands for repeatable workflows" },
       { value: "6", label: "Rules", detail: "Always-on coding and writing standards" },
-      { value: "5", label: "Projects Built", detail: "Every project on this site used this config" }
+      { value: "5", label: "Projects Built", detail: "Every other project on this site was built with it" }
     ],
     sections: [
       {
@@ -597,7 +598,8 @@ export const projects: Project[] = [
               ["data-pipeline", "ETL, API integrations, data pipelines", "Handles fetch/transform/store with proper error handling and scheduling."],
               ["python-reviewer", "Python code review", "Checks types, patterns, security, testing. Structured severity output."],
               ["code-reviewer", "General code review (any language)", "Same rigor as the Python reviewer, adapted per file type."],
-              ["plan-judge", "Independent plan review", "Scores a draft plan against a fixed rubric and finds the methodology gaps the author can't see, because it never wrote the plan."]
+              ["plan-judge", "Independent plan review", "Scores a draft plan against a fixed rubric and finds the methodology gaps the author can't see, because it never wrote the plan."],
+              ["staff-ds-reviewer", "Hiring-manager review of a finished project", "Reads code, methodology, and narrative together, and names the interview question each weakness would expose."]
             ]
           },
           { type: "callout", value: "Agents can be chained: planner designs the approach, web-developer builds it, code-reviewer validates it, content-writer documents it. Each step uses the right specialist." }
@@ -606,7 +608,7 @@ export const projects: Project[] = [
       {
         heading: "The Skills",
         content: [
-          { type: "text", value: "Skills are guided workflows invoked with /skill-name. They codify processes that would otherwise require remembering a checklist every time. These are six of the fifteen, the ones I reach for most." },
+          { type: "text", value: "Skills are guided workflows invoked with /skill-name. They codify processes that would otherwise require remembering a checklist every time. These are six of the nineteen, the ones I reach for most." },
           { type: "table", headers: ["Skill", "What It Does", "Key Design Choice"],
             rows: [
               ["/systematic-debugging", "4-phase: Reproduce, Isolate, Root-Cause, Fix", "No jumping to fixes before understanding the bug"],
