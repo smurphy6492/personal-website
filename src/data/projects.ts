@@ -551,7 +551,7 @@ export const projects: Project[] = [
   {
     id: "claude-workspace-config",
     name: "Claude Code Workspace Config",
-    tagline: "The AI operating system behind every project on this site. Eight specialized agents, 19 reusable skills, and 6 coding standards — refined across 5 shipped projects.",
+    tagline: "The AI operating system behind every project on this site. Eight specialized agents wired into plan, build, review, and enforce loops — refined across 5 shipped projects.",
     category: "AI Tooling",
     problem: [
       { type: "text", value: "I designed this workspace configuration iteratively across 5 shipped projects, adding agents, skills, and rules as real gaps emerged. Claude Code is powerful out of the box, but using it effectively for complex projects requires structure. Without it, every session starts from scratch: no consistent coding standards, no specialized agents, no reusable workflows." },
@@ -578,6 +578,7 @@ export const projects: Project[] = [
         heading: "How It Works",
         content: [
           { type: "text", value: "CLAUDE.md is the control plane. It tells Claude Code which agents exist, which skills are available, which rules are active, and how to route work. Think of it as the operating manual for a software team — except the team is a set of AI agents." },
+          { type: "text", value: "The design work is less about any single agent and more about the graph between them: which agent hands off to which, where an independent judge reads the work cold, and which checks leave the model entirely for deterministic CI gates. Deciding what the model owns versus what the harness enforces is the core engineering call." },
           { type: "workflow" },
           { type: "bullets", items: [
             "Skills are invoked explicitly (/verification-loop, /systematic-debugging). They define phases, gates, and output formats, turning repeatable processes into one-command operations.",
@@ -663,8 +664,9 @@ export const projects: Project[] = [
       {
         heading: "Design Philosophy",
         content: [
-          { type: "text", value: "Five principles shaped this setup:" },
+          { type: "text", value: "Six principles shaped this setup:" },
           { type: "bullets", items: [
+            "Decide what the model owns and what the harness enforces. Judgment calls like planning and review go to agents. Pass/fail checks like lint, types, and tests go to gates that block the merge without anyone invoking them.",
             "Plan before building. The planner agent exists because thinking is cheaper than refactoring.",
             "Separate concerns. The web-developer doesn't review Python. The python-reviewer doesn't write copy. Specialization keeps instructions focused.",
             "Verify before shipping. /verification-loop runs before every significant commit, so quality doesn't depend on remembering a checklist.",
