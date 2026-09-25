@@ -2,7 +2,6 @@ import { Link } from "wouter";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ProjectCard } from "@/components/ProjectCard";
-import { GitHubStats } from "@/components/GitHubStats";
 import { AgentDemo } from "@/components/AgentDemo";
 import { projects, personalInfo } from "@/data/projects";
 import { ArrowDown, Mail, Github, Linkedin, TerminalSquare, GitBranch, Bot, Cpu } from "lucide-react";
@@ -173,8 +172,6 @@ export function Home() {
             </div>
           </div>
         </section>
-
-        {/* <GitHubStats /> */}
 
         {/* CONTACT SECTION */}
         <section id="contact" className="w-full max-w-4xl mx-auto px-6 py-24 text-center z-10 relative">
